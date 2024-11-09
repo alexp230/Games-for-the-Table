@@ -1,4 +1,0 @@
-repository "Games-for-the-Table@Gizza_Impact@cloud"
-  path "/"
-    br "/main"
-    co "/main"
