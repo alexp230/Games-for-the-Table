@@ -29,7 +29,10 @@ public class ChessBoard : NetworkBehaviour
     // public NetworkVariable<Checker[]> Board_Net = new NetworkVariable<Checker[]>(new Checker[64], NVRP.Everyone, NVWP.Server);
 
     public NetworkVariable<bool> IsP1Turn_Net = new NetworkVariable<bool>(true, NVRP.Everyone, NVWP.Server);
+    public NetworkVariable<FixedString64Bytes> Board_Net = new NetworkVariable<FixedString64Bytes>("", NVRP.Everyone, NVWP.Server);
 
+
+    private float timer = 0f;
     // public override void OnNetworkSpawn()
     // {
     //     base.OnNetworkSpawn();
@@ -47,6 +50,15 @@ public class ChessBoard : NetworkBehaviour
         NetworkGameManager_S = GameObject.Find("NetworkGameManager").GetComponent<NetworkGameManager>();
 
         // StartGame();  
+    }
+
+    private void Update() {
+        timer += Time.deltaTime;
+        if (timer >= 2f)
+        {
+            print($"{NetworkManager.Singleton.LocalClientId}:{IsP1Turn_Net.Value} | {IsP1Turn}");
+            timer = 0;
+        }
     }
     
 
@@ -85,9 +97,8 @@ public class ChessBoard : NetworkBehaviour
 
     public void ChangeSides()
     {
-        IsP1Turn ^= true;
-        SetValidMovesForPieces();
-        CheckForGameOver();
+        SetP1Val_ServerRpc();
+        ChangeSides_ServerRPC();
     }
 
     private static void SetValidMovesForPieces()
@@ -275,8 +286,7 @@ public class ChessBoard : NetworkBehaviour
     [ClientRpc]
     public void UpdatePos_ClientRpc(ulong callerID, Vector3 currentPos, Vector3 newPos)
     {
-        print($"{OwnerClientId}");
-        if (OwnerClientId == callerID)
+        if (callerID == NetworkManager.Singleton.LocalClientId)
             return;
 
         GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
@@ -294,14 +304,54 @@ public class ChessBoard : NetworkBehaviour
     }
 
 
-
-
-    [ClientRpc]
-    private void SetP1Val_ClientRpc(bool p1Turn)
+    [ServerRpc(RequireOwnership = false)]
+    private void ChangeSides_ServerRPC()
     {
-        IsP1Turn = p1Turn;
-        print(IsP1Turn);
+        ChangeSides_ClientRPC();
     }
+    [ClientRpc]
+    private void ChangeSides_ClientRPC()
+    {
+        print("ChangeSides");
+        IsP1Turn ^= true;
+        SetValidMovesForPieces();
+        CheckForGameOver();
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetP1Val_ServerRpc()
+    {
+        IsP1Turn_Net.Value ^= true;
+    }
+
+
+
+    public void MakeThatMove(Vector3 currentPos, Vector3 newPos)
+    {
+        ulong senderID = NetworkManager.Singleton.LocalClientId;
+        MakeMove_ServerRPC(senderID, currentPos, newPos);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void MakeMove_ServerRPC(ulong senderID, Vector3 currentPos, Vector3 newPos)
+    {
+        print("ServerRPC");
+        NetworkGameManager_S.MakeMove(senderID, currentPos, newPos);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

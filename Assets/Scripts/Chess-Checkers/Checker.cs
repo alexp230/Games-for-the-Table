@@ -48,12 +48,17 @@ public class Checker : NetworkBehaviour
     }
 
 
-
-
-
     private bool CanMove()
     {
-        return this.ValidMoves.Count != 0;
+        bool p1Turn = ChessBoard_S.IsP1Turn_Net.Value;
+        ulong playerID = NetworkManager.Singleton.LocalClientId;
+
+        if ((!p1Turn && playerID == 0) || (p1Turn && playerID == 1))
+            return false;
+        if (this.ValidMoves.Count == 0)
+            return false;
+
+        return true;
     }
 
     private void OnMouseDown()
@@ -92,12 +97,11 @@ public class Checker : NetworkBehaviour
             {
                 // ChessBoard_S.ValidateGame();
 
-                print("ONMOUSEUP");
-                MakeMove_ServerRPC(this.PreviousPosition, validPos);
+                ChessBoard_S.MakeThatMove(this.PreviousPosition, validPos);
 
                 ChessBoard_S.UpdateBoard(this.PreviousPosition, validPos);
                 UpdatePosition(this, validPos);
-                ProcessTurn(this, validPos);                
+                DoSecondJumpOrChangeSides(this, validPos);                
 
                 this.PreviousPosition = validPos;
                 // UpdatePos_ClientRpc(this.PreviousPosition, validPos);
@@ -117,7 +121,7 @@ public class Checker : NetworkBehaviour
     {
         ChessBoard_S.SetGameState();
     }
-    private void ProcessTurn(Checker currentPiece, Vector3 validPos)
+    private void DoSecondJumpOrChangeSides(Checker currentPiece, Vector3 validPos)
     {
         List<int> newValidMoves = GetValidMoves(this, getOnlyJumps: true); // Check for second jump
         if (newValidMoves.Count > 0 && Math.Abs(currentPiece.PreviousPosition.x - validPos.x) == 2) // if piece has move and made a jump
