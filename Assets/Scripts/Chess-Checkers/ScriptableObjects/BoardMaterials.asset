@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea90765841c959948ac73ac7577f7123, type: 3}
+  m_Name: BoardMaterials
+  m_EditorClassIdentifier: 
+  Tile_LightColor: {fileID: 2100000, guid: 59356d9adcac0a94fb7617ac4a7e7ae2, type: 2}
+  Tile_DarkColor: {fileID: 2100000, guid: 801dd8acd72de914b85222dc1adcffcd, type: 2}
+  Piece_p1Color: {fileID: 2100000, guid: d667c8e8c511dc34fa246ca934ebab2e, type: 2}
+  Piece_p2Color: {fileID: 2100000, guid: e98d5ca560b99b5488069fa95b814b32, type: 2}
+  TitlePrefab: {fileID: 971518803616806932, guid: 2ffa0077cb98d894684254f5e07f26f4, type: 3}
+  CheckerPrefab: {fileID: 1220431944643570660, guid: 5c6e2af04b23e494eb3a2a7fc7490839, type: 3}
+  DukePrefab: {fileID: 1272187813879115648, guid: d8f5d557da4a9bf41beb14659e0242fb, type: 3}
