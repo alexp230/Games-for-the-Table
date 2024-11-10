@@ -11,7 +11,6 @@ using NV_String64B = Unity.Netcode.NetworkVariable<Unity.Collections.FixedString
 public class ChessBoard : NetworkBehaviour
 {
     [SerializeField] private BoardMaterials Prefabs;
-    private NetworkGameManager NetworkGameManager_S;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
     
@@ -35,9 +34,17 @@ public class ChessBoard : NetworkBehaviour
     {
         GenerateBoardTiles();
 
-        NetworkGameManager_S = GameObject.Find("NetworkGameManager").GetComponent<NetworkGameManager>();
-
         // StartGame();  
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        Board_Net.Value = "22222222222200000000111111111111";
+
+        Board_Net.OnValueChanged += (FixedString64Bytes previousVal, FixedString64Bytes newVal) => {
+            print("Old Value ::: "+ previousVal);
+            print("New Value ::: "+ newVal);
+        };
     }
 
     public void StartGame()
@@ -149,10 +156,10 @@ public class ChessBoard : NetworkBehaviour
         print(IsP1Turn ? "Player 2 WINS!" : "Player 1 WINS!");
     }
 
-    public void MakeThatMove(Vector3 currentPos, Vector3 newPos)
+    public void SendMoveToServer(Vector3 currentPos, Vector3 newPos)
     {
         ulong senderID = NetworkManager.Singleton.LocalClientId;
-        MakeMove_ServerRPC(senderID, currentPos, newPos);
+        SendMove_ServerRPC(senderID, currentPos, newPos);
     }
 
     public void UpdateBoard(Vector3 previousPos, Vector3 currentPos)
@@ -254,9 +261,9 @@ public class ChessBoard : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void MakeMove_ServerRPC(ulong senderID, Vector3 currentPos, Vector3 newPos)
+    public void SendMove_ServerRPC(ulong senderID, Vector3 currentPos, Vector3 newPos)
     {
-        NetworkGameManager_S.MakeMove(senderID, currentPos, newPos);
+        UpdatePos_ClientRpc(senderID, currentPos, newPos);
     }
 
 

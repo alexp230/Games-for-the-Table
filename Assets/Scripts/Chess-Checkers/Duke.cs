@@ -1,5 +1,1 @@
-public class Duke : Checker
-{
-
-    
-}
+public class Duke : Checker{}

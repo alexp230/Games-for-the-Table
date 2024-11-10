@@ -4,12 +4,11 @@ using Unity.Netcode;
 using UnityEngine;
 
 
-public class Checker : NetworkBehaviour
+public class Checker : MonoBehaviour
 {
     [SerializeField] protected BoardMaterials CheckerMaterials_SO;
     [SerializeField] protected MeshRenderer _MeshRenderer;
     private static ChessBoard ChessBoard_S;
-    private static NetworkGameManager NetworkGameManager_S;
     public const float Y = 0.15f;
 
     private static Camera MainCamera;
@@ -38,7 +37,6 @@ public class Checker : NetworkBehaviour
         MainCamera = Camera.main;
         CameraDistanceZ = MainCamera.WorldToScreenPoint(this.transform.position).z;
         ChessBoard_S = GameObject.Find("ChessBoard").GetComponent<ChessBoard>();
-        NetworkGameManager_S = GameObject.Find("NetworkGameManager").GetComponent<NetworkGameManager>();
     }
 
 
@@ -89,15 +87,8 @@ public class Checker : NetworkBehaviour
             Vector3 validPos = ChessBoard.BoardPosToPos(validMove);
             if (currentPos == validPos)
             {
-                // ChessBoard_S.ValidateGame();
-
-                ChessBoard_S.MakeThatMove(this.PreviousPosition, validPos);
-
-                ChessBoard_S.UpdateBoard(this.PreviousPosition, validPos);
-                UpdatePosition(this, validPos);
-                DoSecondJumpOrChangeSides(this, validPos);                
-
-                this.PreviousPosition = validPos;
+                ChessBoard_S.SendMoveToServer(this.PreviousPosition, validPos);
+                ProcessTurnLocally(this, validPos);
                 break;
             }
         }
@@ -105,7 +96,14 @@ public class Checker : NetworkBehaviour
         Tile.DeHighLightTiles();
     }
 
+    private void ProcessTurnLocally(Checker currentPiece, Vector3 newPos)
+    {
+        ChessBoard_S.UpdateBoard(currentPiece.PreviousPosition, newPos);
+        UpdatePosition(currentPiece, newPos);
+        DoSecondJumpOrChangeSides(currentPiece, newPos);
 
+        currentPiece.PreviousPosition = newPos;
+    }
     private void UpdatePosition(Checker currentPiece, Vector3 validPos)
     {
         currentPiece.transform.position = validPos;
@@ -122,8 +120,6 @@ public class Checker : NetworkBehaviour
             ChessBoard_S.ChangeSides();
     }
 
-
-    
 
     protected List<int> GetValidMoves(Checker currentPiece, bool getOnlyJumps)
     {
