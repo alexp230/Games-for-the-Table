@@ -1,11 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using QFSW.QC;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+
+using NV_Bool = Unity.Netcode.NetworkVariable<bool>;
+using NV_String64B = Unity.Netcode.NetworkVariable<Unity.Collections.FixedString64Bytes>;
 
 public class ChessBoard : NetworkBehaviour
 {
@@ -23,25 +24,12 @@ public class ChessBoard : NetworkBehaviour
 
     private int P1_PieceCount = 12;
     private int P2_PieceCount = 12;
-    public static bool IsP1Turn { get; private set; }
     
     public static Checker[] Board = new Checker[64];
-    // public NetworkVariable<Checker[]> Board_Net = new NetworkVariable<Checker[]>(new Checker[64], NVRP.Everyone, NVWP.Server);
+    public static bool IsP1Turn = true;
 
-    public NetworkVariable<bool> IsP1Turn_Net = new NetworkVariable<bool>(true, NVRP.Everyone, NVWP.Server);
-    public NetworkVariable<FixedString64Bytes> Board_Net = new NetworkVariable<FixedString64Bytes>("", NVRP.Everyone, NVWP.Server);
-
-
-    private float timer = 0f;
-    // public override void OnNetworkSpawn()
-    // {
-    //     base.OnNetworkSpawn();
-
-    //     IsP1Turn_Net.OnValueChanged += (bool previousVal, bool newVal) => {
-    //         print(OwnerClientId + " | " + IsP1Turn_Net.Value + " " + newVal);
-    //         IsP1Turn = IsP1Turn_Net.Value;
-    //     };
-    // }
+    public static NV_Bool IsP1Turn_Net = new NV_Bool(true, NVRP.Everyone, NVWP.Server);
+    public static NV_String64B Board_Net = new NV_String64B("", NVRP.Everyone, NVWP.Server);
 
     private void Start()
     {
@@ -52,22 +40,9 @@ public class ChessBoard : NetworkBehaviour
         // StartGame();  
     }
 
-    private void Update() {
-        timer += Time.deltaTime;
-        if (timer >= 2f)
-        {
-            print($"{NetworkManager.Singleton.LocalClientId}:{IsP1Turn_Net.Value} | {IsP1Turn}");
-            timer = 0;
-        }
-    }
-    
-
     public void StartGame()
     {
         GeneratePieces();
-
-        IsP1Turn = true;
-
         SetValidMovesForPieces();
     }
 
@@ -86,13 +61,16 @@ public class ChessBoard : NetworkBehaviour
         PlacePieces(forP1: true, 0, 3);
 
         void PlacePieces(bool forP1, int zMin, int zMax){
-            IsP1Turn = forP1;
             for (int z=zMin; z<zMax; ++z)
+            {
                 for (int x=z%2; x<8; x+=2)
-                    Instantiate(Prefabs.CheckerPrefab, new Vector3(x,y,z), Quaternion.identity);
+                {
+                    Checker piece = Instantiate(Prefabs.CheckerPrefab, new Vector3(x,y,z), Quaternion.identity);
+                    piece.InstantiatePieceComponents(forP1: forP1);
+                }
+            }
         }
-        
-        
+ 
     }
 
     public void ChangeSides()
@@ -116,14 +94,13 @@ public class ChessBoard : NetworkBehaviour
             {
                 piece.SetValidMoves();
                 CheckForJumpingMovesAndAdd(piece);
-                
                 allPieces.Add(piece);
             }
         }
 
         if (allPiecesJump.Count > 0)
             ExcludeNonJumpMoves();
-
+        return;
 
         void CheckForJumpingMovesAndAdd(Checker piece)
         {
@@ -169,9 +146,13 @@ public class ChessBoard : NetworkBehaviour
             if (piece.ValidMoves.Count > 0)
                 return;
         }
-            
-
         print(IsP1Turn ? "Player 2 WINS!" : "Player 1 WINS!");
+    }
+
+    public void MakeThatMove(Vector3 currentPos, Vector3 newPos)
+    {
+        ulong senderID = NetworkManager.Singleton.LocalClientId;
+        MakeMove_ServerRPC(senderID, currentPos, newPos);
     }
 
     public void UpdateBoard(Vector3 previousPos, Vector3 currentPos)
@@ -193,8 +174,10 @@ public class ChessBoard : NetworkBehaviour
         void PromotePiece(){
             Destroy(Board[oldPos].gameObject);
             Vector3 newTransform = BoardPosToPos(newPos);
-            Board[newPos] = Instantiate(Prefabs.DukePrefab, newTransform, Quaternion.identity);
 
+            Checker newPiece = Instantiate(Prefabs.DukePrefab, newTransform, Quaternion.identity);
+            newPiece.InstantiatePieceComponents(IsP1Turn);
+            Board[newPos] = newPiece;
         }
         void RemoveCapturedPiece(int index){
             Board[index].transform.position = DEAD_PIECE;
@@ -222,32 +205,6 @@ public class ChessBoard : NetworkBehaviour
     }
 
 
-
-    [Command]
-    public void ValidateGame()
-    {
-        FixedString64Bytes notation = GetGameState();
-        ValidateGame_ServerRpc(notation);
-    }
-    [ServerRpc]
-    private void ValidateGame_ServerRpc(FixedString64Bytes notation)
-    {
-        bool boardValidity = NetworkGameManager_S.ValidateBoard(notation);
-
-        if (!boardValidity)
-            print("CHEATER!");
-    }
-
-    public void SetGameState()
-    {
-        FixedString64Bytes gameState = GetGameState();
-        SetGameState_ServerRpc(gameState);
-    }
-    [ServerRpc]
-    private void SetGameState_ServerRpc(FixedString64Bytes notation)
-    {
-        NetworkGameManager_S.SetBoardState(notation);
-    }
 
     private FixedString64Bytes GetGameState()
     {
@@ -283,6 +240,34 @@ public class ChessBoard : NetworkBehaviour
     }
 
 
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ChangeSides_ServerRPC()
+    {
+        ChangeSides_ClientRPC();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetP1Val_ServerRpc()
+    {
+        IsP1Turn_Net.Value ^= true;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void MakeMove_ServerRPC(ulong senderID, Vector3 currentPos, Vector3 newPos)
+    {
+        NetworkGameManager_S.MakeMove(senderID, currentPos, newPos);
+    }
+
+
+    [ClientRpc]
+    private void ChangeSides_ClientRPC()
+    {
+        IsP1Turn ^= true;
+        SetValidMovesForPieces();
+        CheckForGameOver();
+    }
+
     [ClientRpc]
     public void UpdatePos_ClientRpc(ulong callerID, Vector3 currentPos, Vector3 newPos)
     {
@@ -302,48 +287,6 @@ public class ChessBoard : NetworkBehaviour
             }
         }
     }
-
-
-    [ServerRpc(RequireOwnership = false)]
-    private void ChangeSides_ServerRPC()
-    {
-        ChangeSides_ClientRPC();
-    }
-    [ClientRpc]
-    private void ChangeSides_ClientRPC()
-    {
-        print("ChangeSides");
-        IsP1Turn ^= true;
-        SetValidMovesForPieces();
-        CheckForGameOver();
-    }
-
-
-    [ServerRpc(RequireOwnership = false)]
-    private void SetP1Val_ServerRpc()
-    {
-        IsP1Turn_Net.Value ^= true;
-    }
-
-
-
-    public void MakeThatMove(Vector3 currentPos, Vector3 newPos)
-    {
-        ulong senderID = NetworkManager.Singleton.LocalClientId;
-        MakeMove_ServerRPC(senderID, currentPos, newPos);
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    public void MakeMove_ServerRPC(ulong senderID, Vector3 currentPos, Vector3 newPos)
-    {
-        print("ServerRPC");
-        NetworkGameManager_S.MakeMove(senderID, currentPos, newPos);
-    }
-
-
-
-
-
 
 
 
@@ -397,7 +340,7 @@ public class ChessBoard : NetworkBehaviour
     [Command]
     public void ChangeP1Turn()
     {
-        IsP1Turn_Net.Value ^= true;
+        IsP1Turn ^= true;
     }
 
     public static class NVRP
@@ -410,4 +353,5 @@ public class ChessBoard : NetworkBehaviour
         public static NetworkVariableWritePermission Server => NetworkVariableWritePermission.Server;
         public static NetworkVariableWritePermission Owner => NetworkVariableWritePermission.Owner;
     }
+    
 }

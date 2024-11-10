@@ -21,22 +21,16 @@ public class Checker : NetworkBehaviour
 
     private void Awake()
     {
-        Vector3 pos = this.transform.position;
-        bool isP1 = ChessBoard.IsP1Turn;
+        this.PreviousPosition = this.transform.position;
 
-        this._MeshRenderer.material = isP1 ? CheckerMaterials_SO.Piece_p1Color : CheckerMaterials_SO.Piece_p2Color;
-        this.PreviousPosition = pos;
-        this.TeamID = (this is Duke) ? (isP1 ? ChessBoard.P1_DUKE : ChessBoard.P2_DUKE) : (isP1 ? ChessBoard.P1_PIECE : ChessBoard.P2_PIECE);
-
-        int index = ChessBoard.PosToBoardPos(pos);
+        int index = ChessBoard.PosToBoardPos(this.PreviousPosition);
         ChessBoard.Board[index] = this;
     }
 
-    public override void OnNetworkSpawn()
+    public void InstantiatePieceComponents(bool forP1)
     {
-        this._MeshRenderer.material = ChessBoard.IsP1Turn ? CheckerMaterials_SO.Piece_p1Color : CheckerMaterials_SO.Piece_p2Color;
-
-        base.OnNetworkSpawn();
+        this._MeshRenderer.material = forP1 ? CheckerMaterials_SO.Piece_p1Color : CheckerMaterials_SO.Piece_p2Color;
+        this.TeamID = (this is Duke) ? (forP1 ? ChessBoard.P1_DUKE : ChessBoard.P2_DUKE) : (forP1 ? ChessBoard.P1_PIECE : ChessBoard.P2_PIECE);
     }
 
     private void Start()
@@ -50,7 +44,7 @@ public class Checker : NetworkBehaviour
 
     private bool CanMove()
     {
-        bool p1Turn = ChessBoard_S.IsP1Turn_Net.Value;
+        bool p1Turn = ChessBoard.IsP1Turn_Net.Value;
         ulong playerID = NetworkManager.Singleton.LocalClientId;
 
         if ((!p1Turn && playerID == 0) || (p1Turn && playerID == 1))
@@ -104,7 +98,6 @@ public class Checker : NetworkBehaviour
                 DoSecondJumpOrChangeSides(this, validPos);                
 
                 this.PreviousPosition = validPos;
-                // UpdatePos_ClientRpc(this.PreviousPosition, validPos);
                 break;
             }
         }
@@ -116,10 +109,6 @@ public class Checker : NetworkBehaviour
     private void UpdatePosition(Checker currentPiece, Vector3 validPos)
     {
         currentPiece.transform.position = validPos;
-    }
-    private void UpdateGameState()
-    {
-        ChessBoard_S.SetGameState();
     }
     private void DoSecondJumpOrChangeSides(Checker currentPiece, Vector3 validPos)
     {
@@ -134,18 +123,7 @@ public class Checker : NetworkBehaviour
     }
 
 
-    [ServerRpc(RequireOwnership = false)]
-    public void MakeMove_ServerRPC(Vector3 currentPos, Vector3 newPos)
-    {
-        print("ServerRPC");
-        NetworkGameManager_S.MakeMove(OwnerClientId, currentPos, newPos);
-    }
-
-
-
-
-
-
+    
 
     protected List<int> GetValidMoves(Checker currentPiece, bool getOnlyJumps)
     {
