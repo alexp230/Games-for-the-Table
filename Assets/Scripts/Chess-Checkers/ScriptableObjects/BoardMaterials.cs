@@ -11,9 +11,19 @@ public class BoardMaterials : ScriptableObject
     public Material Piece_p2Color;
 
     public Tile TitlePrefab;
+
     public Checker CheckerPrefab;
     public Duke DukePrefab;
+
+    public Pawn PawnPrefab;
+    public Knight KnightPrefab;
     public Bishop BishopPrefab;
+    public Rook RookPrefab;
+    public Queen QueenPrefab;
+    public King KingPrefab;
+
+    public string ChessSetup = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+    public string CheckersSetup = "1c1c1c1c/c1c1c1c1/1c1c1c1c/8/8/C1C1C1C1/1C1C1C1C/C1C1C1C1";
 
     public char P1_PIECE = 'C';
     public char P2_PIECE = 'c';
