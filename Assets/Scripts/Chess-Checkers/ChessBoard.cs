@@ -27,7 +27,6 @@ public class ChessBoard : NetworkBehaviour
     private void Start()
     {
         GenerateBoardTiles();
-
         // StartGame();  
     }
 
@@ -43,9 +42,8 @@ public class ChessBoard : NetworkBehaviour
 
     public void StartGame()
     {
-        GeneratePieces();
-        Bishop p = Instantiate(Board_SO.BishopPrefab, new Vector3(3,0.15f,3), Quaternion.identity);
-        p.InstantiatePieceComponents(true);
+        // GeneratePieces(Board_SO.ChessSetup);
+        GeneratePieces(Board_SO.CheckersSetup);
 
         SetValidMovesForPieces();
     }
@@ -59,23 +57,36 @@ public class ChessBoard : NetworkBehaviour
                 Instantiate(Board_SO.TitlePrefab, new Vector3(x,0,z), Quaternion.identity);
     }
 
-    private void GeneratePieces()
+    private void GeneratePieces(string layout)
     {
         float y = GenericPiece.Y;
-        PlacePieces(forP1: false, 5, 8);
-        PlacePieces(forP1: true, 0, 3);
 
-        void PlacePieces(bool forP1, int zMin, int zMax){
-            for (int z=zMin; z<zMax; ++z)
+        int x = 0;
+        int z = 7;
+        foreach (char c in layout)
+        {
+            GenericPiece piece = null;
+            switch (c)
             {
-                for (int x=z%2; x<8; x+=2)
-                {
-                    Checker piece = Instantiate(Board_SO.CheckerPrefab, new Vector3(x,y,z), Quaternion.identity);
-                    piece.InstantiatePieceComponents(forP1: forP1);
-                }
+                case 'c': case 'C': piece = Instantiate(Board_SO.CheckerPrefab, new Vector3(x,y,z), Quaternion.identity); break;
+                case 'd': case 'D': piece = Instantiate(Board_SO.DukePrefab, new Vector3(x,y,z), Quaternion.identity); break;
+                case 'p': case 'P': piece = Instantiate(Board_SO.PawnPrefab, new Vector3(x,y,z), Quaternion.identity); break;
+                case 'q': case 'Q': piece = Instantiate(Board_SO.QueenPrefab, new Vector3(x,y,z), Quaternion.identity); break;
+                case 'r': case 'R': piece = Instantiate(Board_SO.RookPrefab, new Vector3(x,y,z), Quaternion.identity); break;
+                case 'n': case 'N': piece = Instantiate(Board_SO.KnightPrefab, new Vector3(x,y,z), Quaternion.identity); break;
+                case 'b': case 'B': piece = Instantiate(Board_SO.BishopPrefab, new Vector3(x,y,z), Quaternion.identity); break;
+                case 'k': case 'K': piece = Instantiate(Board_SO.KingPrefab, new Vector3(x,y,z), Quaternion.identity); break;
+                
+                case '/': --z; x=-1; break;
+                default: x += c-'0'-1; break; // Takes number an increment by whitespace in-between
             }
+            
+            piece?.InstantiatePieceComponents(forP1: GenericPiece.IsP1Piece(c));
+
+            if (++x >= 8)
+                x = 0;
         }
- 
+
     }
 
     public void ChangeSides()
