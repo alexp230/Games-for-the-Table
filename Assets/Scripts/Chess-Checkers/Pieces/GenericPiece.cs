@@ -15,7 +15,7 @@ public abstract class GenericPiece : MonoBehaviour
     private static float CameraDistanceZ;
 
     [SerializeField] public Vector3 PreviousPosition;
-    [SerializeField] public char TeamID { get; protected set; }
+    [SerializeField] public char TeamID;
     [SerializeField] public List<int> ValidMoves = new List<int>();
 
     private void Awake()
@@ -26,8 +26,22 @@ public abstract class GenericPiece : MonoBehaviour
         ChessBoard.Board[index] = this;
     }
 
-    // Set MeshRenderer and TeamID
-    public abstract void InstantiatePieceComponents(bool forP1);
+    public void InstantiatePieceComponents(bool forP1)
+    {
+        switch(this)
+        {
+            case Duke: this.TeamID = forP1 ? Board_SO.P1_DUKE : Board_SO.P2_DUKE; break;
+            case Checker: this.TeamID = forP1 ? Board_SO.P1_PIECE : Board_SO.P2_PIECE; break;
+            case Pawn: this.TeamID = forP1 ? Board_SO.P1_PAWN : Board_SO.P2_PAWN; break;
+            case Knight: this.TeamID = forP1 ? Board_SO.P1_KNIGHT : Board_SO.P2_KNIGHT; break;
+            case Bishop: this.TeamID = forP1 ? Board_SO.P1_BISHOP : Board_SO.P2_BISHOP; break;
+            case Rook: this.TeamID = forP1 ? Board_SO.P1_ROOK : Board_SO.P2_ROOK; break;
+            case Queen: this.TeamID = forP1 ? Board_SO.P1_QUEEN : Board_SO.P2_QUEEN; break;
+            case King: this.TeamID = forP1 ? Board_SO.P1_KING : Board_SO.P2_KING; break;
+        }
+
+        this._MeshRenderer.material = forP1 ? Board_SO.Piece_p1Color : Board_SO.Piece_p2Color;
+    }
 
     private void Start()
     {
@@ -147,31 +161,7 @@ public abstract class GenericPiece : MonoBehaviour
 
     protected bool OutOfBounds(int currentPos){return currentPos < 0 || currentPos > 63;}      
 
-    protected bool Overflown(int currentPos, int offset)
-    {
-        // 0  1  2  3  4  5  6  7
-        // 8  9  10 11 12 13 14 15
-        // 16 17 18 19 20 21 22 23
-        // 24 25 26 27 28 29 30 31
-        // 32 33 34 35 36 37 38 39
-        // 40 41 42 43 44 45 46 47
-        // 48 49 50 51 52 53 54 55
-        // 56 57 58 59 60 61 62 63
-
-        // i.e Given the tile 7, when trying to access its right tile, it will get 16 which is not a valid tile for
-        // the piece on 7 to go to
-
-        int[] rightOverflow = new int[8]{ 0,8,16,24,32,40,48,56 };
-        int[] leftOverflow = new int[8]{ 7,15,23,31,39,47,55,63 };
-
-        foreach (int val in rightOverflow)
-            if (val == currentPos && (offset == -7 || offset == 9))
-                return true;
-        foreach (int val in leftOverflow)
-            if (val == currentPos && (offset == -9 || offset == 7))
-                return true;
-        return false;
-    }
+    protected abstract bool Overflown(int currentPos, int offset);
 
     public static bool IsP1Piece(GenericPiece piece)
     {
@@ -180,6 +170,14 @@ public abstract class GenericPiece : MonoBehaviour
     public static bool IsP2Piece(GenericPiece piece)
     {
         return char.IsLower(piece.TeamID);
+    }
+    public static bool IsP1Piece(char teamID)
+    {
+        return char.IsUpper(teamID);
+    }
+    public static bool IsP2Piece(char teamID)
+    {
+        return char.IsLower(teamID);
     }
     public static bool ArePiecesOnSameTeam(GenericPiece piece1, GenericPiece piece2)
     {
