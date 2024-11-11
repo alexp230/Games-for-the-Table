@@ -21,9 +21,14 @@ public class Tile : MonoBehaviour
 
     public static void HighlightTiles(List<int> positions)
     {
+        GenericPiece[] board = ChessBoard.Board;
         foreach (int pos in positions)
         {
-            TilePositions[pos].HighLight.SetActive(true);
+            GameObject highlight = TilePositions[pos].HighLight;
+            
+            highlight.transform.localScale = board[pos] ? new Vector3(1, 0.1f, 1) : new Vector3(0.25f, 0.1f, 0.25f);
+
+            highlight.SetActive(true);
             HighLightedPositions.Add(pos);
         }
     }

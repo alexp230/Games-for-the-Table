@@ -10,21 +10,15 @@ using NV_String64B = Unity.Netcode.NetworkVariable<Unity.Collections.FixedString
 
 public class ChessBoard : NetworkBehaviour
 {
-    [SerializeField] private BoardMaterials Prefabs;
+    [SerializeField] private BoardMaterials Board_SO;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
     
-    public const int P1 = 1;
-    public const int P2 = 0;
-    public const int P1_PIECE = 1;
-    public const int P2_PIECE = 2;
-    public const int P1_DUKE = 3;
-    public const int P2_DUKE = 4;
-
     private int P1_PieceCount = 12;
     private int P2_PieceCount = 12;
     
-    public static Checker[] Board = new Checker[64];
+    public static bool IsLocalGame = false;
+    public static GenericPiece[] Board = new GenericPiece[64];
     public static bool IsP1Turn = true;
 
     public static NV_Bool IsP1Turn_Net = new NV_Bool(true, NVRP.Everyone, NVWP.Server);
@@ -39,7 +33,7 @@ public class ChessBoard : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        Board_Net.Value = "22222222222200000000111111111111";
+        Board_Net.Value = "cccccccccccc00000000CCCCCCCCCCCC";
 
         Board_Net.OnValueChanged += (FixedString64Bytes previousVal, FixedString64Bytes newVal) => {
             print("Old Value ::: "+ previousVal);
@@ -50,20 +44,24 @@ public class ChessBoard : NetworkBehaviour
     public void StartGame()
     {
         GeneratePieces();
+        Bishop p = Instantiate(Board_SO.BishopPrefab, new Vector3(3,0.15f,3), Quaternion.identity);
+        p.InstantiatePieceComponents(true);
+
         SetValidMovesForPieces();
     }
 
 
     private void GenerateBoardTiles()
     {
+        Instantiate(Board_SO.BoardEdgePrefab);
         for (int z=0; z<8; ++z)
             for (int x=0; x<8; ++x)
-                Instantiate(Prefabs.TitlePrefab, new Vector3(x,0,z), Quaternion.identity);
+                Instantiate(Board_SO.TitlePrefab, new Vector3(x,0,z), Quaternion.identity);
     }
 
     private void GeneratePieces()
     {
-        float y = Checker.Y;
+        float y = GenericPiece.Y;
         PlacePieces(forP1: false, 5, 8);
         PlacePieces(forP1: true, 0, 3);
 
@@ -72,7 +70,7 @@ public class ChessBoard : NetworkBehaviour
             {
                 for (int x=z%2; x<8; x+=2)
                 {
-                    Checker piece = Instantiate(Prefabs.CheckerPrefab, new Vector3(x,y,z), Quaternion.identity);
+                    Checker piece = Instantiate(Board_SO.CheckerPrefab, new Vector3(x,y,z), Quaternion.identity);
                     piece.InstantiatePieceComponents(forP1: forP1);
                 }
             }
@@ -88,14 +86,14 @@ public class ChessBoard : NetworkBehaviour
 
     private static void SetValidMovesForPieces()
     {
-        List<Checker> allPieces = new List<Checker>();
+        List<GenericPiece> allPieces = new List<GenericPiece>();
         List<Checker> allPiecesJump = new List<Checker>();
-        foreach (Checker piece in Board)
+        foreach (GenericPiece piece in Board)
         {
             if (piece == null)
                 continue;
             
-            if ((!IsP1Turn && piece.TeamID%2 == P1) || (IsP1Turn && piece.TeamID%2 == P2)) // If it is other player's piece
+            if ((!IsP1Turn && GenericPiece.IsP1Piece(piece)) || (IsP1Turn && GenericPiece.IsP2Piece(piece)))
                 piece.ClearValidMoves();
             else
             {
@@ -109,9 +107,12 @@ public class ChessBoard : NetworkBehaviour
             ExcludeNonJumpMoves();
         return;
 
-        void CheckForJumpingMovesAndAdd(Checker piece)
+        void CheckForJumpingMovesAndAdd(GenericPiece piece)
         {
+            if (piece is not Checker checker) return;
+
             List<int> jumpingMoves = new List<int>();
+
             int currentPos = PosToBoardPos(piece.PreviousPosition);
             foreach (int move in piece.ValidMoves)
                 if (Math.Abs(currentPos - move) > 9)
@@ -119,15 +120,15 @@ public class ChessBoard : NetworkBehaviour
             
             if (jumpingMoves.Count > 0)
             {
-                allPiecesJump.Add(piece);
+                allPiecesJump.Add(checker);
                 piece.SetValidMoves(jumpingMoves);
             }
         }
         void ExcludeNonJumpMoves()
         {
-            foreach (Checker piece in allPieces)
-                if (!HaveJumpingMove(piece))
-                    piece.ClearValidMoves();                
+            foreach (GenericPiece piece in allPieces)
+                if (piece is not Checker checker || !HaveJumpingMove(checker))
+                    piece.ClearValidMoves();           
         }
         bool HaveJumpingMove(Checker currentPiece)
         {
@@ -145,7 +146,7 @@ public class ChessBoard : NetworkBehaviour
         else if (P2_PieceCount <= 0)
             print("Player 1 WINS!");
 
-        foreach (Checker piece in Board)
+        foreach (GenericPiece piece in Board)
         {
             if (!piece)
                 continue;
@@ -167,14 +168,27 @@ public class ChessBoard : NetworkBehaviour
         int oldPos = PosToBoardPos(previousPos);
         int newPos = PosToBoardPos(currentPos);
 
-        if (OnPromotionRow(newPos) && !PieceIsDuke(Board[oldPos]))
-            PromotePiece();
+        GenericPiece piece = Board[oldPos];
+        if (piece is Checker)
+        {
+            if (OnPromotionRow(newPos) && piece is not Duke)
+                PromotePiece();
+            else
+                Board[newPos] = Board[oldPos];
+
+            if (Mathf.Abs(newPos - oldPos) > 9)
+                RemoveCapturedPiece((newPos+oldPos)/2);
+        }
         else
-            Board[newPos] = Board[oldPos];
+        {
+            if (Board[newPos] != null)
+                RemoveCapturedPiece(newPos);
+
+            Board[newPos] = piece;
+        }
+
         Board[oldPos] = null;
 
-        if (Mathf.Abs(newPos - oldPos) > 9)
-            RemoveCapturedPiece((newPos+oldPos)/2);
 
         return;
 
@@ -182,7 +196,7 @@ public class ChessBoard : NetworkBehaviour
             Destroy(Board[oldPos].gameObject);
             Vector3 newTransform = BoardPosToPos(newPos);
 
-            Checker newPiece = Instantiate(Prefabs.DukePrefab, newTransform, Quaternion.identity);
+            Checker newPiece = Instantiate(Board_SO.DukePrefab, newTransform, Quaternion.identity);
             newPiece.InstantiatePieceComponents(IsP1Turn);
             Board[newPos] = newPiece;
         }
@@ -193,19 +207,18 @@ public class ChessBoard : NetworkBehaviour
             Board[index] = null;
         }
         bool OnPromotionRow(int pos){return (pos < 8 && IsP1Turn) || (pos > 55 && !IsP1Turn);}
-        bool PieceIsDuke(Checker piece){return piece.TeamID == P1_DUKE || piece.TeamID == P2_DUKE;}
             
     }
 
     public void ClearAllPiecesValidMoves()
     {
-        foreach(Checker piece in Board)
+        foreach(GenericPiece piece in Board)
             piece?.ClearValidMoves();
     }
 
     private void DecrementPlayerCount(int index)
     {
-        if (Board[index].TeamID%2 == P1_PIECE)
+        if (GenericPiece.IsP1Piece(Board[index]))
             --P1_PieceCount;
         else
             --P2_PieceCount;
@@ -226,7 +239,7 @@ public class ChessBoard : NetworkBehaviour
                 continue;
 
             int index = PosToBoardPos(checker.transform.position)/2;
-            AlexNotation[index] = (char)(checker.TeamID + '0');
+            AlexNotation[index] = checker.TeamID;
         }
         return new FixedString64Bytes(new string(AlexNotation));
     }
@@ -243,7 +256,7 @@ public class ChessBoard : NetworkBehaviour
     {
         int x = pos%8;
         int z = 7-(pos/8);
-        return new Vector3(x, Checker.Y, z);
+        return new Vector3(x, GenericPiece.Y, z);
     }
 
 
@@ -290,7 +303,7 @@ public class ChessBoard : NetworkBehaviour
                 UpdateBoard(piece.transform.position, newPos);
 
                 piece.transform.position = newPos;
-                piece.GetComponent<Checker>().UpdatePreviousPos(newPos);
+                piece.GetComponent<GenericPiece>().UpdatePreviousPos(newPos);
             }
         }
     }
@@ -314,7 +327,7 @@ public class ChessBoard : NetworkBehaviour
     {
         string line = "";
         int x = 0;
-        foreach (Checker piece in Board)
+        foreach (GenericPiece piece in Board)
         {
             string character = (!piece) ? "0 " : $"{piece.TeamID} ";
             line += $"{character} ";
@@ -329,7 +342,7 @@ public class ChessBoard : NetworkBehaviour
     [Command]
     public void PrintValidMoves()
     {
-        foreach (Checker piece in Board)
+        foreach (GenericPiece piece in Board)
         {
             if (!piece)
                 continue;
@@ -343,6 +356,7 @@ public class ChessBoard : NetworkBehaviour
         print($"P1_Count: {P1_PieceCount}");
         print($"P2_Count: {P2_PieceCount}");
         print($"Player 1 Turn: {IsP1Turn}");
+        print($"Player 1 Turn: {IsP1Turn_Net.Value}");
     }
     [Command]
     public void ChangeP1Turn()

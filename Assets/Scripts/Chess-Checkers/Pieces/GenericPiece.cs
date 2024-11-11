@@ -4,9 +4,9 @@ using Unity.Netcode;
 using UnityEngine;
 
 
-public class Checker : MonoBehaviour
+public abstract class GenericPiece : MonoBehaviour
 {
-    [SerializeField] protected BoardMaterials CheckerMaterials_SO;
+    [SerializeField] protected BoardMaterials Board_SO;
     [SerializeField] protected MeshRenderer _MeshRenderer;
     private static ChessBoard ChessBoard_S;
     public const float Y = 0.15f;
@@ -14,9 +14,9 @@ public class Checker : MonoBehaviour
     private static Camera MainCamera;
     private static float CameraDistanceZ;
 
-    [SerializeField] public Vector3 PreviousPosition { get; protected set; }
-    [SerializeField] public int TeamID { get; protected set; }
-    [SerializeField] public List<int> ValidMoves { get; private set; } = new List<int>();
+    [SerializeField] public Vector3 PreviousPosition;
+    [SerializeField] public char TeamID { get; protected set; }
+    [SerializeField] public List<int> ValidMoves = new List<int>();
 
     private void Awake()
     {
@@ -26,11 +26,8 @@ public class Checker : MonoBehaviour
         ChessBoard.Board[index] = this;
     }
 
-    public void InstantiatePieceComponents(bool forP1)
-    {
-        this._MeshRenderer.material = forP1 ? CheckerMaterials_SO.Piece_p1Color : CheckerMaterials_SO.Piece_p2Color;
-        this.TeamID = (this is Duke) ? (forP1 ? ChessBoard.P1_DUKE : ChessBoard.P2_DUKE) : (forP1 ? ChessBoard.P1_PIECE : ChessBoard.P2_PIECE);
-    }
+    // Set MeshRenderer and TeamID
+    public abstract void InstantiatePieceComponents(bool forP1);
 
     private void Start()
     {
@@ -40,12 +37,12 @@ public class Checker : MonoBehaviour
     }
 
 
-    private bool CanMove()
+    protected bool CanMove()
     {
         bool p1Turn = ChessBoard.IsP1Turn_Net.Value;
         ulong playerID = NetworkManager.Singleton.LocalClientId;
 
-        if ((!p1Turn && playerID == 0) || (p1Turn && playerID == 1))
+        if (!ChessBoard.IsLocalGame && ((!p1Turn && playerID == 0) || (p1Turn && playerID == 1)))
             return false;
         if (this.ValidMoves.Count == 0)
             return false;
@@ -96,7 +93,7 @@ public class Checker : MonoBehaviour
         Tile.DeHighLightTiles();
     }
 
-    private void ProcessTurnLocally(Checker currentPiece, Vector3 newPos)
+    private void ProcessTurnLocally(GenericPiece currentPiece, Vector3 newPos)
     {
         ChessBoard_S.UpdateBoard(currentPiece.PreviousPosition, newPos);
         UpdatePosition(currentPiece, newPos);
@@ -104,12 +101,18 @@ public class Checker : MonoBehaviour
 
         currentPiece.PreviousPosition = newPos;
     }
-    private void UpdatePosition(Checker currentPiece, Vector3 validPos)
+    private void UpdatePosition(GenericPiece currentPiece, Vector3 validPos)
     {
         currentPiece.transform.position = validPos;
     }
-    private void DoSecondJumpOrChangeSides(Checker currentPiece, Vector3 validPos)
+    private void DoSecondJumpOrChangeSides(GenericPiece currentPiece, Vector3 validPos)
     {
+        if (currentPiece is not Checker)
+        {
+            ChessBoard_S.ChangeSides();
+            return;
+        }
+
         List<int> newValidMoves = GetValidMoves(this, getOnlyJumps: true); // Check for second jump
         if (newValidMoves.Count > 0 && Math.Abs(currentPiece.PreviousPosition.x - validPos.x) == 2) // if piece has move and made a jump
         {
@@ -121,68 +124,7 @@ public class Checker : MonoBehaviour
     }
 
 
-    protected List<int> GetValidMoves(Checker currentPiece, bool getOnlyJumps)
-    {
-        Checker[] board = ChessBoard.Board;
-        int[] offsets = (this is Duke) ? new int[]{-9,-7,7,9} : (this.TeamID%2 == ChessBoard.P1_PIECE) ? new int[]{-9, -7} : new int[]{7, 9};
-        int boardPos = ChessBoard.PosToBoardPos(RoundVector(currentPiece.transform.position));
-
-        List<int> allMoves = new List<int>();
-        foreach (int offset in offsets)
-        {
-            int newPos = boardPos+offset;
-            if (OutOfBounds(newPos) || Overflown(newPos, offset))
-                continue;
-
-            Checker newPiece = board[newPos];
-            if (!newPiece)
-            {
-                if (!getOnlyJumps)
-                    allMoves.Add(newPos);
-                continue;
-            }
-
-            if (newPiece.TeamID%2 == currentPiece.TeamID%2)
-                continue;
-            
-            newPos += offset;
-            if (OutOfBounds(newPos) || Overflown(newPos, offset))
-                continue;
-
-            if (board[newPos] == null)
-                allMoves.Add(newPos);
-        }
-        return allMoves;
-    
-        bool OutOfBounds(int currentPos){return currentPos < 0 || currentPos > 63;}
-        bool Overflown(int currentPos, int offset)
-        {
-            // 0  1  2  3  4  5  6  7
-            // 8  9  10 11 12 13 14 15
-            // 16 17 18 19 20 21 22 23
-            // 24 25 26 27 28 29 30 31
-            // 32 33 34 35 36 37 38 39
-            // 40 41 42 43 44 45 46 47
-            // 48 49 50 51 52 53 54 55
-            // 56 57 58 59 60 61 62 63
-
-            // i.e Given the tile 7, when trying to access its right tile, it will get 16 which is not a valid tile for
-            // the piece on 7 to go to
-
-            int[] rightOverflow = new int[8]{ 0,8,16,24,32,40,48,56 };
-            int[] leftOverflow = new int[8]{ 7,15,23,31,39,47,55,63 };
-
-            foreach (int val in rightOverflow)
-                if (val == currentPos && (offset == -7 || offset == 9))
-                    return true;
-            foreach (int val in leftOverflow)
-                if (val == currentPos && (offset == -9 || offset == 7))
-                    return true;
-            return false;
-        }
-      
-    }
-
+    public abstract List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false);
 
 
     public void UpdatePreviousPos(Vector3 position)
@@ -203,10 +145,48 @@ public class Checker : MonoBehaviour
     }
 
 
+    protected bool OutOfBounds(int currentPos){return currentPos < 0 || currentPos > 63;}      
 
+    protected bool Overflown(int currentPos, int offset)
+    {
+        // 0  1  2  3  4  5  6  7
+        // 8  9  10 11 12 13 14 15
+        // 16 17 18 19 20 21 22 23
+        // 24 25 26 27 28 29 30 31
+        // 32 33 34 35 36 37 38 39
+        // 40 41 42 43 44 45 46 47
+        // 48 49 50 51 52 53 54 55
+        // 56 57 58 59 60 61 62 63
 
+        // i.e Given the tile 7, when trying to access its right tile, it will get 16 which is not a valid tile for
+        // the piece on 7 to go to
 
-    private static Vector3 RoundVector(Vector3 vector)
+        int[] rightOverflow = new int[8]{ 0,8,16,24,32,40,48,56 };
+        int[] leftOverflow = new int[8]{ 7,15,23,31,39,47,55,63 };
+
+        foreach (int val in rightOverflow)
+            if (val == currentPos && (offset == -7 || offset == 9))
+                return true;
+        foreach (int val in leftOverflow)
+            if (val == currentPos && (offset == -9 || offset == 7))
+                return true;
+        return false;
+    }
+
+    public static bool IsP1Piece(GenericPiece piece)
+    {
+        return char.IsUpper(piece.TeamID);
+    }
+    public static bool IsP2Piece(GenericPiece piece)
+    {
+        return char.IsLower(piece.TeamID);
+    }
+    public static bool ArePiecesOnSameTeam(GenericPiece piece1, GenericPiece piece2)
+    {
+        return IsP1Piece(piece1) != IsP2Piece(piece2);
+    }
+
+    protected static Vector3 RoundVector(Vector3 vector)
     {
         return new Vector3(Mathf.RoundToInt(vector.x), Y, Mathf.RoundToInt(vector.z));
     }

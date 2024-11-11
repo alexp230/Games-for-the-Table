@@ -122,5 +122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 907a6a53a97579648a875c7ac1412b75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CheckerMaterials_SO: {fileID: 11400000, guid: 8eb33b7e93b982a40b45573fac8e25b8, type: 2}
+  Board_SO: {fileID: 11400000, guid: 8eb33b7e93b982a40b45573fac8e25b8, type: 2}
   _MeshRenderer: {fileID: 8718666122299431037}
+  PreviousPosition: {x: 0, y: 0, z: 0}
+  ValidMoves: 

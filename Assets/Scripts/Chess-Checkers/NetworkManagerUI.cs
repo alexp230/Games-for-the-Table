@@ -44,16 +44,17 @@ public class NetworkManagerUI : NetworkBehaviour
             {
                 StartedGame = true;
                 if (playerCount == 1)
-                    StartGame_ClientRPC();
+                    StartGame_ClientRPC(singlePlayer: true);
                 else if (playerCount == 2)
-                    StartGame_ClientRPC();
+                    StartGame_ClientRPC(singlePlayer: false);
             }
         }
     }
 
     [ClientRpc]
-    private void StartGame_ClientRPC()
+    private void StartGame_ClientRPC(bool singlePlayer)
     {
+        ChessBoard.IsLocalGame = singlePlayer;
         ChessBoard_S.StartGame();
     }
 }
