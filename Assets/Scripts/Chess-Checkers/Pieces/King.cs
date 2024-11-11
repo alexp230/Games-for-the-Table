@@ -2,12 +2,31 @@ using System.Collections.Generic;
 
 public class King : GenericPiece
 {
-    public override void InstantiatePieceComponents(bool forP1)
+    public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false)
     {
-        throw new System.NotImplementedException();
+        List<int> validMoves = new List<int>();
+        GenericPiece[] board = ChessBoard.Board;
+        int[] offsets = new int[] { -8, -7, 1, 9, 8, 7, -1, -9 };
+
+        int boardPos = ChessBoard.PosToBoardPos(RoundVector(currentPiece.transform.position));
+        foreach (int offset in offsets)
+        {
+            int newPos = boardPos + offset;
+
+            if (OutOfBounds(newPos))
+                continue;
+            
+            GenericPiece piece = board[newPos];
+            if (piece && ArePiecesOnSameTeam(currentPiece, piece))
+                continue;
+
+            validMoves.Add(newPos);
+        }
+
+        return validMoves;
     }
 
-    public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false)
+    protected override bool Overflown(int currentPos, int offset)
     {
         throw new System.NotImplementedException();
     }

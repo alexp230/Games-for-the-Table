@@ -2,12 +2,6 @@ using System.Collections.Generic;
 
 public class Bishop : GenericPiece
 {
-    public override void InstantiatePieceComponents(bool forP1)
-    {
-        this._MeshRenderer.material = forP1 ? Board_SO.Piece_p1Color : Board_SO.Piece_p2Color;
-        this.TeamID = forP1 ? Board_SO.P1_BISHOP : Board_SO.P2_BISHOP;
-    }
-    
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false)
     {
         List<int> validMoves = new List<int>();
@@ -23,13 +17,10 @@ public class Bishop : GenericPiece
             {
                 GenericPiece piece = board[newPos];
 
-                print(piece);
                 if (!piece)
                     validMoves.Add(newPos);
                 else
                 {
-                    print($"{currentPiece.TeamID} | {piece.TeamID}");
-                    print($"{newPos} {ArePiecesOnSameTeam(currentPiece, piece)}");
                     if (!ArePiecesOnSameTeam(currentPiece, piece))
                         validMoves.Add(newPos);
                     break;
@@ -40,5 +31,13 @@ public class Bishop : GenericPiece
         }
 
         return validMoves;
+    }
+
+    protected override bool Overflown(int currentPos, int offset)
+    {
+        if (currentPos%8 == 0 && (offset == -7 || offset == 9)) return true;
+        if (currentPos%8 == 7 && (offset == -9 || offset == 7)) return true;
+        
+        return false;
     }
 }
