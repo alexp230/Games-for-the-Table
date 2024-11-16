@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Pawn : GenericPiece
 {
     private bool MadeFirstMove = false;
-
     public bool CanEnPassantLeft = false;
     public bool CanEnPassantRight = false;
 

@@ -203,13 +203,23 @@ public class ChessBoard : NetworkBehaviour
                     RemoveCapturedPiece(newPos-8);
             }
             Board[newPos] = piece;
-
+        }
+        else if (piece is King)
+        {
+            if (Math.Abs(oldPos-newPos) != 2)
+            {
+                if (Board[newPos] != null)
+                    RemoveCapturedPiece(newPos);
+                Board[newPos] = piece;  
+            }
+            else
+                Castle();
         }
         else
         {
             if (Board[newPos] != null)
                 RemoveCapturedPiece(newPos);
-            Board[newPos] = piece; 
+            Board[newPos] = piece;
         }
 
         Board[oldPos] = null;
@@ -253,6 +263,21 @@ public class ChessBoard : NetworkBehaviour
 
             bool OnLeftEdge() {return newPos%8 == 0;}
             bool OnRightEdge() {return newPos%8 == 7;}
+        }
+        void Castle()
+        {
+            Board[newPos] = piece;
+
+            int offset = (newPos-oldPos > 0) ? 1 : -1;
+            int pos = newPos + offset;
+            while (Board[pos] is not Rook)
+                pos += offset;
+            
+            Vector3 newRookPosition = BoardPosToPos(oldPos+offset);
+            Board[pos].transform.position = newRookPosition;
+            Board[pos].PreviousPosition = newRookPosition;
+            Board[oldPos+offset] = Board[pos];
+            Board[pos] = null;
         }
     }
 

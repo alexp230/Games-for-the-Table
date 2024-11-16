@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Rook : GenericPiece
 {
+    public bool HasMoved = false;
+
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false)
     {
         List<int> validMoves = new List<int>();
@@ -44,6 +46,7 @@ public class Rook : GenericPiece
 
     protected override void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos)
     {
+        this.HasMoved = true;
         ChessBoard_S.ChangeSides();;
     }
 }

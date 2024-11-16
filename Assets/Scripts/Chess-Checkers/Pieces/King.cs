@@ -3,18 +3,19 @@ using UnityEngine;
 
 public class King : GenericPiece
 {
+    bool HasMoved = false;
+
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false)
     {
         List<int> validMoves = new List<int>();
         GenericPiece[] board = ChessBoard.Board;
-        int[] offsets = new int[] { -8, -7, 1, 9, 8, 7, -1, -9 };
 
         int boardPos = ChessBoard.PosToBoardPos(RoundVector(currentPiece.transform.position));
-        foreach (int offset in offsets)
+        foreach (int offset in new int[] { -9, -8, -7, 1, 9, 8, 7, -1 })
         {
             int newPos = boardPos + offset;
 
-            if (OutOfBounds(newPos))
+            if (OutOfBounds(newPos) || Overflown(newPos, offset))
                 continue;
             
             GenericPiece piece = board[newPos];
@@ -23,7 +24,39 @@ public class King : GenericPiece
 
             validMoves.Add(newPos);
         }
+        if (this.HasMoved)
+            return validMoves;
 
+        foreach (int offset in new int[] { -2, 2 })
+        {
+            int newPos = boardPos + offset;
+
+            if (OutOfBounds(newPos) || Overflown(newPos, offset))
+                continue;
+            
+            int x_offset = (offset>0) ? -1 : 1;
+            if (board[newPos+x_offset] || board[newPos]) // piece beside king or two spaces from king
+                continue;
+            
+            x_offset = (x_offset==1) ? -1 : 1;
+            int position = newPos + x_offset;
+            while (!OutOfBounds(position) && !Overflown(position, x_offset))
+            {
+                GenericPiece piece = board[position];
+
+                if (!piece)
+                    position += x_offset;
+
+                else if (piece is not Rook rook || rook.HasMoved)
+                    break;
+
+                else
+                {
+                    validMoves.Add(newPos);
+                    break;
+                }
+            }
+        }
         return validMoves;
     }
 
@@ -77,14 +110,16 @@ public class King : GenericPiece
 
     public override bool Overflown(int currentPos, int offset)
     {
-        if (currentPos%8 == 0 && (offset == -7 || offset == 9 || offset == 1)) return true;
-        if (currentPos%8 == 7 && (offset == -9 || offset == 7 || offset == -1)) return true;
-        
+        if (currentPos%8 == 0 && (offset == -7 || offset == 9 || offset == 1 || offset == 2)) return true;
+        if (currentPos%8 == 7 && (offset == -9 || offset == 7 || offset == -1 || offset == -2)) return true;
+        if (currentPos%8 == 6 && (offset == -2)) return true;       
+        if (currentPos%8 == 1 && (offset == 2)) return true;       
         return false;
     }
 
     protected override void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos)
     {
+        this.HasMoved = true;
         ChessBoard_S.ChangeSides();
     }
 }
