@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class King : GenericPiece
 {
@@ -29,5 +30,10 @@ public class King : GenericPiece
     protected override bool Overflown(int currentPos, int offset)
     {
         throw new System.NotImplementedException();
+    }
+
+    protected override void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos)
+    {
+        ChessBoard_S.ChangeSides();
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Bishop : GenericPiece
 {
@@ -39,5 +40,10 @@ public class Bishop : GenericPiece
         if (currentPos%8 == 7 && (offset == -9 || offset == 7)) return true;
         
         return false;
+    }
+
+    protected override void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos)
+    {
+        ChessBoard_S.ChangeSides();
     }
 }
