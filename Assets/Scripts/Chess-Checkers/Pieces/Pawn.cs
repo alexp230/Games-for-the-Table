@@ -1,8 +1,13 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Pawn : GenericPiece
 {
     private bool MadeFirstMove = false;
+
+    public bool CanEnPassantLeft = false;
+    public bool CanEnPassantRight = false;
 
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false)
     {
@@ -33,6 +38,11 @@ public class Pawn : GenericPiece
                 validMoves.Add(newPos);
         }
 
+        if (this.CanEnPassantRight)
+            validMoves.Add( IsP1Piece(this) ? boardPos-7 : boardPos+9 );
+        else if (this.CanEnPassantLeft)
+            validMoves.Add( IsP1Piece(this) ? boardPos-9 : boardPos+7 );
+
         return validMoves;
     }
 
@@ -40,7 +50,13 @@ public class Pawn : GenericPiece
     {
         if (currentPos%8 == 0 && (offset == -7 || offset == 9)) return true;
         if (currentPos%8 == 7 && (offset == -9 || offset == 7)) return true;
-        
         return false;
+    }
+
+    protected override void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos)
+    {
+        this.MadeFirstMove = true;
+
+        ChessBoard_S.ChangeSides();
     }
 }

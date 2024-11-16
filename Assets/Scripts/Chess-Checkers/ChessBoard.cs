@@ -42,12 +42,11 @@ public class ChessBoard : NetworkBehaviour
 
     public void StartGame()
     {
-        // GeneratePieces(Board_SO.ChessSetup);
-        GeneratePieces(Board_SO.CheckersSetup);
+        GeneratePieces(Board_SO.ChessSetup);
+        // GeneratePieces(Board_SO.CheckersSetup);
 
         SetValidMovesForPieces();
     }
-
 
     private void GenerateBoardTiles()
     {
@@ -60,7 +59,6 @@ public class ChessBoard : NetworkBehaviour
     private void GeneratePieces(string layout)
     {
         float y = GenericPiece.Y;
-
         int x = 0;
         int z = 7;
         foreach (char c in layout)
@@ -80,13 +78,11 @@ public class ChessBoard : NetworkBehaviour
                 case '/': --z; x=-1; break;
                 default: x += c-'0'-1; break; // Takes number an increment by whitespace in-between
             }
-            
             piece?.InstantiatePieceComponents(forP1: GenericPiece.IsP1Piece(c));
 
             if (++x >= 8)
                 x = 0;
         }
-
     }
 
     public void ChangeSides()
@@ -148,6 +144,7 @@ public class ChessBoard : NetworkBehaviour
                     return true;
             return false;
         }
+        
     }
 
     private void CheckForGameOver()
@@ -179,28 +176,43 @@ public class ChessBoard : NetworkBehaviour
         int oldPos = PosToBoardPos(previousPos);
         int newPos = PosToBoardPos(currentPos);
 
+        DisableEnPassantForEachPawn();
+
         GenericPiece piece = Board[oldPos];
         if (piece is Checker)
         {
             if (OnPromotionRow(newPos) && piece is not Duke)
                 PromotePiece();
             else
-                Board[newPos] = Board[oldPos];
+                Board[newPos] = piece;
 
-            if (Mathf.Abs(newPos - oldPos) > 9)
+            if (Mathf.Abs(newPos - oldPos) > 9) // if jumped piece
                 RemoveCapturedPiece((newPos+oldPos)/2);
+        }
+        else if (piece is Pawn pawn)
+        {
+            SetPotentialEnPassant(pawn);
+
+            if (Board[newPos] != null)
+                RemoveCapturedPiece(newPos);
+            else if (Mathf.Abs(newPos-oldPos) == 9 || (Mathf.Abs(newPos-oldPos) == 7)) // enpassant move
+            {
+                if (GenericPiece.IsP1Piece(pawn))
+                    RemoveCapturedPiece(newPos+8);
+                else
+                    RemoveCapturedPiece(newPos-8);
+            }
+            Board[newPos] = piece;
+
         }
         else
         {
             if (Board[newPos] != null)
                 RemoveCapturedPiece(newPos);
-
-            Board[newPos] = piece;
+            Board[newPos] = piece; 
         }
 
         Board[oldPos] = null;
-
-
         return;
 
         void PromotePiece(){
@@ -218,7 +230,30 @@ public class ChessBoard : NetworkBehaviour
             Board[index] = null;
         }
         bool OnPromotionRow(int pos){return (pos < 8 && IsP1Turn) || (pos > 55 && !IsP1Turn);}
+        void DisableEnPassantForEachPawn()
+        {
+            foreach (GenericPiece piece in Board)
+            {
+                if (piece is Pawn pawn)
+                {
+                    pawn.CanEnPassantLeft = false;
+                    pawn.CanEnPassantRight = false;
+                }
+            }
+        } 
+        void SetPotentialEnPassant(Pawn currentPiece)
+        {
+            if (Math.Abs(newPos-oldPos) != 16)
+                return;
             
+            if (!OnLeftEdge() && Board[newPos-1] is Pawn pawnL && !GenericPiece.ArePiecesOnSameTeam(currentPiece, pawnL))
+                pawnL.CanEnPassantRight = true;
+            else if (!OnRightEdge() && Board[newPos+1] is Pawn pawnR && !GenericPiece.ArePiecesOnSameTeam(currentPiece, pawnR))
+                pawnR.CanEnPassantLeft= true;
+
+            bool OnLeftEdge() {return newPos%8 == 0;}
+            bool OnRightEdge() {return newPos%8 == 7;}
+        }
     }
 
     public void ClearAllPiecesValidMoves()
