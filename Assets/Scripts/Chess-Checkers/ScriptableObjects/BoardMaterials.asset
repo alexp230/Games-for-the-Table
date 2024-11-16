@@ -22,10 +22,12 @@ MonoBehaviour:
   DukePrefab: {fileID: 1272187813879115648, guid: d8f5d557da4a9bf41beb14659e0242fb, type: 3}
   PawnPrefab: {fileID: 5143538899747013453, guid: f6dca7e515e5fb843adb65e98b7cae49, type: 3}
   KnightPrefab: {fileID: 4924781777800139645, guid: f69b9aba455d1b2409635505b65d84c3, type: 3}
-  BishopPrefab: {fileID: 5193277747884926744, guid: a2f8130e872d6a84882d3b7ab00c4379, type: 3}
+  BishopPrefab: {fileID: -5132804018015385205, guid: e87e40a48ba8264408b7e378236dcfdc, type: 3}
   RookPrefab: {fileID: 6548970298669244974, guid: 208eedfc6e3a3b54e99ee406046f7afd, type: 3}
   QueenPrefab: {fileID: 2469861511600136407, guid: 01414e3b6b0c34841b4241980523f642, type: 3}
   KingPrefab: {fileID: 7417587928292900850, guid: 45531cc83c926fa4f97e3a9fd4cc9b1d, type: 3}
+  ChessSetup: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
+  CheckersSetup: 1c1c1c1c/c1c1c1c1/1c1c1c1c/8/8/C1C1C1C1/1C1C1C1C/C1C1C1C1
   P1_PIECE: 67
   P2_PIECE: 99
   P1_DUKE: 68
