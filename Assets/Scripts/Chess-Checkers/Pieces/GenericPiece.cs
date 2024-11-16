@@ -127,7 +127,32 @@ public abstract class GenericPiece : MonoBehaviour
 
     public abstract List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false);
 
+    private bool MoveKeepsKingSafe(int oldPos, int newPos)
+    {
+        GenericPiece[] newBoard = new GenericPiece[ChessBoard.Board.Length];
+        int i = -1;
+        foreach (GenericPiece piece in ChessBoard.Board)
+            newBoard[++i] = piece;
 
+        newBoard[newPos] = newBoard[oldPos];
+        newBoard[oldPos] = null;
+
+        return !KingInCheck(newBoard);
+
+    }
+
+    bool KingInCheck(GenericPiece[] board)
+    {
+        int i=0;
+        foreach (GenericPiece piece in board)
+        {
+            if (piece is King kingPiece && (IsP1Piece(kingPiece) == ChessBoard.IsP1Turn))
+                return kingPiece.CheckIfKingIsInCheck(board, i);
+            ++i;
+        }
+            
+        return false;
+    }
 
     public void UpdatePreviousPos(Vector3 position)
     {
@@ -135,7 +160,16 @@ public abstract class GenericPiece : MonoBehaviour
     }
     public void SetValidMoves()
     {
-        this.ValidMoves = GetValidMoves(this, getOnlyJumps: false);
+        List<int> validMoves = new List<int>();
+
+        int currentPos = ChessBoard.PosToBoardPos(this.transform.position);
+        List<int> allMoves = GetValidMoves(this, getOnlyJumps: false);
+        foreach (int newMove in allMoves)
+            if (MoveKeepsKingSafe(currentPos, newMove))
+                validMoves.Add(newMove);
+        
+        this.ValidMoves = validMoves;
+
     }
     public void SetValidMoves(List<int> moves)
     {
@@ -159,8 +193,8 @@ public abstract class GenericPiece : MonoBehaviour
     // 56 57 58 59 60 61 62 63
 
     // i.e Given the tile 7, when trying to access its right tile, it will get 16 which is
-    // not a valid tile for the piece on 7 to go to, though being within bounds of board
-    protected abstract bool Overflown(int currentPos, int offset);
+    // not a valid tile for a checker on 7 to go to, though being within bounds of board
+    public abstract bool Overflown(int currentPos, int offset);
 
 
     public static bool IsP1Piece(GenericPiece piece)

@@ -34,7 +34,7 @@ public class Rook : GenericPiece
         return validMoves;
     }
 
-    protected override bool Overflown(int currentPos, int offset)
+    public override bool Overflown(int currentPos, int offset)
     {
         if (currentPos%8 == 0 && offset == 1) return true;
         if (currentPos%8 == 7 && offset == -1) return true;

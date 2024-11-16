@@ -14,7 +14,7 @@ public class Knight : GenericPiece
         {
             int newPos = boardPos + offset;
 
-            if (OutOfBounds(newPos))
+            if (OutOfBounds(newPos) || Overflown(newPos, offset))
                 continue;
             
             GenericPiece piece = board[newPos];
@@ -27,9 +27,13 @@ public class Knight : GenericPiece
         return validMoves;
     }
 
-    protected override bool Overflown(int currentPos, int offset)
+    public override bool Overflown(int currentPos, int offset)
     {
-        throw new System.NotImplementedException();
+        if (currentPos%8 == 0 && (offset == -15 || offset == -6 || offset == 10 || offset == 17)) return true;
+        if (currentPos%8 == 1 && (offset == -6 || offset == 10)) return true;
+        if (currentPos%8 == 7 && (offset == -17 || offset == -10 || offset == 6 || offset == 15)) return true;
+        if (currentPos%8 == 6 && (offset == -10 || offset == 6)) return true;
+        return false;
     }
 
     protected override void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos)

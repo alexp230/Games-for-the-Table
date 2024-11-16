@@ -46,7 +46,7 @@ public class Pawn : GenericPiece
         return validMoves;
     }
 
-    protected override bool Overflown(int currentPos, int offset)
+    public override bool Overflown(int currentPos, int offset)
     {
         if (currentPos%8 == 0 && (offset == -7 || offset == 9)) return true;
         if (currentPos%8 == 7 && (offset == -9 || offset == 7)) return true;
