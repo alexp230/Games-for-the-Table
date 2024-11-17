@@ -38,7 +38,7 @@ public class NetworkManagerUI : NetworkBehaviour
 
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Q))
+        if (Input.GetKeyUp(KeyCode.Alpha1))
         {
             int playerCount = NetworkManager.Singleton.ConnectedClients.Count;
             print($"PlayerCount: {playerCount}");

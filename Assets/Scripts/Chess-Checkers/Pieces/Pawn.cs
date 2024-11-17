@@ -8,6 +8,19 @@ public class Pawn : GenericPiece
     public bool CanEnPassantLeft = false;
     public bool CanEnPassantRight = false;
 
+    void OnMouseOver()
+    {
+        if (OnPromotionRow())
+        {
+            if (Input.GetKeyDown(KeyCode.Q)) PromotePiece(Board_SO.QueenPrefab);
+            else if (Input.GetKeyDown(KeyCode.R)) PromotePiece(Board_SO.RookPrefab);
+            else if (Input.GetKeyDown(KeyCode.B)) PromotePiece(Board_SO.BishopPrefab);
+            else if (Input.GetKeyDown(KeyCode.K)) PromotePiece(Board_SO.KnightPrefab);
+            else if (Input.GetKeyDown(KeyCode.N)) PromotePiece(Board_SO.KnightPrefab);
+            else if (Input.GetKeyDown(KeyCode.D)) PromotePiece(Board_SO.DukePrefab);
+        }    
+    }
+
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false)
     {
         List<int> validMoves = new List<int>();
@@ -69,6 +82,17 @@ public class Pawn : GenericPiece
                 ChessBoard_S.RemovePiece(newPos-8);
         }
 
+        if (OnPromotionRow(newPos))
+        {
+            this._MeshRenderer.material = Board_SO.SpecialPieceColor;
+            UpdatePosition(this, nextPos);
+            this.MadeFirstMove = true;
+
+            ChessBoard_S.UpdateBoard();
+            ChessBoard_S.ClearAllPiecesValidMoves();
+            return;
+        }
+
         UpdatePosition(this, nextPos);
         this.MadeFirstMove = true;
         ChessBoard_S.ChangeSides();
@@ -87,4 +111,16 @@ public class Pawn : GenericPiece
             bool OnRightEdge() {return newPos%8 == 7;}
         }
     }
+
+    private void PromotePiece(GenericPiece prefab)
+    {
+        Vector3 currentPos = this.transform.position;
+        ChessBoard_S.RemovePiece(ChessBoard.PosToBoardPos(currentPos));
+        ChessBoard_S.CreatePiece(prefab, currentPos);
+        ChessBoard_S.ChangeSides();
+    }
+
+    private bool OnPromotionRow(int pos){return (pos < 8 && ChessBoard.IsP1Turn) || (pos > 55 && !ChessBoard.IsP1Turn);}
+    private bool OnPromotionRow(){return (this.PreviousPosition.z == 7 && ChessBoard.IsP1Turn) || (this.PreviousPosition.z == 0 && !ChessBoard.IsP1Turn);}
+
 }

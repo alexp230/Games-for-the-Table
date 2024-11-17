@@ -9,6 +9,7 @@ public class BoardMaterials : ScriptableObject
 
     public Material Piece_p1Color;
     public Material Piece_p2Color;
+    public Material SpecialPieceColor;
 
     public Tile TitlePrefab;
 
