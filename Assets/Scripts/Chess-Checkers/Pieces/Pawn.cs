@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -51,10 +52,39 @@ public class Pawn : GenericPiece
         return false;
     }
 
-    protected override void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos)
+    protected override void PostMoveProcess(Vector3 lastPos, Vector3 nextPos)
     {
-        this.MadeFirstMove = true;
+        int oldPos = ChessBoard.PosToBoardPos(lastPos);
+        int newPos = ChessBoard.PosToBoardPos(nextPos);
 
+        SetPotentialEnPassant(this);
+
+        if (ChessBoard.Board[newPos] != null)
+            ChessBoard_S.RemovePiece(newPos);
+        else if (Mathf.Abs(newPos-oldPos) == 9 || (Mathf.Abs(newPos-oldPos) == 7)) // enpassant move
+        {
+            if (IsP1Piece(this))
+                ChessBoard_S.RemovePiece(newPos+8);
+            else
+                ChessBoard_S.RemovePiece(newPos-8);
+        }
+
+        UpdatePosition(this, nextPos);
+        this.MadeFirstMove = true;
         ChessBoard_S.ChangeSides();
+
+        void SetPotentialEnPassant(Pawn currentPiece)
+        {
+            if (Math.Abs(newPos-oldPos) != 16)
+                return;
+            
+            if (!OnLeftEdge() && ChessBoard.Board[newPos-1] is Pawn pawnL && !ArePiecesOnSameTeam(currentPiece, pawnL))
+                pawnL.CanEnPassantRight = true;
+            else if (!OnRightEdge() && ChessBoard.Board[newPos+1] is Pawn pawnR && !ArePiecesOnSameTeam(currentPiece, pawnR))
+                pawnR.CanEnPassantLeft= true;
+
+            bool OnLeftEdge() {return newPos%8 == 0;}
+            bool OnRightEdge() {return newPos%8 == 7;}
+        }
     }
 }

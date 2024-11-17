@@ -44,9 +44,14 @@ public class Rook : GenericPiece
         return false;
     }
 
-    protected override void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos)
+    protected override void PostMoveProcess(Vector3 lastPos, Vector3 nextPos)
     {
+        int newPos = ChessBoard.PosToBoardPos(nextPos);
+        if (ChessBoard.Board[newPos] != null)
+            ChessBoard_S.RemovePiece(newPos);
+        
+        UpdatePosition(this, nextPos);
         this.HasMoved = true;
-        ChessBoard_S.ChangeSides();;
+        ChessBoard_S.ChangeSides();
     }
 }

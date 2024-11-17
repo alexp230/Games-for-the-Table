@@ -165,120 +165,44 @@ public class ChessBoard : NetworkBehaviour
         print(IsP1Turn ? "Player 2 WINS!" : "Player 1 WINS!");
     }
 
-    public void SendMoveToServer(Vector3 currentPos, Vector3 newPos)
+    public void SendMoveToServer(Vector3 oldPos, Vector3 newPos)
     {
         ulong senderID = NetworkManager.Singleton.LocalClientId;
-        SendMove_ServerRPC(senderID, currentPos, newPos);
+        SendMove_ServerRPC(senderID, oldPos, newPos);
     }
 
-    public void UpdateBoard(Vector3 previousPos, Vector3 currentPos)
+    public void UpdateBoard()
     {
-        int oldPos = PosToBoardPos(previousPos);
-        int newPos = PosToBoardPos(currentPos);
+        for (int i=0; i<Board.Length; ++i)
+            Board[i] = null;
+        foreach (GameObject piece in GameObject.FindGameObjectsWithTag("Piece"))
+            if (piece.transform.position != DEAD_PIECE)
+                Board[PosToBoardPos(piece.transform.position)] = piece.GetComponent<GenericPiece>();
+    }
 
-        DisableEnPassantForEachPawn();
-
-        GenericPiece piece = Board[oldPos];
-        if (piece is Checker)
+    public void DisableEnPassantForEachPawn()
+    {
+        foreach (GenericPiece piece in Board)
         {
-            if (OnPromotionRow(newPos) && piece is not Duke)
-                PromotePiece();
-            else
-                Board[newPos] = piece;
-
-            if (Mathf.Abs(newPos - oldPos) > 9) // if jumped piece
-                RemoveCapturedPiece((newPos+oldPos)/2);
-        }
-        else if (piece is Pawn pawn)
-        {
-            SetPotentialEnPassant(pawn);
-
-            if (Board[newPos] != null)
-                RemoveCapturedPiece(newPos);
-            else if (Mathf.Abs(newPos-oldPos) == 9 || (Mathf.Abs(newPos-oldPos) == 7)) // enpassant move
+            if (piece is Pawn pawn)
             {
-                if (GenericPiece.IsP1Piece(pawn))
-                    RemoveCapturedPiece(newPos+8);
-                else
-                    RemoveCapturedPiece(newPos-8);
+                pawn.CanEnPassantLeft = false;
+                pawn.CanEnPassantRight = false;
             }
-            Board[newPos] = piece;
         }
-        else if (piece is King)
-        {
-            if (Math.Abs(oldPos-newPos) != 2)
-            {
-                if (Board[newPos] != null)
-                    RemoveCapturedPiece(newPos);
-                Board[newPos] = piece;  
-            }
-            else
-                Castle();
-        }
-        else
-        {
-            if (Board[newPos] != null)
-                RemoveCapturedPiece(newPos);
-            Board[newPos] = piece;
-        }
+    } 
 
-        Board[oldPos] = null;
-        return;
-
-        void PromotePiece(){
-            Destroy(Board[oldPos].gameObject);
-            Vector3 newTransform = BoardPosToPos(newPos);
-
-            Checker newPiece = Instantiate(Board_SO.DukePrefab, newTransform, Quaternion.identity);
-            newPiece.InstantiatePieceComponents(IsP1Turn);
-            Board[newPos] = newPiece;
-        }
-        void RemoveCapturedPiece(int index){
-            Board[index].transform.position = DEAD_PIECE;
-            Destroy(Board[index].gameObject);
-            DecrementPlayerCount(index);
-            Board[index] = null;
-        }
-        bool OnPromotionRow(int pos){return (pos < 8 && IsP1Turn) || (pos > 55 && !IsP1Turn);}
-        void DisableEnPassantForEachPawn()
-        {
-            foreach (GenericPiece piece in Board)
-            {
-                if (piece is Pawn pawn)
-                {
-                    pawn.CanEnPassantLeft = false;
-                    pawn.CanEnPassantRight = false;
-                }
-            }
-        } 
-        void SetPotentialEnPassant(Pawn currentPiece)
-        {
-            if (Math.Abs(newPos-oldPos) != 16)
-                return;
-            
-            if (!OnLeftEdge() && Board[newPos-1] is Pawn pawnL && !GenericPiece.ArePiecesOnSameTeam(currentPiece, pawnL))
-                pawnL.CanEnPassantRight = true;
-            else if (!OnRightEdge() && Board[newPos+1] is Pawn pawnR && !GenericPiece.ArePiecesOnSameTeam(currentPiece, pawnR))
-                pawnR.CanEnPassantLeft= true;
-
-            bool OnLeftEdge() {return newPos%8 == 0;}
-            bool OnRightEdge() {return newPos%8 == 7;}
-        }
-        void Castle()
-        {
-            Board[newPos] = piece;
-
-            int offset = (newPos-oldPos > 0) ? 1 : -1;
-            int pos = newPos + offset;
-            while (Board[pos] is not Rook)
-                pos += offset;
-            
-            Vector3 newRookPosition = BoardPosToPos(oldPos+offset);
-            Board[pos].transform.position = newRookPosition;
-            Board[pos].PreviousPosition = newRookPosition;
-            Board[oldPos+offset] = Board[pos];
-            Board[pos] = null;
-        }
+    public void RemovePiece(int index)
+    {
+        Board[index].transform.position = DEAD_PIECE;
+        Destroy(Board[index].gameObject);
+        DecrementPlayerCount(index);
+        Board[index] = null;
+    }
+    public void CreatePiece(GenericPiece prefab, Vector3 position)
+    {
+        GenericPiece piece = Instantiate(prefab, position, Quaternion.identity);
+        piece.InstantiatePieceComponents(forP1: IsP1Turn);
     }
 
     public void ClearAllPiecesValidMoves()
@@ -345,9 +269,9 @@ public class ChessBoard : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SendMove_ServerRPC(ulong senderID, Vector3 currentPos, Vector3 newPos)
+    public void SendMove_ServerRPC(ulong senderID, Vector3 oldPos, Vector3 newPos)
     {
-        UpdatePos_ClientRpc(senderID, currentPos, newPos);
+        UpdatePos_ClientRpc(senderID, oldPos, newPos);
     }
 
 
@@ -355,12 +279,13 @@ public class ChessBoard : NetworkBehaviour
     private void ChangeSides_ClientRPC()
     {
         IsP1Turn ^= true;
+        UpdateBoard();
         SetValidMovesForPieces();
         CheckForGameOver();
     }
 
     [ClientRpc]
-    public void UpdatePos_ClientRpc(ulong callerID, Vector3 currentPos, Vector3 newPos)
+    public void UpdatePos_ClientRpc(ulong callerID, Vector3 oldPos, Vector3 newPos)
     {
         if (callerID == NetworkManager.Singleton.LocalClientId)
             return;
@@ -369,12 +294,12 @@ public class ChessBoard : NetworkBehaviour
 
         foreach (GameObject piece in allPieces)
         {
-            if (piece.transform.position == currentPos)
+            if (piece.transform.position == oldPos)
             {
-                UpdateBoard(piece.transform.position, newPos);
-
                 piece.transform.position = newPos;
                 piece.GetComponent<GenericPiece>().UpdatePreviousPos(newPos);
+
+                UpdateBoard();
             }
         }
     }

@@ -94,17 +94,16 @@ public abstract class GenericPiece : MonoBehaviour
             return;
             
         Vector3 currentPos = RoundVector(this.transform.position);
+        Vector3 lastPos = this.PreviousPosition;
         this.transform.position = this.PreviousPosition;
 
-        foreach (int validMove in ValidMoves)
+        foreach (int validMove in this.ValidMoves)
         {
             Vector3 validPos = ChessBoard.BoardPosToPos(validMove);
             if (currentPos == validPos)
             {
-                ChessBoard_S.SendMoveToServer(this.PreviousPosition, validPos);
-                ProcessTurnLocally(this, validPos);
-                
-                this.PreviousPosition = validPos;
+                ChessBoard_S.SendMoveToServer(lastPos, validPos);
+                ProcessTurnLocally(lastPos, validPos);
                 break;
             }
         }
@@ -112,17 +111,17 @@ public abstract class GenericPiece : MonoBehaviour
         Tile.DeHighLightTiles();
     }
 
-    protected abstract void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos);
+    protected abstract void PostMoveProcess(Vector3 lastPos, Vector3 nextPos);
 
-    private void ProcessTurnLocally(GenericPiece currentPiece, Vector3 newPos)
+    private void ProcessTurnLocally(Vector3 oldPos, Vector3 newPos)
     {
-        ChessBoard_S.UpdateBoard(currentPiece.PreviousPosition, newPos);
-        UpdatePosition(currentPiece, newPos);
-        PostMoveProcess(this, newPos);
+        ChessBoard_S.DisableEnPassantForEachPawn();
+        PostMoveProcess(oldPos, newPos);
     }
-    private void UpdatePosition(GenericPiece currentPiece, Vector3 validPos)
+    protected void UpdatePosition(GenericPiece currentPiece, Vector3 validPos)
     {
         currentPiece.transform.position = validPos;
+        currentPiece.PreviousPosition = validPos;
     }
 
     public abstract List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false);

@@ -45,16 +45,40 @@ public class Checker : GenericPiece
         return false;
     }
 
-    protected override void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos)
+    protected override void PostMoveProcess(Vector3 lastPos, Vector3 nextPos)
     {
-        List<int> newValidMoves = GetValidMoves(this, getOnlyJumps: true); // Checks for jumping moves
-        if (newValidMoves.Count > 0 && Math.Abs(currentPiece.PreviousPosition.x - validPos.x) == 2) // if piece has jumpMove and made a jump
+        int oldPos = ChessBoard.PosToBoardPos(lastPos);
+        int newPos = ChessBoard.PosToBoardPos(nextPos);
+
+        if (OnPromotionRow(newPos) && this is not Duke)
+            PromotePiece(lastPos, nextPos);
+        else
+            UpdatePosition(this, nextPos);
+
+        if (Mathf.Abs(newPos - oldPos) > 9) // if jumped piece
         {
-            ChessBoard_S.ClearAllPiecesValidMoves();
-            currentPiece.ValidMoves = newValidMoves;
+            ChessBoard_S.RemovePiece((newPos+oldPos)/2);
+
+            List<int> newValidMoves = GetValidMoves(this, getOnlyJumps: true); // Checks for jumping moves
+            if (newValidMoves.Count > 0) // if piece has jumpMove and made a jump
+            {
+                ChessBoard_S.UpdateBoard();
+                ChessBoard_S.ClearAllPiecesValidMoves();
+                this.ValidMoves = newValidMoves;
+            }
+            else
+                ChessBoard_S.ChangeSides();
         }
         else
             ChessBoard_S.ChangeSides();
+
+        bool OnPromotionRow(int pos){return (pos < 8 && ChessBoard.IsP1Turn) || (pos > 55 && !ChessBoard.IsP1Turn);}
+    }
+
+    void PromotePiece(Vector3 oldPos, Vector3 newPos)
+    {
+        ChessBoard_S.RemovePiece(ChessBoard.PosToBoardPos(oldPos));
+        ChessBoard_S.CreatePiece(Board_SO.DukePrefab, newPos);
     }
 
 }

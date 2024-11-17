@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -117,9 +118,35 @@ public class King : GenericPiece
         return false;
     }
 
-    protected override void PostMoveProcess(GenericPiece currentPiece, Vector3 validPos)
+    protected override void PostMoveProcess(Vector3 lastPos, Vector3 nextPos)
     {
+        int oldPos = ChessBoard.PosToBoardPos(lastPos);
+        int newPos = ChessBoard.PosToBoardPos(nextPos);
+
+        if (Math.Abs(oldPos-newPos) != 2)
+        {
+            if (ChessBoard.Board[newPos] != null)
+                ChessBoard_S.RemovePiece(newPos);
+        }
+        else
+            Castle(oldPos, newPos);
+
+        UpdatePosition(this, nextPos);
+        
         this.HasMoved = true;
         ChessBoard_S.ChangeSides();
+    }
+
+    private void Castle(int oldPos, int newPos)
+    {
+        int offset = (newPos-oldPos > 0) ? 1 : -1;
+        int pos = newPos + offset;
+        while (ChessBoard.Board[pos] == null)
+            pos += offset;
+
+        Rook rook = ChessBoard.Board[pos].GetComponent<Rook>();
+        rook.HasMoved = true;
+
+        UpdatePosition(rook, ChessBoard.BoardPosToPos(oldPos+offset));
     }
 }
