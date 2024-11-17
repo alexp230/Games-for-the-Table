@@ -58,7 +58,7 @@ public abstract class GenericPiece : MonoBehaviour
         bool p1Turn = ChessBoard.IsP1Turn_Net.Value;
         ulong playerID = NetworkManager.Singleton.LocalClientId;
 
-        if (!ChessBoard.IsLocalGame && ((!p1Turn && playerID == 0) || (p1Turn && playerID == 1)))
+        if (!BoardMaterials.IsLocalGame && ((!p1Turn && playerID == 0) || (p1Turn && playerID == 1)))
             return false;
         if (this.ValidMoves.Count == 0)
             return false;

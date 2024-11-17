@@ -17,7 +17,6 @@ public class ChessBoard : NetworkBehaviour
     private int P1_PieceCount = 12;
     private int P2_PieceCount = 12;
     
-    public static bool IsLocalGame = false;
     public static GenericPiece[] Board = new GenericPiece[64];
     public static bool IsP1Turn = true;
 
@@ -27,7 +26,6 @@ public class ChessBoard : NetworkBehaviour
     private void Start()
     {
         GenerateBoardTiles();
-        // StartGame();  
     }
 
     public override void OnNetworkSpawn()
@@ -42,8 +40,11 @@ public class ChessBoard : NetworkBehaviour
 
     public void StartGame()
     {
-        GeneratePieces(Board_SO.ChessSetup);
-        // GeneratePieces(Board_SO.CheckersSetup);
+        switch (BoardMaterials.GameType)
+        {
+            case BoardMaterials.CHECKERS_GAME: GeneratePieces(BoardMaterials.CheckersSetup); break;
+            case BoardMaterials.CHESS_GAME: GeneratePieces(BoardMaterials.ChessSetup); break;
+        }
 
         SetValidMovesForPieces();
     }

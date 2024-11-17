@@ -10,26 +10,30 @@ public class NetworkManagerUI : NetworkBehaviour
     [SerializeField] private Button hostBtn;
     [SerializeField] private Button clientBtn;
 
-    private bool StartedGame;
+    private bool StartedGame = false;
 
     void Awake()
-    {
-        serverBtn.onClick.AddListener(() => {
-            NetworkManager.Singleton.StartServer();
-        });
-        hostBtn.onClick.AddListener(() => {
-            NetworkManager.Singleton.StartHost();
-        });
-        clientBtn.onClick.AddListener(() => {
-            NetworkManager.Singleton.StartClient();
-        });
-
-        StartedGame = false;
+    {            
+        // serverBtn.onClick.AddListener(() => {
+        //     NetworkManager.Singleton.StartServer();
+        // });
+        // hostBtn.onClick.AddListener(() => {
+        //     NetworkManager.Singleton.StartHost();
+        // });
+        // clientBtn.onClick.AddListener(() => {
+        //     NetworkManager.Singleton.StartClient();
+        // });
     }
 
     void Start()
     {
+        if (BoardMaterials.IsLocalGame)
+            NetworkManager.Singleton.StartHost();
+            
         ChessBoard_S = GameObject.Find("ChessBoard").GetComponent<ChessBoard>();
+        ChessBoard_S.StartGame();
+
+        StartedGame = true;
     }
 
     void Update()
@@ -44,17 +48,17 @@ public class NetworkManagerUI : NetworkBehaviour
             {
                 StartedGame = true;
                 if (playerCount == 1)
-                    StartGame_ClientRPC(singlePlayer: true);
+                    StartGame_ClientRPC(isSinglePlayer: true);
                 else if (playerCount == 2)
-                    StartGame_ClientRPC(singlePlayer: false);
+                    StartGame_ClientRPC(isSinglePlayer: false);
             }
         }
     }
 
     [ClientRpc]
-    private void StartGame_ClientRPC(bool singlePlayer)
+    private void StartGame_ClientRPC(bool isSinglePlayer)
     {
-        ChessBoard.IsLocalGame = singlePlayer;
+        // BoardMaterials.IsLocalGame = isSinglePlayer;
         ChessBoard_S.StartGame();
     }
 }
