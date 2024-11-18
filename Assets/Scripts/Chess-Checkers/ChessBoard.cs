@@ -14,9 +14,6 @@ public class ChessBoard : NetworkBehaviour
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
     
-    private int P1_PieceCount = 12;
-    private int P2_PieceCount = 12;
-    
     public static GenericPiece[] Board = new GenericPiece[64];
     public static bool IsP1Turn = true;
 
@@ -47,6 +44,11 @@ public class ChessBoard : NetworkBehaviour
         }
 
         SetValidMovesForPieces();
+    }
+
+    public void ResetGame()
+    {
+
     }
 
     private void GenerateBoardTiles()
@@ -150,24 +152,30 @@ public class ChessBoard : NetworkBehaviour
 
     private void CheckForGameOver()
     {
-        if (P1_PieceCount <= 0)
-            print("Player 2 WINS!");
-        else if (P2_PieceCount <= 0)
-            print("Player 1 WINS!");
+        bool p1HasMove = false;
+        bool p2HasMove = false;
 
         foreach (GenericPiece piece in Board)
         {
             if (!piece)
                 continue;
 
-            if (piece.ValidMoves.Count > 0)
-                return;
+            if (!p1HasMove && GenericPiece.IsP1Piece(piece) && piece.ValidMoves.Count > 0)
+                p1HasMove = true;
+            else if (!p2HasMove && GenericPiece.IsP2Piece(piece) && piece.ValidMoves.Count > 0)
+                p2HasMove = true;
         }
-        print(IsP1Turn ? "Player 2 WINS!" : "Player 1 WINS!");
+
+        if (IsP1Turn && !p1HasMove)
+            print("Player 2 Wins!");
+        else if (!IsP1Turn && !p2HasMove)
+            print("Player 1 Wins!");
     }
 
     public void SendMoveToServer(Vector3 oldPos, Vector3 newPos)
     {
+        if (BoardMaterials.IsLocalGame) return;
+        
         ulong senderID = NetworkManager.Singleton.LocalClientId;
         SendMove_ServerRPC(senderID, oldPos, newPos);
     }
@@ -197,7 +205,6 @@ public class ChessBoard : NetworkBehaviour
     {
         Board[index].transform.position = DEAD_PIECE;
         Destroy(Board[index].gameObject);
-        DecrementPlayerCount(index);
         Board[index] = null;
     }
     public void CreatePiece(GenericPiece prefab, Vector3 position)
@@ -212,48 +219,30 @@ public class ChessBoard : NetworkBehaviour
             piece?.ClearValidMoves();
     }
 
-    private void DecrementPlayerCount(int index)
-    {
-        if (GenericPiece.IsP1Piece(Board[index]))
-            --P1_PieceCount;
-        else
-            --P2_PieceCount;
-    }
 
 
+    // private FixedString64Bytes GetGameState()
+    // {
+    //     char[] AlexNotation = new char[32];
+    //     Array.Fill(AlexNotation, '0');
 
-    private FixedString64Bytes GetGameState()
-    {
-        char[] AlexNotation = new char[32];
-        Array.Fill(AlexNotation, '0');
+    //     GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
+    //     foreach (GameObject piece in allPieces)
+    //     {
+    //         Checker checker = piece.GetComponent<Checker>();
+    //         if (checker.transform.position == DEAD_PIECE)
+    //             continue;
 
-        GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
-        foreach (GameObject piece in allPieces)
-        {
-            Checker checker = piece.GetComponent<Checker>();
-            if (checker.transform.position == DEAD_PIECE)
-                continue;
-
-            int index = PosToBoardPos(checker.transform.position)/2;
-            AlexNotation[index] = checker.TeamID;
-        }
-        return new FixedString64Bytes(new string(AlexNotation));
-    }
+    //         int index = PosToBoardPos(checker.transform.position)/2;
+    //         AlexNotation[index] = checker.TeamID;
+    //     }
+    //     return new FixedString64Bytes(new string(AlexNotation));
+    // }
 
 
 
 
 
-    public static int PosToBoardPos(Vector3 pos)
-    {
-        return (int) (((7-pos.z)*8)+pos.x);
-    }
-    public static Vector3 BoardPosToPos(int pos)
-    {
-        int x = pos%8;
-        int z = 7-(pos/8);
-        return new Vector3(x, GenericPiece.Y, z);
-    }
 
 
 
@@ -315,6 +304,17 @@ public class ChessBoard : NetworkBehaviour
 
 
 
+    public static int PosToBoardPos(Vector3 pos)
+    {
+        return (int) (((7-pos.z)*8)+pos.x);
+    }
+    public static Vector3 BoardPosToPos(int pos)
+    {
+        int x = pos%8;
+        int z = 7-(pos/8);
+        return new Vector3(x, GenericPiece.Y, z);
+    }
+
 
 
 
@@ -350,8 +350,6 @@ public class ChessBoard : NetworkBehaviour
     [Command]
     public void PrintData()
     {
-        print($"P1_Count: {P1_PieceCount}");
-        print($"P2_Count: {P2_PieceCount}");
         print($"Player 1 Turn: {IsP1Turn}");
         print($"Player 1 Turn: {IsP1Turn_Net.Value}");
     }

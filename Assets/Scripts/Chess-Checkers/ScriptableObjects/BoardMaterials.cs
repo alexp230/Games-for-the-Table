@@ -49,6 +49,6 @@ public class BoardMaterials : ScriptableObject
     public const int COMBINATION_GAME = 2;
     public static int GameType = 0;
 
-    public static bool IsLocalGame = false;
+    public static bool IsLocalGame = true;
     
 }
