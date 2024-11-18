@@ -25,6 +25,7 @@ public class NetworkManagerUI : NetworkBehaviour
         // });
     }
 
+
     void Start()
     {
         if (BoardMaterials.IsLocalGame)
@@ -34,6 +35,11 @@ public class NetworkManagerUI : NetworkBehaviour
         ChessBoard_S.StartGame();
 
         StartedGame = true;
+    }
+
+    void OnDisable()
+    {
+        NetworkManager.Singleton.Shutdown();
     }
 
     void Update()

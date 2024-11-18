@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using QFSW.QC;
+using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,6 +12,7 @@ using NV_String64B = Unity.Netcode.NetworkVariable<Unity.Collections.FixedString
 public class ChessBoard : NetworkBehaviour
 {
     [SerializeField] private BoardMaterials Board_SO;
+    [SerializeField] private VictoryScreen VictoryScreen_S;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
     
@@ -37,6 +39,9 @@ public class ChessBoard : NetworkBehaviour
 
     public void StartGame()
     {
+        IsP1Turn = true;
+        IsP1Turn_Net.Value = true;
+
         switch (BoardMaterials.GameType)
         {
             case BoardMaterials.CHECKERS_GAME: GeneratePieces(BoardMaterials.CheckersSetup); break;
@@ -48,7 +53,9 @@ public class ChessBoard : NetworkBehaviour
 
     public void ResetGame()
     {
+        VictoryScreen_S.gameObject.SetActive(false);
 
+        StartGame();
     }
 
     private void GenerateBoardTiles()
@@ -166,10 +173,12 @@ public class ChessBoard : NetworkBehaviour
                 p2HasMove = true;
         }
 
-        if (IsP1Turn && !p1HasMove)
-            print("Player 2 Wins!");
-        else if (!IsP1Turn && !p2HasMove)
-            print("Player 1 Wins!");
+        if (!p1HasMove && !p2HasMove)
+        {
+            VictoryScreen_S.gameObject.SetActive(true);
+            VictoryScreen_S.GetComponentInChildren<TextMeshProUGUI>().text = IsP1Turn ? "Player 2 Wins!" : "Player 1 Wins!";
+            RemoveAllPieces();
+        }
     }
 
     public void SendMoveToServer(Vector3 oldPos, Vector3 newPos)
@@ -200,6 +209,13 @@ public class ChessBoard : NetworkBehaviour
             }
         }
     } 
+
+    private void RemoveAllPieces()
+    {
+        foreach (GenericPiece piece in Board)
+            if (piece)
+                RemovePiece(PosToBoardPos(piece.transform.position));
+    }
 
     public void RemovePiece(int index)
     {
