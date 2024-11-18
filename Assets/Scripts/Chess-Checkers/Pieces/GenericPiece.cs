@@ -30,14 +30,14 @@ public abstract class GenericPiece : MonoBehaviour
     {
         switch(this)
         {
-            case Duke: this.TeamID = forP1 ? Board_SO.P1_DUKE : Board_SO.P2_DUKE; break;
-            case Checker: this.TeamID = forP1 ? Board_SO.P1_PIECE : Board_SO.P2_PIECE; break;
-            case Pawn: this.TeamID = forP1 ? Board_SO.P1_PAWN : Board_SO.P2_PAWN; break;
-            case Knight: this.TeamID = forP1 ? Board_SO.P1_KNIGHT : Board_SO.P2_KNIGHT; break;
-            case Bishop: this.TeamID = forP1 ? Board_SO.P1_BISHOP : Board_SO.P2_BISHOP; break;
-            case Rook: this.TeamID = forP1 ? Board_SO.P1_ROOK : Board_SO.P2_ROOK; break;
-            case Queen: this.TeamID = forP1 ? Board_SO.P1_QUEEN : Board_SO.P2_QUEEN; break;
-            case King: this.TeamID = forP1 ? Board_SO.P1_KING : Board_SO.P2_KING; break;
+            case Duke: this.TeamID = forP1 ? BoardMaterials.P1_DUKE : BoardMaterials.P2_DUKE; break;
+            case Checker: this.TeamID = forP1 ? BoardMaterials.P1_PIECE : BoardMaterials.P2_PIECE; break;
+            case Pawn: this.TeamID = forP1 ? BoardMaterials.P1_PAWN : BoardMaterials.P2_PAWN; break;
+            case Knight: this.TeamID = forP1 ? BoardMaterials.P1_KNIGHT : BoardMaterials.P2_KNIGHT; break;
+            case Bishop: this.TeamID = forP1 ? BoardMaterials.P1_BISHOP : BoardMaterials.P2_BISHOP; break;
+            case Rook: this.TeamID = forP1 ? BoardMaterials.P1_ROOK : BoardMaterials.P2_ROOK; break;
+            case Queen: this.TeamID = forP1 ? BoardMaterials.P1_QUEEN : BoardMaterials.P2_QUEEN; break;
+            case King: this.TeamID = forP1 ? BoardMaterials.P1_KING : BoardMaterials.P2_KING; break;
         }
 
         this._MeshRenderer.material = forP1 ? Board_SO.Piece_p1Color : Board_SO.Piece_p2Color;
