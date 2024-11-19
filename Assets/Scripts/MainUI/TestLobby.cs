@@ -1,13 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Threading.Tasks;
 using QFSW.QC;
 using TMPro;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class TestLobby : MonoBehaviour
@@ -15,6 +21,8 @@ public class TestLobby : MonoBehaviour
     [SerializeField] private GameObject[] PlayerList = new GameObject[8];
     private const string PLAYER_NAME = "PlayerName";
     private const string KICK_BUTTON = "KickButton";
+    private const string GAME_MODE = "GameMode";
+    private const string START_GAME = "StartGame";
     [SerializeField] private TextMeshProUGUI LobbyCode;
     [SerializeField] private TMP_Dropdown GameModeSelection;
     [SerializeField] private Toggle IsPrivateLobbyToggle;
@@ -29,6 +37,7 @@ public class TestLobby : MonoBehaviour
     {
         string extension = UnityEngine.Random.Range(0, 99999).ToString().PadLeft(5, '0');
         PlayerName = $"Player{extension}";
+        PlayerData.PlayerName  = PlayerName;
 
         InitializationOptions options = new InitializationOptions();
         options.SetProfile(PlayerName);
@@ -52,6 +61,8 @@ public class TestLobby : MonoBehaviour
     {
         HandleHeartBeat();
         HandleLobbyPullForUpdates();
+
+        BeginGame();        
     }
 
     private async void HandleHeartBeat()
@@ -76,7 +87,7 @@ public class TestLobby : MonoBehaviour
             LobbyUpdateTimer -= Time.deltaTime;
             if (LobbyUpdateTimer < 0f)
             {
-                float lobbyUpdateTimerMax = 4f;
+                float lobbyUpdateTimerMax = 2f;
                 LobbyUpdateTimer = lobbyUpdateTimerMax;
 
                 Lobby lobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
@@ -90,9 +101,17 @@ public class TestLobby : MonoBehaviour
                 }
                 CheckForHostChange();
 
+                if (JoinedLobby.Data[START_GAME].Value != "0")
+                {
+                    if (HostLobby == null)
+                        JoinRelay(JoinedLobby.Data[START_GAME].Value);
+                    
+                    JoinedLobby = null;
+                }
+
                 // ---------
 
-                PrintPlayers(lobby);
+                // PrintPlayers(lobby);
 
                 // --------
 
@@ -102,6 +121,93 @@ public class TestLobby : MonoBehaviour
             }
         }
     }
+
+    private void BeginGame()
+    {
+        if (HostLobby != null && NetworkManager.Singleton.ConnectedClientsList.Count == 2)
+        {
+            BoardMaterials.GameType = BoardMaterials.CHECKERS_GAME;
+            BoardMaterials.IsLocalGame = false;
+            NetworkManager.Singleton.SceneManager.LoadScene("Chess-Checkers", LoadSceneMode.Single);
+        }
+    }
+
+
+
+
+    [Command]
+    private async Task<string> CreateRelay()
+    {
+        try{
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
+
+            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+
+            print("JoinCode: " + joinCode);
+
+            RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+
+            NetworkManager.Singleton.StartHost();
+
+            return joinCode;
+        }
+        catch (RelayServiceException e){
+            print(e);
+            return null;
+        }
+    }
+ 
+    [Command]
+    private async void JoinRelay(string joinCode)
+    {
+        try{
+            BoardMaterials.GameType = BoardMaterials.CHECKERS_GAME;
+            BoardMaterials.IsLocalGame = false;
+
+            print("Joining Relay with " + joinCode);
+            JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
+            RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+
+            NetworkManager.Singleton.StartClient();
+        }
+        catch (RelayServiceException e){
+            print(e);
+        }
+    }
+
+    [Command]
+    public async void OnStartGame()
+    {
+        if (HostLobby != null)
+        {
+            try{
+                print("Start Game");
+
+                string relayCode = await CreateRelay();
+
+                Lobby lobby = await Lobbies.Instance.UpdateLobbyAsync(JoinedLobby.Id, new UpdateLobbyOptions {
+                    Data = new Dictionary<string, DataObject> {
+                        { START_GAME, new DataObject(DataObject.VisibilityOptions.Member, relayCode) }
+                    }
+                });
+
+                UpdateLobbySetting(lobby);
+            }
+            catch(Exception e){
+                print(e);
+            }
+        }
+    }
+
+
+
+
+
+
+
     private bool IfKickedFromLobby()
     {
         string thisPlayerId = AuthenticationService.Instance.PlayerId;
@@ -134,7 +240,8 @@ public class TestLobby : MonoBehaviour
                 IsPrivate = IsPrivateLobbyToggle.isOn,
                 Player = GetPlayer(),
                 Data = new Dictionary<string, DataObject> {
-                    { "GameMode", new DataObject(DataObject.VisibilityOptions.Public, "Checkers") }}
+                    { GAME_MODE, new DataObject(DataObject.VisibilityOptions.Public, "Checkers") },
+                    { START_GAME, new DataObject(DataObject.VisibilityOptions.Member, "0")}}
                 };
 
             Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
@@ -170,7 +277,7 @@ public class TestLobby : MonoBehaviour
 
             print("Lobbies found: " + queryResponse.Results.Count);
             foreach (Lobby lobby in queryResponse.Results)
-                print(lobby.Name + " " + lobby.MaxPlayers + " " + lobby.Data["GameMode"].Value);
+                print(lobby.Name + " " + lobby.MaxPlayers + " " + lobby.Data[GAME_MODE].Value);
         }
         catch (Exception e){
             print(e);
@@ -224,7 +331,7 @@ public class TestLobby : MonoBehaviour
 
             HostLobby = await Lobbies.Instance.UpdateLobbyAsync(HostLobby.Id, new UpdateLobbyOptions {
                 Data = new Dictionary<string, DataObject> {
-                    { "GameMode", new DataObject(DataObject.VisibilityOptions.Public, gameMode)}
+                    { GAME_MODE, new DataObject(DataObject.VisibilityOptions.Public, gameMode)}
                 }
             });
 
@@ -258,10 +365,11 @@ public class TestLobby : MonoBehaviour
     {
         try {
             PlayerName = newPlayerName;
+            PlayerData.PlayerName = newPlayerName;
 
             await LobbyService.Instance.UpdatePlayerAsync(JoinedLobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions {
                 Data = new Dictionary<string, PlayerDataObject> {
-                    { "PlayerName" , new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerName)}
+                    { PLAYER_NAME , new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerName)}
                 }
             });
         }
@@ -337,7 +445,7 @@ public class TestLobby : MonoBehaviour
     {
         Player player = new Player { 
             Data = new Dictionary<string, PlayerDataObject> {
-                { "PlayerName" , new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerName)}
+                { PLAYER_NAME , new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerName)}
             }
         };
         return player;
@@ -351,9 +459,9 @@ public class TestLobby : MonoBehaviour
 
     private void PrintPlayers(Lobby lobby)
     {
-        print("Players in Lobby " + lobby.Name + " " + lobby.IsPrivate + " " + lobby.Data["GameMode"].Value);
+        print("Players in Lobby " + lobby.Name + " " + lobby.IsPrivate + " " + lobby.Data[GAME_MODE].Value);
         foreach (Player player in lobby.Players)
-            print(player.Id + " " + player.Data["PlayerName"].Value);
+            print(player.Id + " " + player.Data[PLAYER_NAME].Value);
     }
 
 
@@ -365,7 +473,7 @@ public class TestLobby : MonoBehaviour
     {
         int i = -1;
         foreach (Player player in lobby.Players)
-            PlayerList[++i].transform.Find(PLAYER_NAME).GetComponent<TextMeshProUGUI>().text = player.Data["PlayerName"].Value;
+            PlayerList[++i].transform.Find(PLAYER_NAME).GetComponent<TextMeshProUGUI>().text = player.Data[PLAYER_NAME].Value;
         
         for (int j=i+1; j<PlayerList.Length; ++j)
             PlayerList[j].transform.Find(PLAYER_NAME).GetComponent<TextMeshProUGUI>().text = "";
@@ -414,7 +522,7 @@ public class TestLobby : MonoBehaviour
         string gameMode = GameModeSelection.options[GameModeSelection.value].text;
         Lobby newHostLobby = await Lobbies.Instance.UpdateLobbyAsync(HostLobby.Id, new UpdateLobbyOptions {
                 Data = new Dictionary<string, DataObject> {
-                    { "GameMode", new DataObject(DataObject.VisibilityOptions.Public, gameMode)}
+                    { GAME_MODE, new DataObject(DataObject.VisibilityOptions.Public, gameMode)}
                 }
             });
         UpdateLobbySetting(newHostLobby);

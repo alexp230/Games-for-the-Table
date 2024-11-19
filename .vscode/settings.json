@@ -59,6 +59,8 @@
     "dotnet.defaultSolution": "Games-for-the-Table.sln",
     "cSpell.words": [
         "Behaviour",
+        "Dont",
+        "dtls",
         "enpassant",
         "Mathf",
         "Netcode",
