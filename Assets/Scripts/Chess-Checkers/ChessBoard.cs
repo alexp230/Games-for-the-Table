@@ -29,6 +29,8 @@ public class ChessBoard : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        if (!IsServer) return;
+
         Board_Net.Value = "cccccccccccc00000000CCCCCCCCCCCC";
 
         Board_Net.OnValueChanged += (FixedString64Bytes previousVal, FixedString64Bytes newVal) => {
@@ -40,7 +42,6 @@ public class ChessBoard : NetworkBehaviour
     public void StartGame()
     {
         IsP1Turn = true;
-        IsP1Turn_Net.Value = true;
 
         switch (BoardMaterials.GameType)
         {
@@ -97,8 +98,10 @@ public class ChessBoard : NetworkBehaviour
 
     public void ChangeSides()
     {
-        SetP1Val_ServerRpc();
-        ChangeSides_ServerRPC();
+        IsP1Turn ^= true;
+        UpdateBoard();
+        SetValidMovesForPieces();
+        CheckForGameOver();
     }
 
     private static void SetValidMovesForPieces()
@@ -187,6 +190,7 @@ public class ChessBoard : NetworkBehaviour
         
         ulong senderID = NetworkManager.Singleton.LocalClientId;
         SendMove_ServerRPC(senderID, oldPos, newPos);
+        SetP1Val_ServerRpc();
     }
 
     public void UpdateBoard()
@@ -234,6 +238,16 @@ public class ChessBoard : NetworkBehaviour
         foreach(GenericPiece piece in Board)
             piece?.ClearValidMoves();
     }
+    public static int PosToBoardPos(Vector3 pos)
+    {
+        return (int) (((7-pos.z)*8)+pos.x);
+    }
+    public static Vector3 BoardPosToPos(int pos)
+    {
+        int x = pos%8;
+        int z = 7-(pos/8);
+        return new Vector3(x, GenericPiece.Y, z);
+    }
 
 
 
@@ -259,15 +273,6 @@ public class ChessBoard : NetworkBehaviour
 
 
 
-
-
-
-    [ServerRpc(RequireOwnership = false)]
-    private void ChangeSides_ServerRPC()
-    {
-        ChangeSides_ClientRPC();
-    }
-
     [ServerRpc(RequireOwnership = false)]
     private void SetP1Val_ServerRpc()
     {
@@ -280,16 +285,6 @@ public class ChessBoard : NetworkBehaviour
         UpdatePos_ClientRpc(senderID, oldPos, newPos);
     }
 
-
-    [ClientRpc]
-    private void ChangeSides_ClientRPC()
-    {
-        IsP1Turn ^= true;
-        UpdateBoard();
-        SetValidMovesForPieces();
-        CheckForGameOver();
-    }
-
     [ClientRpc]
     public void UpdatePos_ClientRpc(ulong callerID, Vector3 oldPos, Vector3 newPos)
     {
@@ -297,38 +292,9 @@ public class ChessBoard : NetworkBehaviour
             return;
 
         GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
-
         foreach (GameObject piece in allPieces)
-        {
             if (piece.transform.position == oldPos)
-            {
-                piece.transform.position = newPos;
-                piece.GetComponent<GenericPiece>().UpdatePreviousPos(newPos);
-
-                UpdateBoard();
-            }
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-    public static int PosToBoardPos(Vector3 pos)
-    {
-        return (int) (((7-pos.z)*8)+pos.x);
-    }
-    public static Vector3 BoardPosToPos(int pos)
-    {
-        int x = pos%8;
-        int z = 7-(pos/8);
-        return new Vector3(x, GenericPiece.Y, z);
+                piece.GetComponent<GenericPiece>().ProcessTurnLocally(oldPos, newPos);
     }
 
 

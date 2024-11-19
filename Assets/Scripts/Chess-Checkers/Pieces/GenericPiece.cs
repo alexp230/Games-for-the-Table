@@ -112,7 +112,7 @@ public abstract class GenericPiece : MonoBehaviour
 
     protected abstract void PostMoveProcess(Vector3 lastPos, Vector3 nextPos);
 
-    private void ProcessTurnLocally(Vector3 oldPos, Vector3 newPos)
+    public void ProcessTurnLocally(Vector3 oldPos, Vector3 newPos)
     {
         ChessBoard_S.DisableEnPassantForEachPawn();
         PostMoveProcess(oldPos, newPos);
