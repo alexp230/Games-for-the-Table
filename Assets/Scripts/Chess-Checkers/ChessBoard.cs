@@ -30,7 +30,7 @@ public class ChessBoard : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         if (!IsServer) return;
-
+        
         Board_Net.Value = "cccccccccccc00000000CCCCCCCCCCCC";
 
         Board_Net.OnValueChanged += (FixedString64Bytes previousVal, FixedString64Bytes newVal) => {
@@ -42,6 +42,7 @@ public class ChessBoard : NetworkBehaviour
     public void StartGame()
     {
         IsP1Turn = true;
+        SetP1Val_ServerRpc(true);
 
         switch (BoardMaterials.GameType)
         {
@@ -277,6 +278,12 @@ public class ChessBoard : NetworkBehaviour
     private void SetP1Val_ServerRpc()
     {
         IsP1Turn_Net.Value ^= true;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetP1Val_ServerRpc(bool p1Turn)
+    {
+        IsP1Turn_Net.Value = p1Turn;
     }
 
     [ServerRpc(RequireOwnership = false)]
