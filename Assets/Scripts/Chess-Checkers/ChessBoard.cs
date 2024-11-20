@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Resources;
 using QFSW.QC;
 using TMPro;
 using Unity.Netcode;
@@ -17,12 +18,16 @@ public class ChessBoard : NetworkBehaviour
     
     public static GenericPiece[] Board = new GenericPiece[64];
     public static bool IsP1Turn = true;
+    public static bool IsPaused = false;
+
+    public event Action<bool> OnChangedTurn;
 
     // public static NV_String64B Board_Net = new NV_String64B("", NVRP.Everyone, NVWP.Server);
 
-    private void Start()
+    void Start()
     {
         GenerateBoardTiles();
+        StartGame();
     }
 
     // public override void OnNetworkSpawn()
@@ -40,6 +45,7 @@ public class ChessBoard : NetworkBehaviour
     public void StartGame()
     {
         IsP1Turn = true;
+        OnChangedTurn(IsP1Turn);
 
         switch (BoardMaterials.GameType)
         {
@@ -100,6 +106,8 @@ public class ChessBoard : NetworkBehaviour
         UpdateBoard();
         SetValidMovesForPieces();
         CheckForGameOver();
+
+        OnChangedTurn?.Invoke(IsP1Turn);
     }
 
     private static void SetValidMovesForPieces()
@@ -302,6 +310,10 @@ public class ChessBoard : NetworkBehaviour
     }
 
 
+    public void TogglePauseBool()
+    {
+        IsPaused ^= true;
+    }
 
 
 
