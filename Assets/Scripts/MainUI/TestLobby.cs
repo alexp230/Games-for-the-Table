@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Mono.CSharp;
 using QFSW.QC;
 using TMPro;
 using Unity.Netcode;
@@ -31,25 +32,26 @@ public class TestLobby : MonoBehaviour
     private Lobby JoinedLobby;
     private float HeartBeatTimer;
     private float LobbyUpdateTimer;
-    private string PlayerName;
 
     private async void Start()
     {
         string extension = UnityEngine.Random.Range(0, 99999).ToString().PadLeft(5, '0');
-        PlayerName = $"Player{extension}";
-        PlayerData.PlayerName  = PlayerName;
+        string playerName = $"Player{extension}";
 
         InitializationOptions options = new InitializationOptions();
-        options.SetProfile(PlayerName);
+        options.SetProfile(playerName);
         await UnityServices.InitializeAsync(options);
 
-        AuthenticationService.Instance.SignedIn += () => {
-            print ($"Signed in {AuthenticationService.Instance.PlayerId}");
-        };
+        if (AuthenticationService.Instance.IsSignedIn)
+            return;
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
 
-        print(PlayerName);
+        if (AuthenticationService.Instance.IsSignedIn)
+            print($"Signed in {AuthenticationService.Instance.PlayerId}");
+        
+        PlayerData.PlayerName = playerName;
+        print(playerName);
 
         // ------
 
@@ -364,12 +366,11 @@ public class TestLobby : MonoBehaviour
     private async void UpdatePlayerName(string newPlayerName)
     {
         try {
-            PlayerName = newPlayerName;
             PlayerData.PlayerName = newPlayerName;
 
             await LobbyService.Instance.UpdatePlayerAsync(JoinedLobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions {
                 Data = new Dictionary<string, PlayerDataObject> {
-                    { PLAYER_NAME , new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerName)}
+                    { PLAYER_NAME , new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, newPlayerName)}
                 }
             });
         }
@@ -445,7 +446,7 @@ public class TestLobby : MonoBehaviour
     {
         Player player = new Player { 
             Data = new Dictionary<string, PlayerDataObject> {
-                { PLAYER_NAME , new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerName)}
+                { PLAYER_NAME , new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, PlayerData.PlayerName)}
             }
         };
         return player;
