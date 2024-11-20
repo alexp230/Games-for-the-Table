@@ -19,6 +19,7 @@ public class ChessBoard : NetworkBehaviour
     public static GenericPiece[] Board = new GenericPiece[64];
     public static bool IsP1Turn = true;
     public static bool IsPaused = false;
+    public static bool ShowValidMoves = true;
 
     public event Action<bool> OnChangedTurn;
 
@@ -313,6 +314,10 @@ public class ChessBoard : NetworkBehaviour
     public void TogglePauseBool()
     {
         IsPaused ^= true;
+    }
+    public void ToggleShowValidMovesBool()
+    {
+        ShowValidMoves ^= true;
     }
 
 

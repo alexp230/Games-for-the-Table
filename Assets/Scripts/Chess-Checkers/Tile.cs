@@ -26,6 +26,9 @@ public class Tile : MonoBehaviour
 
     public static void HighlightTiles(GenericPiece currentPiece)
     {
+        if (!ChessBoard.ShowValidMoves)
+            return;
+            
         List<int> positions = currentPiece.ValidMoves;
         GenericPiece[] board = ChessBoard.Board;
         foreach (int pos in positions)
