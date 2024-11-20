@@ -54,7 +54,8 @@ public abstract class GenericPiece : MonoBehaviour
 
     protected bool CanMove()
     {
-        bool p1Turn = ChessBoard.IsP1Turn_Net.Value;
+        // bool p1Turn = ChessBoard.IsP1Turn_Net.Value;
+        bool p1Turn = ChessBoard.IsP1Turn;
         ulong playerID = NetworkManager.Singleton.LocalClientId;
 
         if (!BoardMaterials.IsLocalGame && ((!p1Turn && playerID == 0) || (p1Turn && playerID == 1)))

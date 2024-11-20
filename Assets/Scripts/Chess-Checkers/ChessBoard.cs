@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using QFSW.QC;
 using TMPro;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -19,30 +18,28 @@ public class ChessBoard : NetworkBehaviour
     public static GenericPiece[] Board = new GenericPiece[64];
     public static bool IsP1Turn = true;
 
-    public static NV_Bool IsP1Turn_Net = new NV_Bool(true, NVRP.Everyone, NVWP.Server);
-    public static NV_String64B Board_Net = new NV_String64B("", NVRP.Everyone, NVWP.Server);
+    // public static NV_String64B Board_Net = new NV_String64B("", NVRP.Everyone, NVWP.Server);
 
     private void Start()
     {
         GenerateBoardTiles();
     }
 
-    public override void OnNetworkSpawn()
-    {
-        if (!IsServer) return;
+    // public override void OnNetworkSpawn()
+    // {
+    //     if (!IsServer) return;
         
-        Board_Net.Value = "cccccccccccc00000000CCCCCCCCCCCC";
+    //     Board_Net.Value = "cccccccccccc00000000CCCCCCCCCCCC";
 
-        Board_Net.OnValueChanged += (FixedString64Bytes previousVal, FixedString64Bytes newVal) => {
-            print("Old Value ::: "+ previousVal);
-            print("New Value ::: "+ newVal);
-        };
-    }
+    //     Board_Net.OnValueChanged += (FixedString64Bytes previousVal, FixedString64Bytes newVal) => {
+    //         print("Old Value ::: "+ previousVal);
+    //         print("New Value ::: "+ newVal);
+    //     };
+    // }
 
     public void StartGame()
     {
         IsP1Turn = true;
-        SetP1Val_ServerRpc(true);
 
         switch (BoardMaterials.GameType)
         {
@@ -191,7 +188,7 @@ public class ChessBoard : NetworkBehaviour
         
         ulong senderID = NetworkManager.Singleton.LocalClientId;
         SendMove_ServerRPC(senderID, oldPos, newPos);
-        SetP1Val_ServerRpc();
+        // SetP1Val_ServerRpc();
     }
 
     public void UpdateBoard()
@@ -274,17 +271,17 @@ public class ChessBoard : NetworkBehaviour
 
 
 
-    [ServerRpc(RequireOwnership = false)]
-    private void SetP1Val_ServerRpc()
-    {
-        IsP1Turn_Net.Value ^= true;
-    }
+    // [ServerRpc(RequireOwnership = false)]
+    // private void SetP1Val_ServerRpc()
+    // {
+    //     IsP1Turn_Net.Value ^= true;
+    // }
 
-    [ServerRpc(RequireOwnership = false)]
-    private void SetP1Val_ServerRpc(bool p1Turn)
-    {
-        IsP1Turn_Net.Value = p1Turn;
-    }
+    // [ServerRpc(RequireOwnership = false)]
+    // private void SetP1Val_ServerRpc(bool p1Turn)
+    // {
+    //     IsP1Turn_Net.Value = p1Turn;
+    // }
 
     [ServerRpc(RequireOwnership = false)]
     public void SendMove_ServerRPC(ulong senderID, Vector3 oldPos, Vector3 newPos)
@@ -340,7 +337,7 @@ public class ChessBoard : NetworkBehaviour
     public void PrintData()
     {
         print($"Player 1 Turn: {IsP1Turn}");
-        print($"Player 1 Turn: {IsP1Turn_Net.Value}");
+        // print($"Player 1 Turn: {IsP1Turn_Net.Value}");
     }
     [Command]
     public void ChangeP1Turn()
