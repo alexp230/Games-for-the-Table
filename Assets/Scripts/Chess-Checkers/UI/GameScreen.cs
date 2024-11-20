@@ -1,6 +1,7 @@
-using System;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameScreen : MonoBehaviour
 {
@@ -20,6 +21,11 @@ public class GameScreen : MonoBehaviour
         ChessBoard_S.OnChangedTurn -= SetPlayerTurnText;
     }
 
+    public void OnResignButton()
+    {
+        NetworkManager.Singleton?.Shutdown();
+        SceneManager.LoadScene(sceneName:"MainMenu");
+    }
 
     private void SetPlayerTurnText(bool isP1Turn)
     {

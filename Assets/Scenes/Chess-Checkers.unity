@@ -3718,7 +3718,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 73672828}
+      - m_Target: {fileID: 1417131933}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
@@ -3874,7 +3874,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1433777278}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 73672830}
+        m_TargetAssemblyTypeName: GameScreen, Assembly-CSharp
+        m_MethodName: OnResignButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1433777278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4474,7 +4486,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 73672828}
+      - m_Target: {fileID: 1417131933}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
@@ -4958,6 +4970,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   Board_SO: {fileID: 11400000, guid: 8eb33b7e93b982a40b45573fac8e25b8, type: 2}
   VictoryScreen_S: {fileID: 1947651043}
+  IsPaused: 0
+  ShowValidMoves: 1
 --- !u!4 &1880972536
 Transform:
   m_ObjectHideFlags: 0

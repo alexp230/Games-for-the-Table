@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,6 +18,7 @@ public class VictoryScreen : MonoBehaviour
 
     public void OnMainMenuButton()
     {
+        NetworkManager.Singleton?.Shutdown();
         SceneManager.LoadScene(sceneName:"MainMenu");
     }
 }
