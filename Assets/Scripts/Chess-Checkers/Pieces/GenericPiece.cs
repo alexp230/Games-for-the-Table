@@ -66,7 +66,7 @@ public abstract class GenericPiece : MonoBehaviour
 
         if (this.ValidMoves.Count == 0)
             return false;
-        if (ChessBoard.IsPaused)
+        if (ChessBoard_S.IsPaused)
             return false;
 
         return true;
@@ -78,7 +78,9 @@ public abstract class GenericPiece : MonoBehaviour
             return;
         
         this.PreviousPosition = RoundVector(this.transform.position);
-        Tile.HighlightTiles(this);
+
+        if (ChessBoard_S.ShowValidMoves)
+            Tile.HighlightTiles(this);
     }
 
     private void OnMouseDrag()
@@ -114,7 +116,8 @@ public abstract class GenericPiece : MonoBehaviour
             }
         }
         
-        Tile.DeHighLightTiles();
+        if (ChessBoard_S.ShowValidMoves)
+            Tile.DeHighLightTiles();
     }
 
     protected abstract void PostMoveProcess(Vector3 lastPos, Vector3 nextPos);

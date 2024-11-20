@@ -18,8 +18,8 @@ public class ChessBoard : NetworkBehaviour
     
     public static GenericPiece[] Board = new GenericPiece[64];
     public static bool IsP1Turn = true;
-    public static bool IsPaused = false;
-    public static bool ShowValidMoves = true;
+    public bool IsPaused = false;
+    public bool ShowValidMoves = true;
 
     public event Action<bool> OnChangedTurn;
 
