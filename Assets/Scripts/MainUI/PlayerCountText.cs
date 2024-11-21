@@ -13,8 +13,8 @@ public class PlayerCountText : MonoBehaviour
         switch(GameModeSelection.options[GameModeSelection.value].text)
         {
             case "CHECKERS": MaxPlayerCount.text+="2"; break;
-            case "CHESS": MaxPlayerCount.text+="2"; break;
-            case "COMBINATION": MaxPlayerCount.text+="2"; break;
+            case "CHESS": MaxPlayerCount.text+="4"; break;
+            case "COMBINATION": MaxPlayerCount.text+="6"; break;
         }
     }
 }
