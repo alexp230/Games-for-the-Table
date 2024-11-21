@@ -203,7 +203,7 @@ public class TestLobby : MonoBehaviour
     {
         try{
             
-            BoardMaterials.GameType = GameModeSelection.value;
+            BoardMaterials.GameType = GetGameModeIdFromLobby();
             BoardMaterials.IsLocalGame = false;
 
             print("Joining Relay with " + joinCode);
@@ -275,7 +275,6 @@ public class TestLobby : MonoBehaviour
             // PrintPlayers(HostLobby);
 
             FillPlayerList(JoinedLobby);
-
         }
 
         catch (Exception e){
@@ -573,5 +572,15 @@ public class TestLobby : MonoBehaviour
                 IsPrivate = IsPrivateLobbyToggle.isOn,
             });
         UpdateLobbySetting(newHostLobby);
+    }
+
+
+    private int GetGameModeIdFromLobby()
+    {
+        string gameMode = JoinedLobby.Data[GAME_MODE].Value;
+        for (int i=0; i<GameModeSelection.options.Count; ++i)
+            if (GameModeSelection.options[i].text == gameMode)
+                return i;
+        return -1;
     }
 }
