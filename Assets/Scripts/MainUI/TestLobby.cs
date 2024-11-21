@@ -74,9 +74,9 @@ public class TestLobby : MonoBehaviour
                 if (player.Id == myPlayerId)
                 {
                     JoinedLobby = currentLobby;
-                    
                     if (myPlayerId == currentLobby.HostId)
                         HostLobby = currentLobby;
+                    return;
                 }
             }
         }
@@ -93,7 +93,6 @@ public class TestLobby : MonoBehaviour
 
         BeginGame();        
     }
-
     private async void HandleHeartBeat()
     {
         if (HostLobby != null)
@@ -108,7 +107,6 @@ public class TestLobby : MonoBehaviour
             }
         }
     }
-
     private async void HandleLobbyPullForUpdates()
     {
         if (JoinedLobby != null)
@@ -122,32 +120,16 @@ public class TestLobby : MonoBehaviour
                 Lobby lobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
                 JoinedLobby = lobby;
 
-                // ---------
                 if (IfKickedFromLobby())
-                {
                     ClearLocalLobbyData();
-                    return;
-                }
-                CheckForHostChange();
-
-                if (JoinedLobby.Data[START_GAME].Value != "0")
+                else
                 {
-                    if (HostLobby == null)
-                        JoinRelay(JoinedLobby.Data[START_GAME].Value);
-                    
-                    JoinedLobby = null;
-                }
+                    CheckForHostChange();
+                    SetMiscLobbyVariables();
+                    CheckIfHostStartedGame();   
+                    FillPlayerList(lobby);
+                }                
 
-                // ---------
-
-                // PrintPlayers(lobby);
-
-                // --------
-
-                FillPlayerList(lobby);
-                LobbyCode.text = (HostLobby != null) ? lobby.LobbyCode : "";
-
-                // --------
             }
         }
     }
@@ -163,6 +145,21 @@ public class TestLobby : MonoBehaviour
     {
         if (JoinedLobby.HostId == AuthenticationService.Instance.PlayerId)
             HostLobby = JoinedLobby;
+    }
+    private void SetMiscLobbyVariables()
+    {
+        IsPrivateLobbyToggle.isOn = JoinedLobby.IsPrivate;
+        LobbyCode.text = JoinedLobby.LobbyCode;
+    }
+    private void CheckIfHostStartedGame()
+    {
+        if (JoinedLobby.Data[START_GAME].Value != "0")
+        {
+            if (HostLobby == null)
+                JoinRelay(JoinedLobby.Data[START_GAME].Value);
+            
+            JoinedLobby = null;
+        }
     }
 
     private void BeginGame()
