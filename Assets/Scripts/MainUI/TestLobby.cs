@@ -27,11 +27,16 @@ public class TestLobby : MonoBehaviour
     [SerializeField] private TextMeshProUGUI LobbyCode;
     [SerializeField] private TMP_Dropdown GameModeSelection;
     [SerializeField] private Toggle IsPrivateLobbyToggle;
+    [SerializeField] private Button CreateLobbyButton;
+    [SerializeField] private Button LeaveLobbyButton;
+    [SerializeField] private TMP_InputField JoinLobbyInputField;
+    [SerializeField] private Button JoinLobbyButton;
 
     private Lobby HostLobby;
     private Lobby JoinedLobby;
     private float HeartBeatTimer = 15;
     private float LobbyUpdateTimer = 3;
+    private float JoinLobbyTimer = 4;
 
     void Start()
     {
@@ -86,10 +91,11 @@ public class TestLobby : MonoBehaviour
         FillPlayerList(JoinedLobby);
     }
 
-    void Update()
+    void FixedUpdate()
     {
         HandleHeartBeat();
         HandleLobbyPullForUpdates();
+        HandleDelayingJoinByCodeButton();
 
         BeginGame();        
     }
@@ -97,10 +103,10 @@ public class TestLobby : MonoBehaviour
     {
         if (HostLobby != null)
         {
-            HeartBeatTimer -= Time.deltaTime;
+            HeartBeatTimer -= Time.fixedDeltaTime;
             if (HeartBeatTimer < 0f)
             {
-                float heartbeatTimerMax = 15f;
+                float heartbeatTimerMax = 15.3f;
                 HeartBeatTimer = heartbeatTimerMax;
 
                 await LobbyService.Instance.SendHeartbeatPingAsync(HostLobby.Id);
@@ -111,10 +117,10 @@ public class TestLobby : MonoBehaviour
     {
         if (JoinedLobby != null)
         {
-            LobbyUpdateTimer -= Time.deltaTime;
+            LobbyUpdateTimer -= Time.fixedDeltaTime;
             if (LobbyUpdateTimer < 0f)
             {
-                float lobbyUpdateTimerMax = 2f;
+                float lobbyUpdateTimerMax = 2.2f;
                 LobbyUpdateTimer = lobbyUpdateTimerMax;
 
                 Lobby lobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
@@ -128,8 +134,7 @@ public class TestLobby : MonoBehaviour
                     SetMiscLobbyVariables();
                     CheckIfHostStartedGame();   
                     FillPlayerList(lobby);
-                }                
-
+                }
             }
         }
     }
@@ -160,6 +165,13 @@ public class TestLobby : MonoBehaviour
             
             JoinedLobby = null;
         }
+    }
+    private void HandleDelayingJoinByCodeButton()
+    {
+        JoinLobbyTimer -= Time.fixedDeltaTime;
+        if (JoinLobbyTimer < 0f)
+            JoinLobbyTimer = 0f;
+        print(JoinLobbyTimer);
     }
 
     private void BeginGame()
@@ -314,6 +326,9 @@ public class TestLobby : MonoBehaviour
                 Player = GetPlayer(),
             };
 
+            if (JoinedLobby != null)
+                return;
+
             Lobby lobby = await Lobbies.Instance.JoinLobbyByCodeAsync(lobbyCode, joinLobbyByCodeOptions);
             JoinedLobby = lobby;
             PlayerData.LobbyID = lobby.Id;
@@ -322,7 +337,6 @@ public class TestLobby : MonoBehaviour
 
             PrintPlayers(lobby);
             FillPlayerList(lobby);
-
         }
         catch (Exception e){
             print(e);
@@ -538,17 +552,28 @@ public class TestLobby : MonoBehaviour
 
 
 
-    public void CreateLobbyButton()
+    public void OnCreateLobbyButton()
     {
         CreateLobby();
     }
-    public void LeaveLobbyButton()
+    public void OnLeaveLobbyButton()
     {
         LeaveLobby();
     }
-    public void KickPlayerButton(int index)
+    public void OnKickPlayerButton(int index)
     {
         KickPlayer(index);
+    }
+    public void OnJoinLobbyByCodeButton()
+    {
+        string lobbyCode = JoinLobbyInputField.text.ToUpper();
+        if (lobbyCode == "" || lobbyCode.Length != 6 || JoinLobbyTimer > 0.1f)
+            return;
+
+        float JoinLobbyTimerMax = 4.0f;
+        JoinLobbyTimer = JoinLobbyTimerMax;
+
+        JoinLobbyByCode(lobbyCode);
     }
     public async void OnGameModeChange()
     {
