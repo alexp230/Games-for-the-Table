@@ -24,19 +24,23 @@ public class TestLobby : MonoBehaviour
     private const string GAME_MODE = "GameMode";
     private const string START_GAME = "StartGame";
 
-    [SerializeField] private TextMeshProUGUI LobbyCode;
-    [SerializeField] private TMP_Dropdown GameModeSelection;
+    [SerializeField] private TMP_Dropdown GameModeSelectionDropDown;
+    [SerializeField] private TextMeshProUGUI GameModeText;
+    [SerializeField] private TextMeshProUGUI LobbyCodeText;
     [SerializeField] private Toggle IsPrivateLobbyToggle;
+    [SerializeField] private Button StartGameButton;
     [SerializeField] private Button CreateLobbyButton;
     [SerializeField] private Button LeaveLobbyButton;
     [SerializeField] private TMP_InputField JoinLobbyInputField;
     [SerializeField] private Button JoinLobbyButton;
 
-    private Lobby HostLobby;
-    private Lobby JoinedLobby;
-    private float HeartBeatTimer = 15;
-    private float LobbyUpdateTimer = 3;
-    private float JoinLobbyTimer = 4;
+    private Lobby HostLobby = null;
+    private Lobby JoinedLobby = null;
+    private float HeartBeatTimer = 15f;
+    private float LobbyUpdateTimer = 3f;
+    private float JoinLobbyTimer = 4f;
+    private float LobbyUIUpdateTimer = 2.5f;
+    private float StartGameTimer = -999f;
 
     void Start()
     {
@@ -96,15 +100,16 @@ public class TestLobby : MonoBehaviour
         HandleHeartBeat();
         HandleLobbyPullForUpdates();
         HandleDelayingJoinByCodeButton();
+        HandleUIUpdates();
 
-        BeginGame();        
+        BeginGameWhenApplicable();        
     }
     private async void HandleHeartBeat()
     {
         if (HostLobby != null)
         {
             HeartBeatTimer -= Time.fixedDeltaTime;
-            if (HeartBeatTimer < 0f)
+            if (HeartBeatTimer <= 0f)
             {
                 float heartbeatTimerMax = 15.3f;
                 HeartBeatTimer = heartbeatTimerMax;
@@ -118,7 +123,7 @@ public class TestLobby : MonoBehaviour
         if (JoinedLobby != null)
         {
             LobbyUpdateTimer -= Time.fixedDeltaTime;
-            if (LobbyUpdateTimer < 0f)
+            if (LobbyUpdateTimer <= 0f)
             {
                 float lobbyUpdateTimerMax = 2.2f;
                 LobbyUpdateTimer = lobbyUpdateTimerMax;
@@ -138,6 +143,69 @@ public class TestLobby : MonoBehaviour
             }
         }
     }
+    private void HandleUIUpdates()
+    {
+        LobbyUIUpdateTimer -= Time.fixedDeltaTime;
+        if (LobbyUIUpdateTimer > 0f)
+            return;
+        
+        if (JoinedLobby != null && JoinedLobby.Data[START_GAME].Value != "0")
+        {
+            GameModeSelectionDropDown.gameObject.SetActive(false);
+            GameModeText.gameObject.SetActive(false);
+            LobbyCodeText.gameObject.SetActive(false);
+            IsPrivateLobbyToggle.gameObject.SetActive(false);
+            StartGameButton.gameObject.SetActive(false);
+
+            CreateLobbyButton.gameObject.SetActive(false);
+            LeaveLobbyButton.gameObject.SetActive(false);
+            JoinLobbyInputField.gameObject.SetActive(false);
+            JoinLobbyButton.gameObject.SetActive(false);
+
+        }
+        else if (HostLobby == null && JoinedLobby == null)
+        {
+            GameModeSelectionDropDown.gameObject.SetActive(true);
+            GameModeText.gameObject.SetActive(false);
+            LobbyCodeText.gameObject.SetActive(false);
+            IsPrivateLobbyToggle.gameObject.SetActive(true);
+            StartGameButton.gameObject.SetActive(false);
+
+            CreateLobbyButton.gameObject.SetActive(true);
+            LeaveLobbyButton.gameObject.SetActive(false);
+            JoinLobbyInputField.gameObject.SetActive(true);
+            JoinLobbyButton.gameObject.SetActive(true);
+        }
+        else if (HostLobby != null)
+        {
+            GameModeSelectionDropDown.gameObject.SetActive(true);
+            GameModeText.gameObject.SetActive(false);
+            LobbyCodeText.gameObject.SetActive(true);
+            IsPrivateLobbyToggle.gameObject.SetActive(true);
+            StartGameButton.gameObject.SetActive((HostLobby.Players.Count >= 2) ? true : false);
+
+            CreateLobbyButton.gameObject.SetActive(false);
+            LeaveLobbyButton.gameObject.SetActive(true);
+            JoinLobbyInputField.gameObject.SetActive(false);
+            JoinLobbyButton.gameObject.SetActive(false);
+        }
+        else if (JoinedLobby != null)
+        {
+            GameModeSelectionDropDown.gameObject.SetActive(false);
+            GameModeText.gameObject.SetActive(true);
+            LobbyCodeText.gameObject.SetActive(true);
+            IsPrivateLobbyToggle.gameObject.SetActive(false);
+            StartGameButton.gameObject.SetActive(false);
+
+            CreateLobbyButton.gameObject.SetActive(false);
+            LeaveLobbyButton.gameObject.SetActive(true);
+            JoinLobbyInputField.gameObject.SetActive(false);
+            JoinLobbyButton.gameObject.SetActive(false);       
+        }
+
+        float LobbyUIUpdateTimerMax = 1;
+        LobbyUIUpdateTimer = LobbyUIUpdateTimerMax;
+    }
     private bool IfKickedFromLobby()
     {
         string thisPlayerId = AuthenticationService.Instance.PlayerId;
@@ -154,7 +222,8 @@ public class TestLobby : MonoBehaviour
     private void SetMiscLobbyVariables()
     {
         IsPrivateLobbyToggle.isOn = JoinedLobby.IsPrivate;
-        LobbyCode.text = JoinedLobby.LobbyCode;
+        LobbyCodeText.text = JoinedLobby.LobbyCode;
+        GameModeText.text = JoinedLobby.Data[GAME_MODE].Value;
     }
     private void CheckIfHostStartedGame()
     {
@@ -171,14 +240,18 @@ public class TestLobby : MonoBehaviour
         JoinLobbyTimer -= Time.fixedDeltaTime;
         if (JoinLobbyTimer < 0f)
             JoinLobbyTimer = 0f;
-        print(JoinLobbyTimer);
     }
 
-    private void BeginGame()
+    private void BeginGameWhenApplicable()
     {
-        if (HostLobby != null && NetworkManager.Singleton.ConnectedClientsList.Count == 2)
+        if (StartGameTimer < -1f)
+            return;
+        
+        StartGameTimer -= Time.fixedDeltaTime;
+
+        if (StartGameTimer < 0f && HostLobby != null)
         {
-            BoardMaterials.GameType = GameModeSelection.value;
+            BoardMaterials.GameType = GameModeSelectionDropDown.value;
             BoardMaterials.IsLocalGame = false;
             NetworkManager.Singleton.SceneManager.LoadScene("Chess-Checkers", LoadSceneMode.Single);
         }
@@ -199,8 +272,9 @@ public class TestLobby : MonoBehaviour
 
             RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-
             NetworkManager.Singleton.StartHost();
+
+            StartGameTimer = 5f;
 
             return joinCode;
         }
@@ -263,12 +337,12 @@ public class TestLobby : MonoBehaviour
     private async void CreateLobby()
     {
         try {
-            if (HostLobby != null)
+            if (HostLobby != null || JoinedLobby != null)
                 return;
             
             string lobbyName = "MyLobby";
             int maxPlayers = 8;
-            string gameMode = GameModeSelection.options[GameModeSelection.value].text;
+            string gameMode = GameModeSelectionDropDown.options[GameModeSelectionDropDown.value].text;
 
             CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions {
                 IsPrivate = IsPrivateLobbyToggle.isOn,
@@ -322,12 +396,12 @@ public class TestLobby : MonoBehaviour
     private async void JoinLobbyByCode(string lobbyCode)
     {
         try{
+            if (HostLobby != null || JoinedLobby != null)
+                return;
+
             JoinLobbyByCodeOptions joinLobbyByCodeOptions = new JoinLobbyByCodeOptions() {
                 Player = GetPlayer(),
             };
-
-            if (JoinedLobby != null)
-                return;
 
             Lobby lobby = await Lobbies.Instance.JoinLobbyByCodeAsync(lobbyCode, joinLobbyByCodeOptions);
             JoinedLobby = lobby;
@@ -347,6 +421,9 @@ public class TestLobby : MonoBehaviour
     private async void QuickJoinLobby()
     {
         try {
+            if (HostLobby != null || JoinedLobby != null)
+                return;
+
             QuickJoinLobbyOptions quickJoinLobbyByCodeOptions = new QuickJoinLobbyOptions() {
                 Player = GetPlayer(),
             };
@@ -420,6 +497,9 @@ public class TestLobby : MonoBehaviour
     private async void LeaveLobby()
     {
         try {
+            if (JoinedLobby == null)
+                return;
+
             if (HostLobby != null && JoinedLobby.Players.Count > 1)
                 MigrateLobbyHost();
 
@@ -538,7 +618,7 @@ public class TestLobby : MonoBehaviour
     {
         HostLobby = null;
         JoinedLobby = null;
-        LobbyCode.text = "";
+        LobbyCodeText.text = "";
 
         // Clear PlayerList Data
         foreach (GameObject playerBar in PlayerList)
@@ -574,13 +654,14 @@ public class TestLobby : MonoBehaviour
         JoinLobbyTimer = JoinLobbyTimerMax;
 
         JoinLobbyByCode(lobbyCode);
+        JoinLobbyInputField.text = "";
     }
     public async void OnGameModeChange()
     {
         if (HostLobby == null)
             return;
 
-        string gameMode = GameModeSelection.options[GameModeSelection.value].text;
+        string gameMode = GameModeSelectionDropDown.options[GameModeSelectionDropDown.value].text;
         Lobby newHostLobby = await Lobbies.Instance.UpdateLobbyAsync(HostLobby.Id, new UpdateLobbyOptions {
                 Data = new Dictionary<string, DataObject> {
                     { GAME_MODE, new DataObject(DataObject.VisibilityOptions.Public, gameMode)}
@@ -603,8 +684,8 @@ public class TestLobby : MonoBehaviour
     private int GetGameModeIdFromLobby()
     {
         string gameMode = JoinedLobby.Data[GAME_MODE].Value;
-        for (int i=0; i<GameModeSelection.options.Count; ++i)
-            if (GameModeSelection.options[i].text == gameMode)
+        for (int i=0; i<GameModeSelectionDropDown.options.Count; ++i)
+            if (GameModeSelectionDropDown.options[i].text == gameMode)
                 return i;
         return -1;
     }
