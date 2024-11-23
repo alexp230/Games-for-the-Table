@@ -227,7 +227,7 @@ public class TestLobby : MonoBehaviour
     }
     private void CheckIfHostStartedGame()
     {
-        if (JoinedLobby.Data[START_GAME].Value != "0")
+        if (JoinedLobby != null && JoinedLobby.Data[START_GAME].Value != "0")
         {
             if (HostLobby == null)
                 JoinRelay(JoinedLobby.Data[START_GAME].Value);
@@ -288,7 +288,6 @@ public class TestLobby : MonoBehaviour
     private async void JoinRelay(string joinCode)
     {
         try{
-            
             BoardMaterials.GameType = GetGameModeIdFromLobby();
             BoardMaterials.IsLocalGame = false;
 
@@ -297,7 +296,6 @@ public class TestLobby : MonoBehaviour
 
             RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-
             NetworkManager.Singleton.StartClient();
         }
         catch (RelayServiceException e){
@@ -306,7 +304,7 @@ public class TestLobby : MonoBehaviour
     }
 
     [Command]
-    public async void OnStartGame()
+    public async void OnStartGameButton()
     {
         if (HostLobby != null)
         {
@@ -500,12 +498,17 @@ public class TestLobby : MonoBehaviour
             if (JoinedLobby == null)
                 return;
 
+            bool deleteLobby = false;
+
             if (HostLobby != null && JoinedLobby.Players.Count > 1)
                 MigrateLobbyHost();
+            else if  (HostLobby != null && JoinedLobby.Players.Count <= 1)
+                deleteLobby = true;
 
             await LobbyService.Instance.RemovePlayerAsync(JoinedLobby.Id, AuthenticationService.Instance.PlayerId);
-
-            // -------------------------
+        
+            if (deleteLobby)
+                DeleteLobby();
 
             ClearLocalLobbyData();
         }
