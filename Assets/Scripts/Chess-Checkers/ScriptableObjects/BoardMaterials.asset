@@ -18,6 +18,9 @@ MonoBehaviour:
   Piece_p1Color: {fileID: 2100000, guid: d667c8e8c511dc34fa246ca934ebab2e, type: 2}
   Piece_p2Color: {fileID: 2100000, guid: e98d5ca560b99b5488069fa95b814b32, type: 2}
   SpecialPieceColor: {fileID: 2100000, guid: 394bf2a1c58651344beef485ef450abf, type: 2}
+  ChessSFX_1: {fileID: 8300000, guid: c8a06dea7c51faa48a6763e1b520e8ba, type: 3}
+  ChessSFX_2: {fileID: 8300000, guid: 8225b7baf2cc52846828307a2b0eeecb, type: 3}
+  ChessSFX_3: {fileID: 8300000, guid: bd76fcc5e5af6224eb58e71bedc48b69, type: 3}
   TitlePrefab: {fileID: 971518803616806932, guid: 2ffa0077cb98d894684254f5e07f26f4, type: 3}
   CheckerPrefab: {fileID: 1220431944643570660, guid: 5c6e2af04b23e494eb3a2a7fc7490839, type: 3}
   DukePrefab: {fileID: 1272187813879115648, guid: d8f5d557da4a9bf41beb14659e0242fb, type: 3}
@@ -27,19 +30,3 @@ MonoBehaviour:
   RookPrefab: {fileID: 6548970298669244974, guid: 208eedfc6e3a3b54e99ee406046f7afd, type: 3}
   QueenPrefab: {fileID: 2469861511600136407, guid: 01414e3b6b0c34841b4241980523f642, type: 3}
   KingPrefab: {fileID: 7417587928292900850, guid: 45531cc83c926fa4f97e3a9fd4cc9b1d, type: 3}
-  P1_PIECE: 67
-  P2_PIECE: 99
-  P1_DUKE: 68
-  P2_DUKE: 100
-  P1_PAWN: 80
-  P2_PAWN: 112
-  P1_BISHOP: 66
-  P2_BISHOP: 98
-  P1_KNIGHT: 72
-  P2_KNIGHT: 104
-  P1_ROOK: 82
-  P2_ROOK: 114
-  P1_QUEEN: 81
-  P2_QUEEN: 113
-  P1_KING: 75
-  P2_KING: 107

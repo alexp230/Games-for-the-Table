@@ -63,7 +63,7 @@ public class BoardMaterials : ScriptableObject
         {
             case 1: return ChessSFX_1;
             case 2: return ChessSFX_2;
-            case 4: return ChessSFX_3;
+            case 3: return ChessSFX_3;
             default: return ChessSFX_1; 
         }
     }
