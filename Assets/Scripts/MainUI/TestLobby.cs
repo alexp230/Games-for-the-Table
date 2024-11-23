@@ -33,6 +33,7 @@ public class TestLobby : MonoBehaviour
     [SerializeField] private Button LeaveLobbyButton;
     [SerializeField] private TMP_InputField JoinLobbyInputField;
     [SerializeField] private Button JoinLobbyButton;
+    [SerializeField] private Button BackButton;
 
     private Lobby HostLobby = null;
     private Lobby JoinedLobby = null;
@@ -46,6 +47,7 @@ public class TestLobby : MonoBehaviour
     {
         SignIn();
         ResetLobbyVariables();
+        ShutDownNetworkManagerAndRelay();
     }
     private async void SignIn()
     {
@@ -71,8 +73,9 @@ public class TestLobby : MonoBehaviour
     {
         try{
             ClearLocalLobbyData();
+            FillPlayerList(JoinedLobby);
 
-            if (PlayerData.LobbyID == "")
+            if (string.IsNullOrEmpty(PlayerData.LobbyID))
                 return;
 
             Lobby currentLobby = await LobbyService.Instance.GetLobbyAsync(PlayerData.LobbyID);
@@ -93,6 +96,18 @@ public class TestLobby : MonoBehaviour
             print(e);
         }
         FillPlayerList(JoinedLobby);
+    }
+    private void ShutDownNetworkManagerAndRelay()
+    {
+        NetworkManager.Singleton?.Shutdown();
+    }
+
+    void OnDisable()
+    {
+        if (HostLobby != null)
+            DeleteLobby();
+        else if (JoinedLobby != null)
+            LeaveLobby();
     }
 
     void FixedUpdate()
@@ -128,17 +143,23 @@ public class TestLobby : MonoBehaviour
                 float lobbyUpdateTimerMax = 2.2f;
                 LobbyUpdateTimer = lobbyUpdateTimerMax;
 
-                Lobby lobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
-                JoinedLobby = lobby;
+                try{
 
-                if (IfKickedFromLobby())
+                    Lobby lobby = await LobbyService.Instance.GetLobbyAsync(JoinedLobby.Id);
+                    JoinedLobby = lobby;
+
+                    if (IfKickedFromLobby())
+                        ClearLocalLobbyData();
+                    else
+                    {
+                        CheckForHostChange();
+                        SetMiscLobbyVariables();
+                        CheckIfHostStartedGame();   
+                        FillPlayerList(lobby);
+                    }
+                }
+                catch{
                     ClearLocalLobbyData();
-                else
-                {
-                    CheckForHostChange();
-                    SetMiscLobbyVariables();
-                    CheckIfHostStartedGame();   
-                    FillPlayerList(lobby);
                 }
             }
         }
@@ -149,7 +170,7 @@ public class TestLobby : MonoBehaviour
         if (LobbyUIUpdateTimer > 0f)
             return;
         
-        if (JoinedLobby != null && JoinedLobby.Data[START_GAME].Value != "0")
+        if (JoinedLobby != null && JoinedLobby.Data[START_GAME].Value != "0") // If game started
         {
             GameModeSelectionDropDown.gameObject.SetActive(false);
             GameModeText.gameObject.SetActive(false);
@@ -161,6 +182,7 @@ public class TestLobby : MonoBehaviour
             LeaveLobbyButton.gameObject.SetActive(false);
             JoinLobbyInputField.gameObject.SetActive(false);
             JoinLobbyButton.gameObject.SetActive(false);
+            BackButton.gameObject.SetActive(false);
 
         }
         else if (HostLobby == null && JoinedLobby == null)
@@ -175,6 +197,7 @@ public class TestLobby : MonoBehaviour
             LeaveLobbyButton.gameObject.SetActive(false);
             JoinLobbyInputField.gameObject.SetActive(true);
             JoinLobbyButton.gameObject.SetActive(true);
+            BackButton.gameObject.SetActive(true);
         }
         else if (HostLobby != null)
         {
@@ -188,6 +211,7 @@ public class TestLobby : MonoBehaviour
             LeaveLobbyButton.gameObject.SetActive(true);
             JoinLobbyInputField.gameObject.SetActive(false);
             JoinLobbyButton.gameObject.SetActive(false);
+            BackButton.gameObject.SetActive(false);
         }
         else if (JoinedLobby != null)
         {
@@ -200,7 +224,8 @@ public class TestLobby : MonoBehaviour
             CreateLobbyButton.gameObject.SetActive(false);
             LeaveLobbyButton.gameObject.SetActive(true);
             JoinLobbyInputField.gameObject.SetActive(false);
-            JoinLobbyButton.gameObject.SetActive(false);       
+            JoinLobbyButton.gameObject.SetActive(false);
+            BackButton.gameObject.SetActive(false);
         }
 
         float LobbyUIUpdateTimerMax = 1;
@@ -230,9 +255,10 @@ public class TestLobby : MonoBehaviour
         if (JoinedLobby != null && JoinedLobby.Data[START_GAME].Value != "0")
         {
             if (HostLobby == null)
+            {
                 JoinRelay(JoinedLobby.Data[START_GAME].Value);
-            
-            JoinedLobby = null;
+                LeaveLobby();
+            }
         }
     }
     private void HandleDelayingJoinByCodeButton()
@@ -251,6 +277,8 @@ public class TestLobby : MonoBehaviour
 
         if (StartGameTimer < 0f && HostLobby != null)
         {
+            LeaveLobby();
+
             BoardMaterials.GameType = GameModeSelectionDropDown.value;
             BoardMaterials.IsLocalGame = false;
             NetworkManager.Singleton.SceneManager.LoadScene("Chess-Checkers", LoadSceneMode.Single);
@@ -264,7 +292,7 @@ public class TestLobby : MonoBehaviour
     private async Task<string> CreateRelay()
     {
         try{
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(7);
 
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
@@ -498,17 +526,10 @@ public class TestLobby : MonoBehaviour
             if (JoinedLobby == null)
                 return;
 
-            bool deleteLobby = false;
-
             if (HostLobby != null && JoinedLobby.Players.Count > 1)
                 MigrateLobbyHost();
-            else if  (HostLobby != null && JoinedLobby.Players.Count <= 1)
-                deleteLobby = true;
 
             await LobbyService.Instance.RemovePlayerAsync(JoinedLobby.Id, AuthenticationService.Instance.PlayerId);
-        
-            if (deleteLobby)
-                DeleteLobby();
 
             ClearLocalLobbyData();
         }
@@ -548,7 +569,12 @@ public class TestLobby : MonoBehaviour
     private async void DeleteLobby()
     {
         try {
+            if (HostLobby == null)
+                return;
+
             await LobbyService.Instance.DeleteLobbyAsync(JoinedLobby.Id);
+
+            ClearLocalLobbyData();
         }
         catch (LobbyServiceException e){
             print(e);
@@ -622,14 +648,10 @@ public class TestLobby : MonoBehaviour
         HostLobby = null;
         JoinedLobby = null;
         LobbyCodeText.text = "";
+        
+        PlayerData.LobbyID = "";
 
-        // Clear PlayerList Data
-        foreach (GameObject playerBar in PlayerList)
-        {
-            Transform bar = playerBar.transform;
-            bar.Find(PLAYER_NAME).GetComponent<TextMeshProUGUI>().text = "";
-            bar.Find(KICK_BUTTON).gameObject.SetActive(false);
-        }
+        FillPlayerList(JoinedLobby);
     }
 
 
@@ -691,5 +713,19 @@ public class TestLobby : MonoBehaviour
             if (GameModeSelectionDropDown.options[i].text == gameMode)
                 return i;
         return -1;
+    }
+
+
+
+
+
+
+    [Command]
+    private void PrintDataLobby()
+    {
+        print("HostLobby: " + (HostLobby != null));
+        print("JoinedLobby: " + (JoinedLobby != null));
+        print("IsHost: " + NetworkManager.Singleton.IsHost);
+        print("IsClient: " + (!NetworkManager.Singleton.IsHost && NetworkManager.Singleton.IsClient));
     }
 }
