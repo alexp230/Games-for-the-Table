@@ -22,6 +22,7 @@ public class ChessBoard : NetworkBehaviour
     public bool ShowValidMoves = true;
 
     public event Action<bool> OnChangedTurn;
+    public event Action<bool> OnGameOver;
 
     // public static NV_String64B Board_Net = new NV_String64B("", NVRP.Everyone, NVWP.Server);
 
@@ -46,7 +47,7 @@ public class ChessBoard : NetworkBehaviour
     public void StartGame()
     {
         IsP1Turn = true;
-        OnChangedTurn(IsP1Turn);
+        OnChangedTurn?.Invoke(IsP1Turn);
 
         switch (BoardMaterials.GameType)
         {
@@ -185,6 +186,7 @@ public class ChessBoard : NetworkBehaviour
 
         if (!p1HasMove && !p2HasMove)
         {
+            OnGameOver(IsP1Turn);
             VictoryScreen_S.gameObject.SetActive(true);
             VictoryScreen_S.GetComponentInChildren<TextMeshProUGUI>().text = IsP1Turn ? "Player 2 Wins!" : "Player 1 Wins!";
             RemoveAllPieces();

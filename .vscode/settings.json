@@ -62,11 +62,14 @@
         "Dont",
         "dtls",
         "enpassant",
+        "interactable",
+        "Investore",
         "Mathf",
         "Netcode",
         "NVRP",
         "NVWP",
         "QFSW",
+        "RNBQKBNR",
         "Scriptable",
         "UGUI"
     ]

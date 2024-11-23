@@ -54,7 +54,14 @@ public class BoardMaterials : ScriptableObject
     public static int GameType = 0;
 
     public static bool IsLocalGame = true;
+    public static bool ShowValidMoves = true;
+    public static bool ForceJump = true;
+    public static bool IsP1Turn = true;
 
+    public static void ToggleShowValidMovesBool()
+    {
+        ShowValidMoves ^= true;
+    }
     public AudioClip GetMoveSoundEffect()
     {
         int AllSFXs = 4;
