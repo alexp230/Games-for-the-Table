@@ -5,6 +5,7 @@ using UnityEngine;
 
 public abstract class GenericPiece : MonoBehaviour
 {
+    [SerializeField] protected AudioSource _AudioSource;
     [SerializeField] protected BoardMaterials Board_SO;
     [SerializeField] protected MeshRenderer _MeshRenderer;
     protected static ChessBoard ChessBoard_S;
@@ -126,6 +127,7 @@ public abstract class GenericPiece : MonoBehaviour
     {
         ChessBoard_S.DisableEnPassantForEachPawn();
         PostMoveProcess(oldPos, newPos);
+        _AudioSource.PlayOneShot(Board_SO.GetMoveSoundEffect());
     }
     protected void UpdatePosition(GenericPiece currentPiece, Vector3 validPos)
     {

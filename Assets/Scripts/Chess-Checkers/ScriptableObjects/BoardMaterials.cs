@@ -11,6 +11,10 @@ public class BoardMaterials : ScriptableObject
     public Material Piece_p2Color;
     public Material SpecialPieceColor;
 
+    public AudioClip ChessSFX_1;
+    public AudioClip ChessSFX_2;
+    public AudioClip ChessSFX_3;
+
     public Tile TitlePrefab;
 
     public Checker CheckerPrefab;
@@ -50,5 +54,18 @@ public class BoardMaterials : ScriptableObject
     public static int GameType = 0;
 
     public static bool IsLocalGame = true;
+
+    public AudioClip GetMoveSoundEffect()
+    {
+        int AllSFXs = 4;
+        int randomIndex = Random.Range(1, AllSFXs+1);
+        switch (randomIndex)
+        {
+            case 1: return ChessSFX_1;
+            case 2: return ChessSFX_2;
+            case 4: return ChessSFX_3;
+            default: return ChessSFX_1; 
+        }
+    }
     
 }
