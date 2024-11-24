@@ -125,9 +125,9 @@ public abstract class GenericPiece : MonoBehaviour
 
     public void ProcessTurnLocally(Vector3 oldPos, Vector3 newPos)
     {
+        _AudioSource.PlayOneShot(Board_SO.GetMoveSoundEffect());
         ChessBoard_S.DisableEnPassantForEachPawn();
         PostMoveProcess(oldPos, newPos);
-        _AudioSource.PlayOneShot(Board_SO.GetMoveSoundEffect());
     }
     protected void UpdatePosition(GenericPiece currentPiece, Vector3 validPos)
     {
