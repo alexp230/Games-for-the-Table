@@ -1,30 +1,28 @@
 using System;
 using System.Collections.Generic;
 using QFSW.QC;
-using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-
-using NV_Bool = Unity.Netcode.NetworkVariable<bool>;
-using NV_String64B = Unity.Netcode.NetworkVariable<Unity.Collections.FixedString64Bytes>;
+using UnityEngine.Events;
 
 public class ChessBoard : NetworkBehaviour
 {
     [SerializeField] private BoardMaterials Board_SO;
-    [SerializeField] private VictoryScreen VictoryScreen_S;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
     
     public static GenericPiece[] Board = new GenericPiece[64];
 
-    public event Action<bool> OnChangedTurn;
-    public event Action<bool> OnGameOver;
+    public UnityEvent<bool> OnChangedTurn;
+    public UnityEvent OnGameOver;
+    public UnityEvent<string> OnWinnerAnnounced;
 
     // public static NV_String64B Board_Net = new NV_String64B("", NVRP.Everyone, NVWP.Server);
 
     void Start()
     {
         GenerateBoardTiles();
+        
         // StartGame();
     }
 
@@ -55,8 +53,6 @@ public class ChessBoard : NetworkBehaviour
 
     public void ResetGame()
     {
-        VictoryScreen_S.gameObject.SetActive(false);
-
         StartGame();
     }
 
@@ -181,9 +177,8 @@ public class ChessBoard : NetworkBehaviour
 
         if (!p1HasMove && !p2HasMove)
         {
-            OnGameOver(BoardMaterials.IsP1Turn);
-            VictoryScreen_S.gameObject.SetActive(true);
-            VictoryScreen_S.GetComponentInChildren<TextMeshProUGUI>().text = BoardMaterials.IsP1Turn ? "Player 2 Wins!" : "Player 1 Wins!";
+            OnGameOver?.Invoke();
+            SetWinnerName_ServerRPC(NetworkManager.Singleton.LocalClientId);
             RemoveAllPieces();
         }
     }
@@ -305,6 +300,21 @@ public class ChessBoard : NetworkBehaviour
         foreach (GameObject piece in allPieces)
             if (piece.transform.position == oldPos)
                 piece.GetComponent<GenericPiece>().ProcessTurnLocally(oldPos, newPos);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SetWinnerName_ServerRPC(ulong callerID)
+    {
+        bool isP1Turn = BoardMaterials.IsP1Turn;
+        if ((isP1Turn && callerID == 1) || (!isP1Turn && callerID == 0))
+            SetWinnerName_ClientRPC(PlayerData.PlayerName);
+    }
+
+    [ClientRpc]
+    public void SetWinnerName_ClientRPC(string playerName)
+    {
+        print(playerName);
+        OnWinnerAnnounced?.Invoke(playerName);
     }
 
 

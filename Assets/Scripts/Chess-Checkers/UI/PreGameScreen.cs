@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -91,7 +90,5 @@ public class PreGameScreen : NetworkBehaviour
 
         ChessBoard_S.StartGame();
     }
-
-
 
 }
