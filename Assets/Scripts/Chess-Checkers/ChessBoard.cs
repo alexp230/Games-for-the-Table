@@ -351,7 +351,7 @@ public class ChessBoard : NetworkBehaviour
     public void PrintData()
     {
         print($"Player 1 Turn: {BoardMaterials.IsP1Turn}");
-        print("ID: " + NetworkManager.Singleton.LocalClientId);
+        print("ID: " + NetworkManager.Singleton?.LocalClientId);
         print("IsLocalGame: " + BoardMaterials.IsLocalGame);
         // print($"Player 1 Turn: {IsP1Turn_Net.Value}");
     }

@@ -13,6 +13,8 @@ public class PreGameScreen : NetworkBehaviour
     [SerializeField] private Button ConfirmButton;
     [SerializeField] private GameObject GameScreen;
 
+    private bool IsLocalGame = BoardMaterials.IsLocalGame;
+
     void Start()
     {
         ChessBoard_S = GameObject.Find("ChessBoard").GetComponent<ChessBoard>();
@@ -21,7 +23,7 @@ public class PreGameScreen : NetworkBehaviour
     {
         SetBoardVariables();
 
-        if (!BoardMaterials.IsLocalGame)
+        if (!IsLocalGame)
             if (NetworkManager.Singleton.LocalClientId != 0)
                 SetSettingsInteractable(false);
 
@@ -52,15 +54,20 @@ public class PreGameScreen : NetworkBehaviour
 
     public void OnForceJumpToggle()
     {
-        SendForceJump_ClientRPC(ForceJumpToggle.isOn);
+        if (!IsLocalGame)
+            SendForceJump_ClientRPC(ForceJumpToggle.isOn);
     }
     public void OnPlayer1MovesFirstToggle()
     {
-        SendPlayer1MovesFirst_ClientRPC(Player1MovesFirstToggle.isOn);
+        if (!IsLocalGame)
+            SendPlayer1MovesFirst_ClientRPC(Player1MovesFirstToggle.isOn);
     }
     public void OnConfirmButton()
     {
-        SetGameDataAndStartGame_ClientRPC();
+        if (!IsLocalGame)
+            SetGameDataAndStartGame_ClientRPC();
+        else
+            StartGame();
     }
 
 
@@ -79,6 +86,11 @@ public class PreGameScreen : NetworkBehaviour
     }
     [ClientRpc]
     private void SetGameDataAndStartGame_ClientRPC()
+    {
+        StartGame();
+    }
+
+    private void StartGame()
     {
         BoardMaterials.IsPaused = false;
         BoardMaterials.ShowValidMoves = ShowValidMovesToggle.isOn;
