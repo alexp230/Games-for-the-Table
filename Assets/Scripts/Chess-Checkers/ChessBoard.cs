@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Resources;
 using QFSW.QC;
 using TMPro;
 using Unity.Netcode;
@@ -17,9 +16,6 @@ public class ChessBoard : NetworkBehaviour
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
     
     public static GenericPiece[] Board = new GenericPiece[64];
-    public static bool IsP1Turn = true;
-    public bool IsPaused = false;
-    public bool ShowValidMoves = true;
 
     public event Action<bool> OnChangedTurn;
     public event Action<bool> OnGameOver;
@@ -29,7 +25,7 @@ public class ChessBoard : NetworkBehaviour
     void Start()
     {
         GenerateBoardTiles();
-        StartGame();
+        // StartGame();
     }
 
     // public override void OnNetworkSpawn()
@@ -46,8 +42,7 @@ public class ChessBoard : NetworkBehaviour
 
     public void StartGame()
     {
-        IsP1Turn = true;
-        OnChangedTurn?.Invoke(IsP1Turn);
+        OnChangedTurn?.Invoke(BoardMaterials.IsP1Turn);
 
         switch (BoardMaterials.GameType)
         {
@@ -104,12 +99,12 @@ public class ChessBoard : NetworkBehaviour
 
     public void ChangeSides()
     {
-        IsP1Turn ^= true;
+        BoardMaterials.IsP1Turn ^= true;
         UpdateBoard();
         SetValidMovesForPieces();
         CheckForGameOver();
 
-        OnChangedTurn?.Invoke(IsP1Turn);
+        OnChangedTurn?.Invoke(BoardMaterials.IsP1Turn);
     }
 
     private static void SetValidMovesForPieces()
@@ -121,7 +116,7 @@ public class ChessBoard : NetworkBehaviour
             if (piece == null)
                 continue;
             
-            if ((!IsP1Turn && GenericPiece.IsP1Piece(piece)) || (IsP1Turn && GenericPiece.IsP2Piece(piece)))
+            if ((!BoardMaterials.IsP1Turn && GenericPiece.IsP1Piece(piece)) || (BoardMaterials.IsP1Turn && GenericPiece.IsP2Piece(piece)))
                 piece.ClearValidMoves();
             else
             {
@@ -186,9 +181,9 @@ public class ChessBoard : NetworkBehaviour
 
         if (!p1HasMove && !p2HasMove)
         {
-            OnGameOver(IsP1Turn);
+            OnGameOver(BoardMaterials.IsP1Turn);
             VictoryScreen_S.gameObject.SetActive(true);
-            VictoryScreen_S.GetComponentInChildren<TextMeshProUGUI>().text = IsP1Turn ? "Player 2 Wins!" : "Player 1 Wins!";
+            VictoryScreen_S.GetComponentInChildren<TextMeshProUGUI>().text = BoardMaterials.IsP1Turn ? "Player 2 Wins!" : "Player 1 Wins!";
             RemoveAllPieces();
         }
     }
@@ -239,7 +234,7 @@ public class ChessBoard : NetworkBehaviour
     public void CreatePiece(GenericPiece prefab, Vector3 position)
     {
         GenericPiece piece = Instantiate(prefab, position, Quaternion.identity);
-        piece.InstantiatePieceComponents(forP1: IsP1Turn);
+        piece.InstantiatePieceComponents(forP1: BoardMaterials.IsP1Turn);
     }
 
     public void ClearAllPiecesValidMoves()
@@ -313,16 +308,6 @@ public class ChessBoard : NetworkBehaviour
     }
 
 
-    public void TogglePauseBool()
-    {
-        IsPaused ^= true;
-    }
-    public void ToggleShowValidMovesBool()
-    {
-        ShowValidMoves ^= true;
-    }
-
-
 
     [Command]
     public void PrintBoard()
@@ -355,7 +340,7 @@ public class ChessBoard : NetworkBehaviour
     [Command]
     public void PrintData()
     {
-        print($"Player 1 Turn: {IsP1Turn}");
+        print($"Player 1 Turn: {BoardMaterials.IsP1Turn}");
         print("ID: " + NetworkManager.Singleton.LocalClientId);
         print("IsLocalGame: " + BoardMaterials.IsLocalGame);
         // print($"Player 1 Turn: {IsP1Turn_Net.Value}");
@@ -363,7 +348,7 @@ public class ChessBoard : NetworkBehaviour
     [Command]
     public void ChangeP1Turn()
     {
-        IsP1Turn ^= true;
+        BoardMaterials.IsP1Turn ^= true;
     }
 
     public static class NVRP

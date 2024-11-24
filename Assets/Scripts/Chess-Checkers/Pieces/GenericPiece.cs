@@ -56,7 +56,7 @@ public abstract class GenericPiece : MonoBehaviour
     protected bool CanMove()
     {
         // bool p1Turn = ChessBoard.IsP1Turn_Net.Value;
-        bool p1Turn = ChessBoard.IsP1Turn;
+        bool p1Turn = BoardMaterials.IsP1Turn;
 
         if (!BoardMaterials.IsLocalGame)
         {
@@ -67,7 +67,7 @@ public abstract class GenericPiece : MonoBehaviour
 
         if (this.ValidMoves.Count == 0)
             return false;
-        if (ChessBoard_S.IsPaused)
+        if (BoardMaterials.IsPaused)
             return false;
 
         return true;
@@ -80,7 +80,7 @@ public abstract class GenericPiece : MonoBehaviour
         
         this.PreviousPosition = RoundVector(this.transform.position);
 
-        if (ChessBoard_S.ShowValidMoves)
+        if (BoardMaterials.ShowValidMoves)
             Tile.HighlightTiles(this);
     }
 
@@ -117,7 +117,7 @@ public abstract class GenericPiece : MonoBehaviour
             }
         }
         
-        if (ChessBoard_S.ShowValidMoves)
+        if (BoardMaterials.ShowValidMoves)
             Tile.DeHighLightTiles();
     }
 
@@ -156,7 +156,7 @@ public abstract class GenericPiece : MonoBehaviour
         int i=0;
         foreach (GenericPiece piece in board)
         {
-            if (piece is King kingPiece && (IsP1Piece(kingPiece) == ChessBoard.IsP1Turn))
+            if (piece is King kingPiece && (IsP1Piece(kingPiece) == BoardMaterials.IsP1Turn))
                 return kingPiece.CheckIfKingIsInCheck(board, i);
             ++i;
         }

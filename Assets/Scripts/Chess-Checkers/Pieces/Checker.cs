@@ -71,7 +71,7 @@ public class Checker : GenericPiece
         else
             ChessBoard_S.ChangeSides();
 
-        bool OnPromotionRow(int pos){return (pos < 8 && ChessBoard.IsP1Turn) || (pos > 55 && !ChessBoard.IsP1Turn);}
+        bool OnPromotionRow(int pos){return (pos < 8 && BoardMaterials.IsP1Turn) || (pos > 55 && !BoardMaterials.IsP1Turn);}
     }
 
     void PromotePiece(Vector3 oldPos, Vector3 newPos)

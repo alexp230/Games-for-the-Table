@@ -120,7 +120,7 @@ public class Pawn : GenericPiece
         ChessBoard_S.ChangeSides();
     }
 
-    private bool OnPromotionRow(int pos){return (pos < 8 && ChessBoard.IsP1Turn) || (pos > 55 && !ChessBoard.IsP1Turn);}
-    private bool OnPromotionRow(){return (this.PreviousPosition.z == 7 && ChessBoard.IsP1Turn) || (this.PreviousPosition.z == 0 && !ChessBoard.IsP1Turn);}
+    private bool OnPromotionRow(int pos){return (pos < 8 && BoardMaterials.IsP1Turn) || (pos > 55 && !BoardMaterials.IsP1Turn);}
+    private bool OnPromotionRow(){return (this.PreviousPosition.z == 7 && BoardMaterials.IsP1Turn) || (this.PreviousPosition.z == 0 && !BoardMaterials.IsP1Turn);}
 
 }
