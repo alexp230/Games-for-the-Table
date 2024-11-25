@@ -41,6 +41,7 @@ public abstract class GenericPiece : MonoBehaviour
         }
 
         this._MeshRenderer.material = forP1 ? Board_SO.Piece_p1Color : Board_SO.Piece_p2Color;
+        this.transform.eulerAngles = (PlayerData.PlayerID == 0) ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 180f, 0f);
     }
 
 
@@ -60,7 +61,7 @@ public abstract class GenericPiece : MonoBehaviour
 
         if (!BoardMaterials.IsLocalGame)
         {
-            ulong playerID = NetworkManager.Singleton.LocalClientId;
+            int playerID = PlayerData.PlayerID;
             if ((!p1Turn && playerID == 0) || (p1Turn && playerID == 1))
                 return false;
         }

@@ -8,24 +8,22 @@ public class PreGameScreen : NetworkBehaviour
     [SerializeField] private ChessBoard ChessBoard_S;
 
     [SerializeField] private Toggle ShowValidMovesToggle;
+    [SerializeField] private Toggle EnableBoardRotationToggle;
+
     [SerializeField] private Toggle ForceJumpToggle;
     [SerializeField] private Toggle Player1MovesFirstToggle;
     [SerializeField] private Button ConfirmButton;
+
     [SerializeField] private GameObject GameScreen;
 
     private bool IsLocalGame = BoardMaterials.IsLocalGame;
 
-    void Start()
-    {
-        ChessBoard_S = GameObject.Find("ChessBoard").GetComponent<ChessBoard>();
-    }
     void OnEnable()
     {
-        SetBoardVariables();
+        SetToggleValues();
 
-        if (!IsLocalGame)
-            if (NetworkManager.Singleton.LocalClientId != 0)
-                SetSettingsInteractable(false);
+        if (!IsLocalGame && NetworkManager.Singleton.LocalClientId != 0)
+            SetSettingsInteractable(false);
 
     }
 
@@ -44,12 +42,24 @@ public class PreGameScreen : NetworkBehaviour
         ConfirmButton.GetComponentInChildren<TextMeshProUGUI>().text = interactable ? "Confirm" : "Waiting on Host";
     }
 
-    private void SetBoardVariables()
+    private void SetToggleValues()
     {
-        BoardMaterials.IsPaused = true;
         ShowValidMovesToggle.isOn = BoardMaterials.ShowValidMoves;
-        BoardMaterials.ForceJump = ForceJumpToggle.isOn;
-        BoardMaterials.IsP1Turn = Player1MovesFirstToggle.isOn;
+        EnableBoardRotationToggle.isOn = BoardMaterials.RotateBoardOnMove;
+        ForceJumpToggle.isOn = BoardMaterials.ForceJump;
+        Player1MovesFirstToggle.isOn = BoardMaterials.IsP1Turn;
+
+        BoardMaterials.IsPaused = true;
+
+        if (BoardMaterials.IsLocalGame)
+            EnableBoardRotationToggle.gameObject.SetActive(true);
+        else
+            EnableBoardRotationToggle.gameObject.SetActive(false);
+
+        if (BoardMaterials.GameType == BoardMaterials.CHESS_GAME)
+            ForceJumpToggle.gameObject.SetActive(false);
+        else
+            ForceJumpToggle.gameObject.SetActive(true);
     }
 
     public void OnForceJumpToggle()
@@ -95,12 +105,24 @@ public class PreGameScreen : NetworkBehaviour
         BoardMaterials.IsPaused = false;
         BoardMaterials.ShowValidMoves = ShowValidMovesToggle.isOn;
         BoardMaterials.ForceJump = ForceJumpToggle.isOn;
-        BoardMaterials.IsP1Turn = Player1MovesFirstToggle.isOn;
+        BoardMaterials.RotateBoardOnMove = IsLocalGame ? EnableBoardRotationToggle.isOn : false;
+
+        PlayerData.PlayerID = GetPlayerID(Player1MovesFirstToggle.isOn);
+
+        print("PlayerID: " + PlayerData.PlayerID);
 
         this.gameObject.SetActive(false);
         GameScreen.SetActive(true);
 
         ChessBoard_S.StartGame();
+    }
+
+    private int GetPlayerID(bool isPlayer1)
+    {
+        if (IsLocalGame)
+            return isPlayer1 ? 0 : 1;
+        else
+            return (isPlayer1 == (NetworkManager.Singleton.LocalClientId == 0)) ? 0 : 1;  
     }
 
 }

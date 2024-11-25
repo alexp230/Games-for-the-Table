@@ -6,7 +6,7 @@ public class PlayerData : ScriptableObject
 {
 
     public static string PlayerName = "A_Player";
-
+    public static int PlayerID = -1;
     public static string LobbyID = "";
     
 }

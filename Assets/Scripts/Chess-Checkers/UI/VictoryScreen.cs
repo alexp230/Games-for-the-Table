@@ -5,24 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class VictoryScreen : NetworkBehaviour
 {
-    private ChessBoard ChessBoard_S;
-
     [SerializeField] private TextMeshProUGUI PlayerWinner;
-    
-    void Start()
-    {
-        ChessBoard_S = GameObject.Find("ChessBoard").GetComponent<ChessBoard>();
-    }
 
-    public void SetWinnerText(string playerName)
+    public void SetWinnerText(string winnerText)
     {
-        PlayerWinner.text = $"{playerName} Wins!";
-    }
-
-    public void OnRestartButton()
-    {
-        ChessBoard_S.ResetGame();
-        this.gameObject.SetActive(false);
+        PlayerWinner.text = winnerText;
     }
 
     public void OnMainMenuButton()

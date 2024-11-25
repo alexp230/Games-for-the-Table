@@ -8,6 +8,7 @@ using UnityEngine.Events;
 public class ChessBoard : NetworkBehaviour
 {
     [SerializeField] private BoardMaterials Board_SO;
+    [SerializeField] private Camera MainCamera;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
     
@@ -40,6 +41,7 @@ public class ChessBoard : NetworkBehaviour
 
     public void StartGame()
     {
+        BoardMaterials.IsP1Turn = true;
         OnChangedTurn?.Invoke(BoardMaterials.IsP1Turn);
 
         switch (BoardMaterials.GameType)
@@ -49,6 +51,42 @@ public class ChessBoard : NetworkBehaviour
         }
 
         SetValidMovesForPieces();
+
+        if (BoardMaterials.IsLocalGame)
+        {
+            if (BoardMaterials.RotateBoardOnMove)
+                SetCameraAndPiecesRotation();
+            else
+                FixCameraAndPiecesRotation();
+        }
+    }
+    public void FixCameraAndPiecesRotation()
+    {
+        int playerID = PlayerData.PlayerID;
+        
+        Vector3 cameraEulerAngle = (playerID == 0) ? new Vector3(90f, 0f, 0f) : new Vector3(90f, 0f, 180f);
+        if (MainCamera != null)
+            MainCamera.transform.eulerAngles = cameraEulerAngle;
+
+        Vector3 pieceEulerAngle = (playerID == 0) ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 180f, 0f);
+        foreach (GenericPiece piece in Board)
+            if (piece)
+                piece.transform.eulerAngles = pieceEulerAngle;
+    }
+    public void SetCameraAndPiecesRotation()
+    {
+        if (BoardMaterials.IsLocalGame && BoardMaterials.RotateBoardOnMove)
+        {
+            bool p1Turn = BoardMaterials.IsP1Turn;
+
+            Vector3 cameraEulerAngle = p1Turn ? new Vector3(90f, 0f, 0f) : new Vector3(90f, 0f, 180f);
+            MainCamera.transform.eulerAngles = cameraEulerAngle;
+
+            Vector3 pieceEulerAngle = p1Turn ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 180f, 0f);
+            foreach (GenericPiece piece in Board)
+                if (piece)
+                    piece.transform.eulerAngles = pieceEulerAngle;
+        }
     }
 
     public void ResetGame()
@@ -99,6 +137,7 @@ public class ChessBoard : NetworkBehaviour
         UpdateBoard();
         SetValidMovesForPieces();
         CheckForGameOver();
+        SetCameraAndPiecesRotation();
 
         OnChangedTurn?.Invoke(BoardMaterials.IsP1Turn);
     }
@@ -178,9 +217,16 @@ public class ChessBoard : NetworkBehaviour
         if (!p1HasMove && !p2HasMove)
         {
             OnGameOver?.Invoke();
-            SetWinnerName_ServerRPC(NetworkManager.Singleton.LocalClientId);
+            SetWinnerName(PlayerData.PlayerID, PlayerData.PlayerName);
             RemoveAllPieces();
         }
+    }
+    private void SetWinnerName(int playerID, string playerName)
+    {
+        if (BoardMaterials.IsLocalGame)
+            OnWinnerAnnounced?.Invoke(BoardMaterials.IsP1Turn == (playerID == 0) ? $"{playerName} Loses!" : $"{playerName} Wins!");
+        else
+            SetWinnerName_ServerRPC(PlayerData.PlayerID, PlayerData.PlayerName);
     }
 
     public void SendMoveToServer(Vector3 oldPos, Vector3 newPos)
@@ -303,18 +349,18 @@ public class ChessBoard : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SetWinnerName_ServerRPC(ulong callerID)
+    public void SetWinnerName_ServerRPC(int callerID, string playerName)
     {
         bool isP1Turn = BoardMaterials.IsP1Turn;
         if ((isP1Turn && callerID == 1) || (!isP1Turn && callerID == 0))
-            SetWinnerName_ClientRPC(PlayerData.PlayerName);
+            SetWinnerName_ClientRPC(playerName);
     }
 
     [ClientRpc]
     public void SetWinnerName_ClientRPC(string playerName)
     {
         print(playerName);
-        OnWinnerAnnounced?.Invoke(playerName);
+        OnWinnerAnnounced?.Invoke($"{playerName} Wins!");
     }
 
 
