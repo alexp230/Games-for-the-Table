@@ -64,9 +64,10 @@ public class ChessBoard : NetworkBehaviour
     {
         int playerID = PlayerData.PlayerID;
         
-        Vector3 cameraEulerAngle = (playerID == 0) ? new Vector3(90f, 0f, 0f) : new Vector3(90f, 0f, 180f);
+        Vector3 cameraPosition = (playerID == 0) ? new Vector3(3.5f, 8f, 1f) : new Vector3(3.5f, 8f, 6f);
+        Quaternion cameraEulerAngle = (playerID == 0) ? Quaternion.Euler(75f, 0f, 0f) : Quaternion.Euler(75f, 180f, 0f);
         if (MainCamera != null)
-            MainCamera.transform.eulerAngles = cameraEulerAngle;
+            MainCamera.transform.SetPositionAndRotation(cameraPosition, cameraEulerAngle);
 
         Vector3 pieceEulerAngle = (playerID == 0) ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 180f, 0f);
         foreach (GenericPiece piece in Board)
@@ -79,8 +80,10 @@ public class ChessBoard : NetworkBehaviour
         {
             bool p1Turn = BoardMaterials.IsP1Turn;
 
-            Vector3 cameraEulerAngle = p1Turn ? new Vector3(90f, 0f, 0f) : new Vector3(90f, 0f, 180f);
-            MainCamera.transform.eulerAngles = cameraEulerAngle;
+            Vector3 cameraPosition = p1Turn ? new Vector3(3.5f, 8f, 1f) : new Vector3(3.5f, 8f, 6f);
+            Quaternion cameraEulerAngle = p1Turn ? Quaternion.Euler(75f, 0f, 0f) : Quaternion.Euler(75f, 180f, 0f);
+            if (MainCamera != null)
+                MainCamera.transform.SetPositionAndRotation(cameraPosition, cameraEulerAngle);
 
             Vector3 pieceEulerAngle = p1Turn ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 180f, 0f);
             foreach (GenericPiece piece in Board)
