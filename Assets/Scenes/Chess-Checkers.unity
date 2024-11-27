@@ -942,7 +942,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 359154310}
+    m_TransformParent: {fileID: 1611567205}
     m_Modifications:
     - target: {fileID: 3045415705584639545, guid: 584c40470253480459da8f75f7539eb1, type: 3}
       propertyPath: m_Name
@@ -962,15 +962,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8027881744512955654, guid: 584c40470253480459da8f75f7539eb1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6
+      value: -2.5
       objectReference: {fileID: 0}
     - target: {fileID: 8027881744512955654, guid: 584c40470253480459da8f75f7539eb1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8027881744512955654, guid: 584c40470253480459da8f75f7539eb1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8027881744512955654, guid: 584c40470253480459da8f75f7539eb1, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2364,7 +2364,6 @@ Transform:
   - {fileID: 1735326441}
   - {fileID: 1113851462}
   - {fileID: 487711365}
-  - {fileID: 181986116}
   - {fileID: 1611567205}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7105,11 +7104,12 @@ Transform:
   m_GameObject: {fileID: 1611567204}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.17364846, z: -0, w: -0.9848077}
-  m_LocalPosition: {x: -6.25, y: 2, z: -4}
+  m_LocalPosition: {x: -6.25, y: 1.5, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 242316777}
+  - {fileID: 181986116}
   - {fileID: 1700095764}
   m_Father: {fileID: 359154310}
   m_LocalEulerAnglesHint: {x: 0, y: 340, z: 0}
@@ -9228,6 +9228,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   Board_SO: {fileID: 11400000, guid: 8eb33b7e93b982a40b45573fac8e25b8, type: 2}
   MainCamera: {fileID: 973233790}
+  GameInfoNoteBook: {fileID: 1611567204}
   OnChangedTurn:
     m_PersistentCalls:
       m_Calls:

@@ -9,6 +9,7 @@ public class ChessBoard : NetworkBehaviour
 {
     [SerializeField] private BoardMaterials Board_SO;
     [SerializeField] private Camera MainCamera;
+    [SerializeField] private GameObject GameInfoNoteBook;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
     
@@ -60,36 +61,32 @@ public class ChessBoard : NetworkBehaviour
                 FixCameraAndPiecesRotation();
         }
     }
+
     public void FixCameraAndPiecesRotation()
     {
-        int playerID = PlayerData.PlayerID;
-        
-        Vector3 cameraPosition = (playerID == 0) ? new Vector3(3.5f, 10f, 2f) : new Vector3(3.5f, 10f, 5f);
-        Quaternion cameraEulerAngle = (playerID == 0) ? Quaternion.Euler(85f, 0f, 0f) : Quaternion.Euler(85f, 180f, 0f);
-        if (MainCamera != null)
-            MainCamera.transform.SetPositionAndRotation(cameraPosition, cameraEulerAngle);
-
-        Vector3 pieceEulerAngle = (playerID == 0) ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 180f, 0f);
-        foreach (GenericPiece piece in Board)
-            if (piece)
-                piece.transform.eulerAngles = pieceEulerAngle;
+        SetObjectsTransform(forP1: PlayerData.PlayerID == 0);
     }
     public void SetCameraAndPiecesRotation()
     {
         if (BoardMaterials.IsLocalGame && BoardMaterials.RotateBoardOnMove)
-        {
-            bool p1Turn = BoardMaterials.IsP1Turn;
+            SetObjectsTransform(forP1: BoardMaterials.IsP1Turn);
+    }
 
-            Vector3 cameraPosition = p1Turn ? new Vector3(3.5f, 10f, 2f) : new Vector3(3.5f, 10f, 5f);
-            Quaternion cameraEulerAngle = p1Turn ? Quaternion.Euler(85f, 0f, 0f) : Quaternion.Euler(85f, 180f, 0f);
-            if (MainCamera != null)
-                MainCamera.transform.SetPositionAndRotation(cameraPosition, cameraEulerAngle);
+    private void SetObjectsTransform(bool forP1)
+    {
+        Vector3 GameInfoPosition = forP1 ? new Vector3(-6.25f, 1.5f, -4f) : new Vector3(6.25f, 1.5f, 4f);
+        Quaternion GameInfoRotation = forP1 ? Quaternion.Euler(0, 340f, 0) : Quaternion.Euler(0, 160f, 0);
+        GameInfoNoteBook.transform.SetLocalPositionAndRotation(GameInfoPosition, GameInfoRotation);
+        
+        Vector3 cameraPosition = forP1 ? new Vector3(3.5f, 10f, 2f) : new Vector3(3.5f, 10f, 5f);
+        Quaternion cameraEulerAngle = forP1 ? Quaternion.Euler(85f, 0f, 0f) : Quaternion.Euler(85f, 180f, 0f);
+        if (MainCamera != null)
+            MainCamera.transform.SetPositionAndRotation(cameraPosition, cameraEulerAngle);
 
-            Vector3 pieceEulerAngle = p1Turn ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 180f, 0f);
-            foreach (GenericPiece piece in Board)
-                if (piece)
-                    piece.transform.eulerAngles = pieceEulerAngle;
-        }
+        Vector3 pieceEulerAngle = forP1 ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 180f, 0f);
+        foreach (GenericPiece piece in Board)
+            if (piece)
+                piece.transform.eulerAngles = pieceEulerAngle;
     }
 
     public void ResetGame()
