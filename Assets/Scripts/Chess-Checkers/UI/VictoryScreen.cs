@@ -9,7 +9,7 @@ public class VictoryScreen : NetworkBehaviour
 
     public void SetWinnerText(string winnerText)
     {
-        PlayerWinner.text = winnerText;
+        PlayerWinner.text = winnerText; 
     }
 
     public void OnMainMenuButton()
