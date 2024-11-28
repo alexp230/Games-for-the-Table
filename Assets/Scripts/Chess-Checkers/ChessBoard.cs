@@ -53,13 +53,7 @@ public class ChessBoard : NetworkBehaviour
 
         SetValidMovesForPieces();
 
-        if (BoardMaterials.IsLocalGame)
-        {
-            if (BoardMaterials.RotateBoardOnMove)
-                SetCameraAndPiecesRotation();
-            else
-                FixCameraAndPiecesRotation();
-        }
+        FixCameraAndPiecesRotation();
     }
 
     public void FixCameraAndPiecesRotation()
@@ -81,7 +75,7 @@ public class ChessBoard : NetworkBehaviour
         Vector3 cameraPosition = forP1 ? new Vector3(3.5f, 10f, 2f) : new Vector3(3.5f, 10f, 5f);
         Quaternion cameraEulerAngle = forP1 ? Quaternion.Euler(85f, 0f, 0f) : Quaternion.Euler(85f, 180f, 0f);
         if (MainCamera != null)
-            MainCamera.transform.SetPositionAndRotation(cameraPosition, cameraEulerAngle);
+            MainCamera.transform.SetLocalPositionAndRotation(cameraPosition, cameraEulerAngle);
 
         Vector3 pieceEulerAngle = forP1 ? new Vector3(0f, 0f, 0f) : new Vector3(0f, 180f, 0f);
         foreach (GenericPiece piece in Board)
@@ -397,8 +391,9 @@ public class ChessBoard : NetworkBehaviour
     public void PrintData()
     {
         print($"Player 1 Turn: {BoardMaterials.IsP1Turn}");
-        print("ID: " + NetworkManager.Singleton?.LocalClientId);
+        print("NetworkID: " + NetworkManager.Singleton?.LocalClientId);
         print("IsLocalGame: " + BoardMaterials.IsLocalGame);
+        print("PlayerID: " + PlayerData.PlayerID);
         // print($"Player 1 Turn: {IsP1Turn_Net.Value}");
     }
     [Command]
