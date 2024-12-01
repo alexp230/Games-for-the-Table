@@ -76,10 +76,12 @@ public class Pawn : GenericPiece
             ChessBoard_S.RemovePiece(newPos);
         else if (Mathf.Abs(newPos-oldPos) == 9 || (Mathf.Abs(newPos-oldPos) == 7)) // enpassant move
         {
+            print("here");
             if (IsP1Piece(this))
                 ChessBoard_S.RemovePiece(newPos+8);
             else
                 ChessBoard_S.RemovePiece(newPos-8);
+            // SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_8");
         }
 
         if (OnPromotionRow(newPos))

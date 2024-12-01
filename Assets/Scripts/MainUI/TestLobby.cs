@@ -51,8 +51,19 @@ public class TestLobby : MonoBehaviour
     }
     private async void SignIn()
     {
-        string extension = UnityEngine.Random.Range(1, 99999).ToString().PadLeft(5, '0');
-        string playerName = $"Player{extension}";
+        string playerName;
+        try
+        {
+            playerName = SteamIntegration.GetSteamName();
+        }
+        catch (Exception e){
+            string extension = UnityEngine.Random.Range(1, 99999).ToString().PadLeft(5, '0');
+            playerName = $"Player{extension}";
+
+            print(e);
+        }
+        
+        PlayerData.PlayerName = playerName;
 
         InitializationOptions options = new InitializationOptions();
         options.SetProfile(playerName);
@@ -66,7 +77,6 @@ public class TestLobby : MonoBehaviour
         if (AuthenticationService.Instance.IsSignedIn)
             print($"Signed in {AuthenticationService.Instance.PlayerId}");
         
-        PlayerData.PlayerName = playerName;
         print(playerName);
     }
     private async void ResetLobbyVariables()
