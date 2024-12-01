@@ -155,7 +155,7 @@ public class ChessBoard : NetworkBehaviour
             }
         }
 
-        if (allPiecesJump.Count > 0)
+        if (allPiecesJump.Count > 0 && BoardMaterials.ForceJump && BoardMaterials.GameType == BoardMaterials.CHECKERS_GAME)
             ExcludeNonJumpMoves();
         return;
 
