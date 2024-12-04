@@ -49,6 +49,6 @@ public class Queen : GenericPiece
             ChessBoard_S.RemovePiece(newPos);
         
         UpdatePosition(this, nextPos);
-        ChessBoard_S.ChangeSides();
+        ChessBoard_S.ChangeSides(this);
     }
 }

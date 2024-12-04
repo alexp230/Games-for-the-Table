@@ -134,7 +134,7 @@ public class King : GenericPiece
         UpdatePosition(this, nextPos);
         
         this.HasMoved = true;
-        ChessBoard_S.ChangeSides();
+        ChessBoard_S.ChangeSides(this);
     }
 
     private void Castle(int oldPos, int newPos)

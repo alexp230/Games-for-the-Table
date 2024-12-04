@@ -52,6 +52,6 @@ public class Rook : GenericPiece
         
         UpdatePosition(this, nextPos);
         this.HasMoved = true;
-        ChessBoard_S.ChangeSides();
+        ChessBoard_S.ChangeSides(this);
     }
 }

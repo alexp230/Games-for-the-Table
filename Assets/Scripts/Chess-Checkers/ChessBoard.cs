@@ -125,12 +125,12 @@ public class ChessBoard : NetworkBehaviour
         }
     }
 
-    public void ChangeSides()
+    public void ChangeSides(GenericPiece currentPiece)
     {
         BoardMaterials.IsP1Turn ^= true;
         UpdateBoard();
         SetValidMovesForPieces();
-        CheckForGameOver();
+        CheckForGameOver(currentPiece);
         SetCameraAndPiecesRotation();
 
         OnChangedTurn?.Invoke(BoardMaterials.IsP1Turn);
@@ -192,7 +192,7 @@ public class ChessBoard : NetworkBehaviour
         
     }
 
-    private void CheckForGameOver()
+    private void CheckForGameOver(GenericPiece currentPiece)
     {
         bool p1HasMove = false;
         bool p2HasMove = false;
@@ -210,9 +210,25 @@ public class ChessBoard : NetworkBehaviour
 
         if (!p1HasMove && !p2HasMove)
         {
+            CallCheckMateAchievement(currentPiece);
             OnGameOver?.Invoke();
             SetWinnerName(PlayerData.PlayerID, PlayerData.PlayerName);
             RemoveAllPieces();
+        }
+
+        void CallCheckMateAchievement(GenericPiece currentPiece)
+        {
+            if (DidThisPlayerMove() || (BoardMaterials.GameType != BoardMaterials.CHESS_GAME))
+                return;
+                
+            switch (currentPiece)
+            {
+                case Pawn: SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_1"); break;
+                case Bishop: SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_2"); break;
+                case Rook: SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_3"); break;
+                case Knight: SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_4"); break;
+                case Queen: SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_5"); break;
+            }
         }
     }
     private void SetWinnerName(int playerID, string playerName)
@@ -286,6 +302,11 @@ public class ChessBoard : NetworkBehaviour
         int x = pos%8;
         int z = 7-(pos/8);
         return new Vector3(x, GenericPiece.Y, z);
+    }
+
+    public static bool DidThisPlayerMove()
+    {
+        return BoardMaterials.IsP1Turn == (PlayerData.PlayerID == 0);
     }
 
 

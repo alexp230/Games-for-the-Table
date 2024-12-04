@@ -66,10 +66,10 @@ public class Checker : GenericPiece
                 this.ValidMoves = newValidMoves;
             }
             else
-                ChessBoard_S.ChangeSides();
+                ChessBoard_S.ChangeSides(this);
         }
         else
-            ChessBoard_S.ChangeSides();
+            ChessBoard_S.ChangeSides(this);
 
         bool OnPromotionRow(int pos){return (pos < 8 && BoardMaterials.IsP1Turn) || (pos > 55 && !BoardMaterials.IsP1Turn);}
     }

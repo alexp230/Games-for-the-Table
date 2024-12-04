@@ -109,8 +109,6 @@ public class PreGameScreen : NetworkBehaviour
 
         PlayerData.PlayerID = GetPlayerID(Player1MovesFirstToggle.isOn);
 
-        print("PlayerID: " + PlayerData.PlayerID);
-
         this.gameObject.SetActive(false);
         GameScreen.SetActive(true);
 
