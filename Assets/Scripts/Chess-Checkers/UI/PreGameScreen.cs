@@ -47,7 +47,7 @@ public class PreGameScreen : NetworkBehaviour
         ShowValidMovesToggle.isOn = BoardMaterials.ShowValidMoves;
         EnableBoardRotationToggle.isOn = BoardMaterials.RotateBoardOnMove;
         ForceJumpToggle.isOn = BoardMaterials.ForceJump;
-        Player1MovesFirstToggle.isOn = BoardMaterials.IsP1Turn;
+        Player1MovesFirstToggle.isOn = true;
 
         BoardMaterials.IsPaused = true;
 
