@@ -35,7 +35,7 @@ public class ChessBoard : NetworkBehaviour
         {
             case BoardMaterials.CHECKERS_GAME: GeneratePieces(BoardMaterials.CheckersSetup); break;
             case BoardMaterials.CHESS_GAME: GeneratePieces(BoardMaterials.ChessSetup); break;
-            case BoardMaterials.CHECKERS_CHESS_GAME: GeneratePieces(BoardMaterials.Xs_P2 + '/' + BoardMaterials.Xs_P1); break;
+            case BoardMaterials.CHECKERS_CHESS_GAME: GeneratePieces(BoardMaterials.P2_Formation+'/'+BoardMaterials.P1_Formation); break;
         }
 
         SetValidMovesForPieces();

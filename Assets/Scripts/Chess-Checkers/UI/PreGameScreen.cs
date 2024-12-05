@@ -112,16 +112,13 @@ public class PreGameScreen : NetworkBehaviour
 
         this.gameObject.SetActive(false);
 
-        // if (BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME)
-        //     FormationScreen.SetActive(true);
-        // else
-        // {
-        //     GameScreen.SetActive(true);
-        //     ChessBoard_S.StartGame();
-        // }
-
-        GameScreen.SetActive(true);
-        ChessBoard_S.StartGame();
+        if (BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME)
+            FormationScreen.SetActive(true);
+        else
+        {
+            GameScreen.SetActive(true);
+            ChessBoard_S.StartGame();
+        }
     }
 
     private int GetPlayerID(bool isPlayer1)
