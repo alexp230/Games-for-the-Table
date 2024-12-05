@@ -56,6 +56,7 @@ public class ChessBoard : NetworkBehaviour
         FixCameraAndPiecesRotation();
     }
 
+    // Canvas/OptionsScreen/Options(BackButton) OC
     public void FixCameraAndPiecesRotation()
     {
         SetObjectsTransform(forP1: PlayerData.PlayerID == 0);

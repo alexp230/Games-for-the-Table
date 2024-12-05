@@ -38,6 +38,7 @@ public class OptionsScreen : MonoBehaviour
         OnGameObjectDisabled?.Invoke();
     }
 
+    // Canvas/OptionsScreen/Options(ResignButton) OC
     public void OnResignButton()
     {
         NetworkManager.Singleton?.Shutdown();

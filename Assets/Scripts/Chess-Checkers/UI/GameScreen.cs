@@ -13,18 +13,21 @@ public class GameScreen : MonoBehaviour
         HasShowValidMovesValueBeenOn = BoardMaterials.ShowValidMoves;
     }
 
+    // ChessBoard(OnChangedTurn) UE
     public void SetPlayerTurnText(bool isP1Turn)
     {
         PlayerTurnText.text = isP1Turn ? "Light" : "Dark";
         PlayerTurnText.color = isP1Turn ? BoardMaterials_SO.Piece_p1Color.color : BoardMaterials_SO.Piece_p2Color.color;
     }
 
+    // Canvas/OptionsScreen(OnGameObjectDisabled) UE
     public void SetHasShowValidMovesValueBeenOn()
     {
         if (BoardMaterials.ShowValidMoves)
             HasShowValidMovesValueBeenOn = true;
     }
 
+    // ChessBoard(OnGameOver) UE
     public void SetShowValidMoveAchievement()
     {
         if (ChessBoard.DidThisPlayerMove() || HasShowValidMovesValueBeenOn)
