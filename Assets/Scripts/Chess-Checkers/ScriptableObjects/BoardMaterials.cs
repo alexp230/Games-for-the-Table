@@ -30,6 +30,21 @@ public class BoardMaterials : ScriptableObject
     public const string ChessSetup = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
     public const string CheckersSetup = "1c1c1c1c/c1c1c1c1/1c1c1c1c/8/8/C1C1C1C1/1C1C1C1C/C1C1C1C1";
 
+    public const string Apical_P1 = "8/1CCCCCC1/2CCCC2/3CC3";
+    public const string Apical_P2 = "3cc3/2cccc2/1cccccc1/8";
+    public const string Canal_P1 = "8/CC4CC/CC4CC/CC4CC";
+    public const string Canal_P2 = "cc4cc/cc4cc/cc4cc/8";
+    public const string Default_P1 = "8/C1C1C1C1/1C1C1C1C/C1C1C1C1";
+    public const string Default_P2 = "1c1c1c1c/c1c1c1c1/1c1c1c1c/8";
+    public const string Offset_P1 = "8/1C1C1C1C/C1C1C1C1/1C1C1C1C";
+    public const string Offset_P2 = "c1c1c1c1/1c1c1c1c/c1c1c1c1/8";
+    public const string Pyramid_P1 = "8/3CC3/2CCCC2/1CCCCCC1";
+    public const string Pyramid_P2 = "1cccccc1/2cccc2/3cc3/8";
+    public const string Wedges_P1 = "8/1C1CC1C1/C1C2C1C/C1C2C1C";
+    public const string Wedges_P2 = "c1c2c1c/c1c2c1c/1c1cc1c1/8";
+    public const string Xs_P1 = "8/C1C2C1C/1C1CC1C1/C1C2C1C";
+    public const string Xs_P2 = "c1c2c1c/1c1cc1c1/c1c2c1c/8";
+
     public const char P1_PIECE = 'C';
     public const char P2_PIECE = 'c';
     public const char P1_DUKE = 'D';

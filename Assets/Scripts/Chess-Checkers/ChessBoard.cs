@@ -19,26 +19,12 @@ public class ChessBoard : NetworkBehaviour
     public UnityEvent OnGameOver;
     public UnityEvent<string> OnWinnerAnnounced;
 
-    // public static NV_String64B Board_Net = new NV_String64B("", NVRP.Everyone, NVWP.Server);
-
     void Start()
     {
         GenerateBoardTiles();
         
         // StartGame();
     }
-
-    // public override void OnNetworkSpawn()
-    // {
-    //     if (!IsServer) return;
-        
-    //     Board_Net.Value = "cccccccccccc00000000CCCCCCCCCCCC";
-
-    //     Board_Net.OnValueChanged += (FixedString64Bytes previousVal, FixedString64Bytes newVal) => {
-    //         print("Old Value ::: "+ previousVal);
-    //         print("New Value ::: "+ newVal);
-    //     };
-    // }
 
     public void StartGame()
     {
@@ -49,6 +35,7 @@ public class ChessBoard : NetworkBehaviour
         {
             case BoardMaterials.CHECKERS_GAME: GeneratePieces(BoardMaterials.CheckersSetup); break;
             case BoardMaterials.CHESS_GAME: GeneratePieces(BoardMaterials.ChessSetup); break;
+            case BoardMaterials.CHECKERS_CHESS_GAME: GeneratePieces(BoardMaterials.Xs_P2 + '/' + BoardMaterials.Xs_P1); break;
         }
 
         SetValidMovesForPieces();

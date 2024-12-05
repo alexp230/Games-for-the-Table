@@ -15,6 +15,7 @@ public class PreGameScreen : NetworkBehaviour
     [SerializeField] private Button ConfirmButton;
 
     [SerializeField] private GameObject GameScreen;
+    [SerializeField] private GameObject FormationScreen;
 
     private bool IsLocalGame = BoardMaterials.IsLocalGame;
 
@@ -110,8 +111,16 @@ public class PreGameScreen : NetworkBehaviour
         PlayerData.PlayerID = GetPlayerID(Player1MovesFirstToggle.isOn);
 
         this.gameObject.SetActive(false);
-        GameScreen.SetActive(true);
 
+        // if (BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME)
+        //     FormationScreen.SetActive(true);
+        // else
+        // {
+        //     GameScreen.SetActive(true);
+        //     ChessBoard_S.StartGame();
+        // }
+
+        GameScreen.SetActive(true);
         ChessBoard_S.StartGame();
     }
 
