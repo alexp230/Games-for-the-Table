@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class FormationSelectionScreen : MonoBehaviour
 {
     [SerializeField] private ChessBoard ChessBoard_S;
+    [SerializeField] private GameObject GameScreen;
 
     private readonly Dictionary<string, string> Formations = new Dictionary<string, string>
     {
@@ -70,6 +71,7 @@ public class FormationSelectionScreen : MonoBehaviour
     public void OnPlayGameButton()
     {
         this.gameObject.SetActive(false);
+        GameScreen.SetActive(true);
         ChessBoard_S.StartGame();
     }
 
