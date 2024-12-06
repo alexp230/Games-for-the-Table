@@ -56,22 +56,25 @@ public abstract class GenericPiece : MonoBehaviour
 
     protected bool CanMove()
     {
-        // bool p1Turn = ChessBoard.IsP1Turn_Net.Value;
-        bool p1Turn = BoardMaterials.IsP1Turn;
-
-        if (!BoardMaterials.IsLocalGame)
-        {
-            int playerID = PlayerData.PlayerID;
-            if ((!p1Turn && playerID == 0) || (p1Turn && playerID == 1))
-                return false;
-        }
-
+        if (!OwnPiece())
+            return false;
         if (this.ValidMoves.Count == 0)
             return false;
         if (BoardMaterials.IsPaused)
             return false;
 
         return true;
+    }
+    protected bool OwnPiece()
+    {
+        if (BoardMaterials.IsPaused)
+            return false;
+        if (BoardMaterials.IsLocalGame)
+            return true;
+
+        bool p1Turn = BoardMaterials.IsP1Turn;
+        int playerID = PlayerData.PlayerID;
+        return !(!p1Turn && playerID == 0) || (p1Turn && playerID == 1);
     }
 
     private void OnMouseDown()

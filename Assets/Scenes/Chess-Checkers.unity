@@ -3435,7 +3435,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1303281822}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.76572144
+  m_Size: 0.7654929
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -8509,6 +8509,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ChessBoard_S: {fileID: 1880972535}
+  GameScreen: {fileID: 73672828}
   IsPlayer1Toggle: {fileID: 603988169}
   PlayerTurnText: {fileID: 1053101429}
   PlayGameButton: {fileID: 1673767438}
@@ -13617,6 +13618,7 @@ MonoBehaviour:
   Board_SO: {fileID: 11400000, guid: 8eb33b7e93b982a40b45573fac8e25b8, type: 2}
   MainCamera: {fileID: 973233790}
   GameInfoNoteBook: {fileID: 1611567204}
+  TurnCount: 1
   OnChangedTurn:
     m_PersistentCalls:
       m_Calls:

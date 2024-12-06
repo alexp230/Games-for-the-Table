@@ -3,6 +3,18 @@ using UnityEngine;
 
 public class Checker : GenericPiece
 {
+    void OnMouseOver()
+    {   
+        if (!OwnPiece())
+            return;
+            
+        if (Input.GetKeyDown(KeyCode.Q)) ElevatePiece(Board_SO.QueenPrefab);
+        else if (Input.GetKeyDown(KeyCode.R)) ElevatePiece(Board_SO.RookPrefab);
+        else if (Input.GetKeyDown(KeyCode.B)) ElevatePiece(Board_SO.BishopPrefab);
+        else if (Input.GetKeyDown(KeyCode.K)) ElevatePiece(Board_SO.KnightPrefab);
+        else if (Input.GetKeyDown(KeyCode.N)) ElevatePiece(Board_SO.KnightPrefab);
+    }
+
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps)
     {
         GenericPiece[] board = ChessBoard.Board;
@@ -74,10 +86,19 @@ public class Checker : GenericPiece
         bool OnPromotionRow(int pos){return (pos < 8 && BoardMaterials.IsP1Turn) || (pos > 55 && !BoardMaterials.IsP1Turn);}
     }
 
-    void PromotePiece(Vector3 oldPos, Vector3 newPos)
+    private void PromotePiece(Vector3 oldPos, Vector3 newPos)
     {
         ChessBoard.RemovePiece(ChessBoard.PosToBoardPos(oldPos));
         ChessBoard.CreatePiece(Board_SO.DukePrefab, newPos);
+    }
+
+    private void ElevatePiece(GenericPiece prefab)
+    {
+        Vector3 pos = this.transform.position;
+        ChessBoard.RemovePiece(ChessBoard.PosToBoardPos(pos));
+        ChessBoard.CreatePiece(prefab, pos);
+
+        ChessBoard_S.ChangeSides(this);
     }
 
 }
