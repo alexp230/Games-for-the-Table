@@ -73,13 +73,13 @@ public class Pawn : GenericPiece
         SetPotentialEnPassant(this);
 
         if (ChessBoard.Board[newPos] != null)
-            ChessBoard_S.RemovePiece(newPos);
+            ChessBoard.RemovePiece(newPos);
         else if (Mathf.Abs(newPos-oldPos) == 9 || (Mathf.Abs(newPos-oldPos) == 7)) // enpassant move
         {
             if (IsP1Piece(this))
-                ChessBoard_S.RemovePiece(newPos+8);
+                ChessBoard.RemovePiece(newPos+8);
             else
-                ChessBoard_S.RemovePiece(newPos-8);
+                ChessBoard.RemovePiece(newPos-8);
             
             if (ChessBoard.DidThisPlayerMove())
                 SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_8");
@@ -118,8 +118,8 @@ public class Pawn : GenericPiece
     private void PromotePiece(GenericPiece prefab)
     {
         Vector3 currentPos = this.transform.position;
-        ChessBoard_S.RemovePiece(ChessBoard.PosToBoardPos(currentPos));
-        ChessBoard_S.CreatePiece(prefab, currentPos);
+        ChessBoard.RemovePiece(ChessBoard.PosToBoardPos(currentPos));
+        ChessBoard.CreatePiece(prefab, currentPos);
         ChessBoard_S.ChangeSides(this);
     }
 

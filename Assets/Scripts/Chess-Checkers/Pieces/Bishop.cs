@@ -46,7 +46,7 @@ public class Bishop : GenericPiece
     {
         int newPos = ChessBoard.PosToBoardPos(nextPos);
         if (ChessBoard.Board[newPos] != null)
-            ChessBoard_S.RemovePiece(newPos);
+            ChessBoard.RemovePiece(newPos);
         
         UpdatePosition(this, nextPos);
         ChessBoard_S.ChangeSides(this);

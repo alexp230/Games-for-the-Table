@@ -56,7 +56,7 @@ public class Checker : GenericPiece
 
         if (Mathf.Abs(newPos - oldPos) > 9) // if jumped piece
         {
-            ChessBoard_S.RemovePiece((newPos+oldPos)/2);
+            ChessBoard.RemovePiece((newPos+oldPos)/2);
 
             List<int> newValidMoves = GetValidMoves(this, getOnlyJumps: true); // Checks for jumping moves
             if (newValidMoves.Count > 0) // if piece has jumpMove and made a jump
@@ -76,8 +76,8 @@ public class Checker : GenericPiece
 
     void PromotePiece(Vector3 oldPos, Vector3 newPos)
     {
-        ChessBoard_S.RemovePiece(ChessBoard.PosToBoardPos(oldPos));
-        ChessBoard_S.CreatePiece(Board_SO.DukePrefab, newPos);
+        ChessBoard.RemovePiece(ChessBoard.PosToBoardPos(oldPos));
+        ChessBoard.CreatePiece(Board_SO.DukePrefab, newPos);
     }
 
 }

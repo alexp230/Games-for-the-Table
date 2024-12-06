@@ -122,7 +122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9f3d0602e14c934eae861f76664d30e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TileMaterials_SO: {fileID: 11400000, guid: 8eb33b7e93b982a40b45573fac8e25b8, type: 2}
+  Board_SO: {fileID: 11400000, guid: 8eb33b7e93b982a40b45573fac8e25b8, type: 2}
   _MeshRenderer: {fileID: 4078862094527501121}
   HighLight: {fileID: 6974617758541028454}
 --- !u!1 &6974617758541028454

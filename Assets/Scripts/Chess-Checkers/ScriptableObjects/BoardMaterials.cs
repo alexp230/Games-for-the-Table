@@ -6,6 +6,7 @@ public class BoardMaterials : ScriptableObject
     public GameObject BoardEdgePrefab;
     public Material Tile_LightColor;
     public Material Tile_DarkColor;
+    public Material Tile_HighLight;
 
     public Material Piece_p1Color;
     public Material Piece_p2Color;

@@ -4,6 +4,7 @@ using QFSW.QC;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
 
 public class ChessBoard : NetworkBehaviour
 {
@@ -12,8 +13,10 @@ public class ChessBoard : NetworkBehaviour
     [SerializeField] private GameObject GameInfoNoteBook;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
+    private const int KING_SPAWN = 2;
     
     public static GenericPiece[] Board = new GenericPiece[64];
+    public int TurnCount = 1;
 
     public UnityEvent<bool> OnChangedTurn;
     public UnityEvent OnGameOver;
@@ -22,12 +25,11 @@ public class ChessBoard : NetworkBehaviour
     void Start()
     {
         GenerateBoardTiles();
-        
-        // StartGame();
     }
 
     public void StartGame()
     {
+        TurnCount = 1;
         BoardMaterials.IsP1Turn = true;
         OnChangedTurn?.Invoke(BoardMaterials.IsP1Turn);
 
@@ -116,6 +118,7 @@ public class ChessBoard : NetworkBehaviour
     public void ChangeSides(GenericPiece currentPiece)
     {
         BoardMaterials.IsP1Turn ^= true;
+        SetTurnCount();
         UpdateBoard();
         SetValidMovesForPieces();
         CheckForGameOver(currentPiece);
@@ -124,8 +127,24 @@ public class ChessBoard : NetworkBehaviour
         OnChangedTurn?.Invoke(BoardMaterials.IsP1Turn);
     }
 
-    private static void SetValidMovesForPieces()
+    private void SetValidMovesForPieces()
     {
+        if ((BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME) && (TurnCount == KING_SPAWN))
+        {
+            foreach (GenericPiece piece in Board)
+                piece?.ClearValidMoves();
+
+            List<int> kingSpawnTiles = new List<int>();
+            int[] kingsRow = BoardMaterials.IsP1Turn ? new int[] {56,57,58,59,60,61,62,63} : new int[] {0,1,2,3,4,5,6,7};
+           
+            foreach (int tile in kingsRow)
+                if (!Board[tile])
+                    kingSpawnTiles.Add(tile);
+
+            Tile.SetValidKingSpawnTiles(kingSpawnTiles, Board_SO.Tile_HighLight);
+            return;            
+        }
+
         List<GenericPiece> allPieces = new List<GenericPiece>();
         List<Checker> allPiecesJump = new List<Checker>();
         foreach (GenericPiece piece in Board)
@@ -182,6 +201,9 @@ public class ChessBoard : NetworkBehaviour
 
     private void CheckForGameOver(GenericPiece currentPiece)
     {
+        if (TurnCount == KING_SPAWN)
+            return;
+
         bool p1HasMove = false;
         bool p2HasMove = false;
 
@@ -226,6 +248,12 @@ public class ChessBoard : NetworkBehaviour
         else
             SetWinnerName_ServerRPC(PlayerData.PlayerID, PlayerData.PlayerName);
     }
+    private void SetTurnCount()
+    {
+        if (BoardMaterials.IsP1Turn)
+            ++TurnCount;
+        print(TurnCount);
+    }
 
     public void SendMoveToServer(Vector3 oldPos, Vector3 newPos)
     {
@@ -264,13 +292,13 @@ public class ChessBoard : NetworkBehaviour
                 RemovePiece(PosToBoardPos(piece.transform.position));
     }
 
-    public void RemovePiece(int index)
+    public static void RemovePiece(int index)
     {
         Board[index].transform.position = DEAD_PIECE;
         Destroy(Board[index].gameObject);
         Board[index] = null;
     }
-    public void CreatePiece(GenericPiece prefab, Vector3 position)
+    public static void CreatePiece(GenericPiece prefab, Vector3 position)
     {
         GenericPiece piece = Instantiate(prefab, position, Quaternion.identity);
         piece.InstantiatePieceComponents(forP1: BoardMaterials.IsP1Turn);

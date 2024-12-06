@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-    [SerializeField] private BoardMaterials TileMaterials_SO;
+    private ChessBoard ChessBoard_S;
+    [SerializeField] private BoardMaterials Board_SO;
     [SerializeField] private MeshRenderer _MeshRenderer;
     [SerializeField] private GameObject HighLight;
 
@@ -13,15 +14,43 @@ public class Tile : MonoBehaviour
     void Awake()
     {
         Vector3 pos = this.transform.position;
-        this._MeshRenderer.material = (pos.x%2 == pos.z%2) ? TileMaterials_SO.Tile_DarkColor : TileMaterials_SO.Tile_LightColor;
+        this._MeshRenderer.material = GetTileMaterial(pos);
         this.name = $"Tile({pos.x},{pos.z})";
 
         TilePositions.Add(ChessBoard.PosToBoardPos(pos), this);
     }
 
+    void Start()
+    {
+        ChessBoard_S = GameObject.Find("ChessBoard").GetComponent<ChessBoard>();
+    }
+
     void OnDisable()
     {
         TilePositions.Remove(ChessBoard.PosToBoardPos(this.transform.position));
+    }
+
+    void OnMouseDown()
+    {
+        if (this._MeshRenderer.material.color == Board_SO.Tile_HighLight.color)
+        {
+            Vector3 position = this.transform.position;
+            ChessBoard.CreatePiece(Board_SO.KingPrefab, new Vector3(position.x, GenericPiece.Y, position.z));
+
+            int[] kingsRow = BoardMaterials.IsP1Turn ? new int[] {56,57,58,59,60,61,62,63} : new int[] {0,1,2,3,4,5,6,7};
+            foreach (int pos in kingsRow)
+            {
+                Tile tile = TilePositions[pos];
+                tile._MeshRenderer.material = GetTileMaterial(tile.transform.position);
+            }
+
+            ChessBoard_S.ChangeSides(null);
+        }
+    }
+
+    private Material GetTileMaterial(Vector3 position)
+    {
+        return (position.x%2 == position.z%2) ? Board_SO.Tile_DarkColor : Board_SO.Tile_LightColor;
     }
 
     public static void HighlightTiles(GenericPiece currentPiece)
@@ -56,5 +85,11 @@ public class Tile : MonoBehaviour
         foreach (int pos in HighLightedPositions)
             TilePositions[pos].HighLight.SetActive(false);
         HighLightedPositions.Clear();
+    }
+
+    public static void SetValidKingSpawnTiles(List<int> validTiles, Material highlightMaterial)
+    {
+        foreach (int pos in validTiles)
+            TilePositions[pos]._MeshRenderer.material = highlightMaterial;
     }
 }

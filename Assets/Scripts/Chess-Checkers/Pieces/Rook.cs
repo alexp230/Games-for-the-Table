@@ -48,7 +48,7 @@ public class Rook : GenericPiece
     {
         int newPos = ChessBoard.PosToBoardPos(nextPos);
         if (ChessBoard.Board[newPos] != null)
-            ChessBoard_S.RemovePiece(newPos);
+            ChessBoard.RemovePiece(newPos);
         
         UpdatePosition(this, nextPos);
         this.HasMoved = true;

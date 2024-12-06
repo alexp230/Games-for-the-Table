@@ -126,7 +126,7 @@ public class King : GenericPiece
         if (Math.Abs(oldPos-newPos) != 2)
         {
             if (ChessBoard.Board[newPos] != null)
-                ChessBoard_S.RemovePiece(newPos);
+                ChessBoard.RemovePiece(newPos);
         }
         else
             Castle(oldPos, newPos);
