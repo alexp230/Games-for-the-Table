@@ -1,11 +1,17 @@
-using System.Diagnostics;
+using System;
 using UnityEngine;
 
 public class SteamAchievements : MonoBehaviour
 {
     public static void UnlockAchievement(string id)
     {
-        Steamworks.Data.Achievement achievement = new Steamworks.Data.Achievement(id);
-        achievement.Trigger();
+        try{
+            Steamworks.Data.Achievement achievement = new Steamworks.Data.Achievement(id);
+            achievement.Trigger();
+        }
+        catch (Exception e){
+            print(e);
+        }
+        
     }
 }
