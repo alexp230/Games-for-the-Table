@@ -13,7 +13,7 @@ public class ChessBoard : NetworkBehaviour
     [SerializeField] private GameObject GameInfoNoteBook;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
-    private const int KING_SPAWN = 2;
+    public const int KING_SPAWN = 2;
     
     public static GenericPiece[] Board = new GenericPiece[64];
     public int TurnCount = 1;
@@ -162,7 +162,7 @@ public class ChessBoard : NetworkBehaviour
             }
         }
 
-        if (allPiecesJump.Count > 0 && BoardMaterials.ForceJump && BoardMaterials.GameType == BoardMaterials.CHECKERS_GAME)
+        if (allPiecesJump.Count > 0 && BoardMaterials.ForceJump && (BoardMaterials.GameType != BoardMaterials.CHESS_GAME))
             ExcludeNonJumpMoves();
         return;
 
@@ -206,6 +206,7 @@ public class ChessBoard : NetworkBehaviour
 
         bool p1HasMove = false;
         bool p2HasMove = false;
+        int kingCount = 0;
 
         foreach (GenericPiece piece in Board)
         {
@@ -216,16 +217,27 @@ public class ChessBoard : NetworkBehaviour
                 p1HasMove = true;
             else if (!p2HasMove && GenericPiece.IsP2Piece(piece) && piece.ValidMoves.Count > 0)
                 p2HasMove = true;
+            
+            if (piece is King)
+                ++kingCount;
         }
 
-        if (!p1HasMove && !p2HasMove)
+        if ((!p1HasMove && !p2HasMove) || !KingIsAlive())
         {
-            CallCheckMateAchievement(currentPiece);
+            if (BoardMaterials.GameType == BoardMaterials.CHESS_GAME)
+                CallCheckMateAchievement(currentPiece);
+
             OnGameOver?.Invoke();
             SetWinnerName(PlayerData.PlayerID, PlayerData.PlayerName);
             RemoveAllPieces();
         }
 
+        bool KingIsAlive()
+        {
+            if ((BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME) && (TurnCount > KING_SPAWN))
+                return kingCount==2;
+            return true;
+        }
         void CallCheckMateAchievement(GenericPiece currentPiece)
         {
             if (DidThisPlayerMove() || (BoardMaterials.GameType != BoardMaterials.CHESS_GAME))

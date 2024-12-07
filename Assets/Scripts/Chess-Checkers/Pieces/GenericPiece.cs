@@ -67,14 +67,15 @@ public abstract class GenericPiece : MonoBehaviour
     }
     protected bool OwnPiece()
     {
-        if (BoardMaterials.IsPaused)
-            return false;
-        if (BoardMaterials.IsLocalGame)
-            return true;
+        if (!BoardMaterials.IsLocalGame)
+        {
+            bool p1Turn = BoardMaterials.IsP1Turn;
+            int playerID = PlayerData.PlayerID;
 
-        bool p1Turn = BoardMaterials.IsP1Turn;
-        int playerID = PlayerData.PlayerID;
-        return !(!p1Turn && playerID == 0) || (p1Turn && playerID == 1);
+            if ((!p1Turn && playerID == 0) || (p1Turn && playerID == 1))
+                return false;
+        }
+        return true;
     }
 
     private void OnMouseDown()
@@ -143,6 +144,9 @@ public abstract class GenericPiece : MonoBehaviour
 
     private bool MoveKeepsKingSafe(int oldPos, int newPos)
     {
+        if (BoardMaterials.GameType != BoardMaterials.CHESS_GAME)
+            return true;
+
         GenericPiece[] newBoard = new GenericPiece[ChessBoard.Board.Length];
         int i = -1;
         foreach (GenericPiece piece in ChessBoard.Board)
@@ -178,12 +182,11 @@ public abstract class GenericPiece : MonoBehaviour
 
         int currentPos = ChessBoard.PosToBoardPos(this.transform.position);
         List<int> allMoves = GetValidMoves(this, getOnlyJumps: false);
-        foreach (int newMove in allMoves)
-            if (MoveKeepsKingSafe(currentPos, newMove))
-                validMoves.Add(newMove);
+        foreach (int move in allMoves)
+            if (MoveKeepsKingSafe(currentPos, move))
+                validMoves.Add(move);
         
         this.ValidMoves = validMoves;
-
     }
     public void SetValidMoves(List<int> moves)
     {

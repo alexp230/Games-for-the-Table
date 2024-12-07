@@ -3,16 +3,27 @@ using UnityEngine;
 
 public class Checker : GenericPiece
 {
+    private bool CanElevate(Checker piece)
+    {
+        if (BoardMaterials.GameType != BoardMaterials.CHECKERS_CHESS_GAME)
+            return false;
+        if (ChessBoard_S.TurnCount == ChessBoard.KING_SPAWN)
+            return false;
+        
+        return BoardMaterials.IsP1Turn == IsP1Piece(piece);
+    }
+
     void OnMouseOver()
-    {   
-        if (!OwnPiece())
+    {
+        if (!CanElevate(this))
             return;
-            
+
         if (Input.GetKeyDown(KeyCode.Q)) ElevatePiece(Board_SO.QueenPrefab);
         else if (Input.GetKeyDown(KeyCode.R)) ElevatePiece(Board_SO.RookPrefab);
         else if (Input.GetKeyDown(KeyCode.B)) ElevatePiece(Board_SO.BishopPrefab);
         else if (Input.GetKeyDown(KeyCode.K)) ElevatePiece(Board_SO.KnightPrefab);
         else if (Input.GetKeyDown(KeyCode.N)) ElevatePiece(Board_SO.KnightPrefab);
+        else if (Input.GetKeyDown(KeyCode.P)) ElevatePiece(Board_SO.PawnPrefab);
     }
 
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps)
