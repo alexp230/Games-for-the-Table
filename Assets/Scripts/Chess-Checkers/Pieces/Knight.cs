@@ -40,7 +40,14 @@ public class Knight : GenericPiece
     {
         int newPos = ChessBoard.PosToBoardPos(nextPos);
         if (ChessBoard.Board[newPos] != null)
+        {
+            AddMoveTokens($"{this.TeamID}", $"{lastPos}", "x", $"{newPos}", $"{ChessBoard.Board[newPos].TeamID}");
             ChessBoard.RemovePiece(newPos);
+        }
+
+        if (MoveTokens.Count == 0)
+            AddMoveTokens($"{this.TeamID}", $"{lastPos}", $"{newPos}");
+        UpdateMoveList();
         
         UpdatePosition(this, nextPos);
         ChessBoard_S.ChangeSides(this);

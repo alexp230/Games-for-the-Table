@@ -13595,6 +13595,7 @@ GameObject:
   - component: {fileID: 1880972536}
   - component: {fileID: 1880972537}
   - component: {fileID: 1880972535}
+  - component: {fileID: 1880972538}
   m_Layer: 0
   m_Name: ChessBoard
   m_TagString: Untagged
@@ -13740,6 +13741,19 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &1880972538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1880972534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 499b07f5c6ec9c843905c1bc81174a5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MoveList: []
 --- !u!1 &1902167861
 GameObject:
   m_ObjectHideFlags: 0

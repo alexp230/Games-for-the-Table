@@ -4,7 +4,6 @@ using QFSW.QC;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Rendering;
 
 public class ChessBoard : NetworkBehaviour
 {
@@ -310,10 +309,11 @@ public class ChessBoard : NetworkBehaviour
         Destroy(Board[index].gameObject);
         Board[index] = null;
     }
-    public static void CreatePiece(GenericPiece prefab, Vector3 position)
+    public static GenericPiece CreatePiece(GenericPiece prefab, Vector3 position)
     {
         GenericPiece piece = Instantiate(prefab, position, Quaternion.identity);
         piece.InstantiatePieceComponents(forP1: BoardMaterials.IsP1Turn);
+        return piece;
     }
 
     public void ClearAllPiecesValidMoves()

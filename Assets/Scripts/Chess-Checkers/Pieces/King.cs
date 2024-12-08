@@ -6,6 +6,16 @@ public class King : GenericPiece
 {
     bool HasMoved = false;
 
+    void Start()
+    {
+        if (BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME)
+        {
+            int boardPos = ChessBoard.PosToBoardPos(this.transform.position);
+            AddMoveTokens($"{this.TeamID}", $"{boardPos}");
+            UpdateMoveList();
+        }
+    }
+
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps = false)
     {
         List<int> validMoves = new List<int>();
@@ -126,10 +136,17 @@ public class King : GenericPiece
         if (Math.Abs(oldPos-newPos) != 2)
         {
             if (ChessBoard.Board[newPos] != null)
+            {
+                AddMoveTokens($"{this.TeamID}", $"{lastPos}", "x", $"{newPos}", $"{ChessBoard.Board[newPos].TeamID}");
                 ChessBoard.RemovePiece(newPos);
+            }
         }
         else
             Castle(oldPos, newPos);
+        
+        if (MoveTokens.Count == 0)
+            AddMoveTokens($"{this.TeamID}", $"{lastPos}", $"{newPos}");
+        UpdateMoveList();
 
         UpdatePosition(this, nextPos);
         
@@ -147,6 +164,8 @@ public class King : GenericPiece
         Rook rook = ChessBoard.Board[pos].GetComponent<Rook>();
         rook.HasMoved = true;
 
+        AddMoveTokens($"{this.TeamID}", $"{oldPos}", "c", $"{newPos}", $"{rook.TeamID}", $"{pos}");
+        
         UpdatePosition(rook, ChessBoard.BoardPosToPos(oldPos+offset));
     }
 }

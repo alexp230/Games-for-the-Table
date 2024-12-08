@@ -79,7 +79,10 @@ public class Checker : GenericPiece
 
         if (Mathf.Abs(newPos - oldPos) > 9) // if jumped piece
         {
-            ChessBoard.RemovePiece((newPos+oldPos)/2);
+            int jumpedPiecePos = (newPos+oldPos)/2;
+
+            AddMoveTokens($"{this.TeamID}", $"{oldPos}", "x", $"{newPos}", $"{ChessBoard.Board[jumpedPiecePos].TeamID}");
+            ChessBoard.RemovePiece(jumpedPiecePos);
 
             List<int> newValidMoves = GetValidMoves(this, getOnlyJumps: true); // Checks for jumping moves
             if (newValidMoves.Count > 0) // if piece has jumpMove and made a jump
@@ -89,10 +92,17 @@ public class Checker : GenericPiece
                 this.ValidMoves = newValidMoves;
             }
             else
+            {
+                UpdateMoveList();
                 ChessBoard_S.ChangeSides(this);
+            }
         }
         else
+        {
+            AddMoveTokens($"{this.TeamID}", $"{oldPos}", $"{newPos}");
+            UpdateMoveList();
             ChessBoard_S.ChangeSides(this);
+        }
 
         bool OnPromotionRow(int pos){return (pos < 8 && BoardMaterials.IsP1Turn) || (pos > 55 && !BoardMaterials.IsP1Turn);}
     }
@@ -106,8 +116,13 @@ public class Checker : GenericPiece
     private void ElevatePiece(GenericPiece prefab)
     {
         Vector3 pos = this.transform.position;
-        ChessBoard.RemovePiece(ChessBoard.PosToBoardPos(pos));
-        ChessBoard.CreatePiece(prefab, pos);
+        int boardPos = ChessBoard.PosToBoardPos(pos);
+
+        ChessBoard.RemovePiece(boardPos);
+        GenericPiece newPiece = ChessBoard.CreatePiece(prefab, pos);
+
+        AddMoveTokens($"{this.TeamID}", $"{boardPos}", $"{newPiece.TeamID}");
+        UpdateMoveList();
 
         ChessBoard_S.ChangeSides(this);
     }

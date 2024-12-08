@@ -81,6 +81,8 @@ public class Pawn : GenericPiece
             else
                 ChessBoard.RemovePiece(newPos-8);
             
+            AddMoveTokens($"{this.TeamID}", $"{lastPos}", "ex", $"{newPos}");
+            
             if (ChessBoard.DidThisPlayerMove())
                 SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_8");
         }
@@ -91,10 +93,16 @@ public class Pawn : GenericPiece
             UpdatePosition(this, nextPos);
             this.MadeFirstMove = true;
 
+            AddMoveTokens($"{this.TeamID}", $"{lastPos}", $"{newPos}");
+
             ChessBoard_S.UpdateBoard();
             ChessBoard_S.ClearAllPiecesValidMoves();
             return;
         }
+
+        if (MoveTokens.Count == 0)
+            AddMoveTokens($"{this.TeamID}", $"{lastPos}", $"{newPos}");
+        UpdateMoveList();
 
         UpdatePosition(this, nextPos);
         this.MadeFirstMove = true;
@@ -119,7 +127,11 @@ public class Pawn : GenericPiece
     {
         Vector3 currentPos = this.transform.position;
         ChessBoard.RemovePiece(ChessBoard.PosToBoardPos(currentPos));
-        ChessBoard.CreatePiece(prefab, currentPos);
+        GenericPiece newPiece = ChessBoard.CreatePiece(prefab, currentPos);
+
+        AddMoveTokens($"{newPiece.TeamID}");
+        UpdateMoveList();
+
         ChessBoard_S.ChangeSides(this);
     }
 

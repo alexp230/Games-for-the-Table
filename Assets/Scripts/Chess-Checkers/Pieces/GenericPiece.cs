@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 
@@ -9,10 +8,14 @@ public abstract class GenericPiece : MonoBehaviour
     [SerializeField] protected BoardMaterials Board_SO;
     [SerializeField] protected MeshRenderer _MeshRenderer;
     protected static ChessBoard ChessBoard_S;
+    protected static CombinationGame CombinationGame_S;
+
     public const float Y = 0.15f;
 
     private static Camera MainCamera;
     private static float CameraDistanceZ;
+    protected static string CurrentMove = "";
+    protected static List<string> MoveTokens = new List<string>();
 
     [SerializeField] public Vector3 PreviousPosition;
     [SerializeField] public char TeamID;
@@ -51,6 +54,7 @@ public abstract class GenericPiece : MonoBehaviour
         MainCamera = Camera.main;
         CameraDistanceZ = MainCamera.WorldToScreenPoint(this.transform.position).z;
         ChessBoard_S = GameObject.Find("ChessBoard").GetComponent<ChessBoard>();
+        CombinationGame_S = GameObject.Find("ChessBoard").GetComponent<CombinationGame>();
     }
 
 
@@ -159,7 +163,7 @@ public abstract class GenericPiece : MonoBehaviour
 
     }
 
-    bool KingInCheck(GenericPiece[] board)
+    private bool KingInCheck(GenericPiece[] board)
     {
         int i=0;
         foreach (GenericPiece piece in board)
@@ -170,6 +174,44 @@ public abstract class GenericPiece : MonoBehaviour
         }
             
         return false;
+    }
+
+    protected static void UpdateMoveList()
+    {
+        string move = "";
+        int getNextCaptureTimer = -1;
+        
+        for (int i=0; i<MoveTokens.Count; ++i)
+        {
+            string token = MoveTokens[i];
+
+            if (getNextCaptureTimer == 0)
+                ++i;
+            else if (token == "x")
+            {
+                move += token;
+                getNextCaptureTimer = 3;
+            }
+            else if (char.IsLetter(token[0]))
+                move += $"{token}";
+            else if (char.IsDigit(token[0]))
+            {
+                int tile = int.Parse(token);
+                char col = (char)((tile%8)+97);
+                int row = 8 - (tile/8);
+
+                move += $"{col}{row}";
+            }
+            --getNextCaptureTimer;
+        }
+
+        CombinationGame_S.AddToMoveList(move);
+        MoveTokens.Clear();
+    }
+    protected static void AddMoveTokens(params string[] moveTokens)
+    {
+        foreach (string token in moveTokens)
+            MoveTokens.Add(token);
     }
 
     public void UpdatePreviousPos(Vector3 position)
