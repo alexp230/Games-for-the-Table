@@ -12,7 +12,7 @@ public class ChessBoard : NetworkBehaviour
     [SerializeField] private GameObject GameInfoNoteBook;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
-    public const int KING_SPAWN = 2;
+    public const int KING_SPAWN = 3;
     
     public static GenericPiece[] Board = new GenericPiece[64];
     public int TurnCount = 1;
@@ -200,7 +200,7 @@ public class ChessBoard : NetworkBehaviour
 
     private void CheckForGameOver(GenericPiece currentPiece)
     {
-        if (TurnCount == KING_SPAWN)
+        if ((BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME) && (TurnCount == KING_SPAWN))
             return;
 
         bool p1HasMove = false;
@@ -221,7 +221,7 @@ public class ChessBoard : NetworkBehaviour
                 ++kingCount;
         }
 
-        if ((!p1HasMove && !p2HasMove) || !KingIsAlive())
+        if (PlayerCanNotMove())
         {
             if (BoardMaterials.GameType == BoardMaterials.CHESS_GAME)
                 CallCheckMateAchievement(currentPiece);
@@ -230,12 +230,15 @@ public class ChessBoard : NetworkBehaviour
             SetWinnerName(PlayerData.PlayerID, PlayerData.PlayerName);
             RemoveAllPieces();
         }
-
-        bool KingIsAlive()
+        bool PlayerCanNotMove()
         {
-            if ((BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME) && (TurnCount > KING_SPAWN))
-                return kingCount==2;
-            return true;
+            if (BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME)
+            {
+                if (TurnCount > KING_SPAWN)
+                    return kingCount!=2;
+                return false;
+            }
+            return !p1HasMove && !p2HasMove;
         }
         void CallCheckMateAchievement(GenericPiece currentPiece)
         {
