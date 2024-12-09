@@ -7,14 +7,14 @@ public class PlayerData : ScriptableObject
     public static int PlayerID = -1;
     public static string LobbyID = "";
 
-    public static int PawnTokens = 0;
-    public static int KnightTokens = 0;
-    public static int BishopTokens = 0;
-    public static int RookTokens = 0;
-    public static int QueenTokens = 0;
-    public static bool HasTokens()
+    public static int[] PawnTokens = new int[2] { 0,0 };
+    public static int[] KnightTokens = new int[2] { 0,0 };
+    public static int[] BishopTokens = new int[2] { 0,0 };
+    public static int[] RookTokens = new int[2] { 0,0 };
+    public static int[] QueenTokens = new int[2] { 0,0 };
+    public static bool HasTokens(int id)
     {
-        return (PawnTokens + KnightTokens + BishopTokens + RookTokens + QueenTokens) == 0;
+        return (PawnTokens[id] + KnightTokens[id] + BishopTokens[id] + RookTokens[id] + QueenTokens[id]) == 0;
     }
 
 }

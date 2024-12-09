@@ -7,14 +7,16 @@ public class Checker : GenericPiece
     {
         if (BoardMaterials.GameType != BoardMaterials.CHECKERS_CHESS_GAME)
             return false;
+        if (piece is Duke)
+            return false;
         if (ChessBoard_S.TurnCount == ChessBoard.KING_SPAWN)
             return false;
         if (ForceJumpPresent())
             return false;
 
-        if (BoardMaterials.IsP1Turn && IsP1Piece(piece) && (PlayerData.PlayerID == 0))
+        if (BoardMaterials.IsP1Turn && IsP1Piece(piece))
             return true;
-        if (!BoardMaterials.IsP1Turn && IsP2Piece(piece) && (PlayerData.PlayerID == 1))
+        if (!BoardMaterials.IsP1Turn && IsP2Piece(piece))
             return true;
         
         return false;
@@ -25,12 +27,20 @@ public class Checker : GenericPiece
         if (!CanElevate(this))
             return;
 
-        if (Input.GetKeyDown(KeyCode.Q) && (PlayerData.QueenTokens != 0)) ElevatePiece(Board_SO.QueenPrefab, ref PlayerData.QueenTokens);
-        else if (Input.GetKeyDown(KeyCode.R) && (PlayerData.RookTokens != 0)) ElevatePiece(Board_SO.RookPrefab, ref PlayerData.RookTokens);
-        else if (Input.GetKeyDown(KeyCode.B) && (PlayerData.BishopTokens != 0)) ElevatePiece(Board_SO.BishopPrefab, ref PlayerData.BishopTokens);
-        else if (Input.GetKeyDown(KeyCode.K) && (PlayerData.KnightTokens != 0)) ElevatePiece(Board_SO.KnightPrefab, ref PlayerData.KnightTokens);
-        else if (Input.GetKeyDown(KeyCode.N) && (PlayerData.KnightTokens != 0)) ElevatePiece(Board_SO.KnightPrefab, ref PlayerData.KnightTokens);
-        else if (Input.GetKeyDown(KeyCode.P) && (PlayerData.PawnTokens != 0)) ElevatePiece(Board_SO.PawnPrefab, ref PlayerData.PawnTokens);
+        int playerID = BoardMaterials.IsP1Turn ? 0 : 1;
+
+        if (Input.GetKeyDown(KeyCode.Q) && (PlayerData.QueenTokens[playerID] != 0)) 
+            ElevatePiece(Board_SO.QueenPrefab, ref PlayerData.QueenTokens[playerID]);
+        else if (Input.GetKeyDown(KeyCode.R) && (PlayerData.RookTokens[playerID] != 0)) 
+            ElevatePiece(Board_SO.RookPrefab, ref PlayerData.RookTokens[playerID]);
+        else if (Input.GetKeyDown(KeyCode.B) && (PlayerData.BishopTokens[playerID] != 0)) 
+            ElevatePiece(Board_SO.BishopPrefab, ref PlayerData.BishopTokens[playerID]);
+        else if (Input.GetKeyDown(KeyCode.K) && (PlayerData.KnightTokens[playerID] != 0)) 
+            ElevatePiece(Board_SO.KnightPrefab, ref PlayerData.KnightTokens[playerID]);
+        else if (Input.GetKeyDown(KeyCode.N) && (PlayerData.KnightTokens[playerID] != 0)) 
+            ElevatePiece(Board_SO.KnightPrefab, ref PlayerData.KnightTokens[playerID]);
+        else if (Input.GetKeyDown(KeyCode.P) && (PlayerData.PawnTokens[playerID] != 0)) 
+            ElevatePiece(Board_SO.PawnPrefab, ref PlayerData.PawnTokens[playerID]);
     }
 
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps)

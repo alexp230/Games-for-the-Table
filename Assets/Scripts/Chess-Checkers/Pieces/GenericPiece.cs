@@ -291,9 +291,19 @@ public abstract class GenericPiece : MonoBehaviour
             return false;
         
         foreach (GenericPiece piece in ChessBoard.Board)
-            if (piece?.ValidMoves.Count > 0)
+            if (piece && CanJump(piece))
                 return true;
         return false;
+
+        bool CanJump(GenericPiece piece)
+        {
+            if (piece is not Checker)
+                return false;
+            if (piece.ValidMoves.Count == 0)
+                return false;
+            
+            return Math.Abs(ChessBoard.PosToBoardPos(piece.transform.position) - piece.ValidMoves[0]) > 9;
+        }
     }
 
 }
