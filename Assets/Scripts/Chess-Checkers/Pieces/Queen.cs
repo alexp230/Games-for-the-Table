@@ -47,7 +47,7 @@ public class Queen : GenericPiece
         int newPos = ChessBoard.PosToBoardPos(nextPos);
         if (ChessBoard.Board[newPos] != null)
         {
-            AddMoveTokens($"{this.TeamID}", $"{lastPos}", "x", $"{newPos}", $"{ChessBoard.Board[newPos].TeamID}");
+            AddMoveTokens($"{this.TeamID}", $"{lastPos}", "x", $"{newPos}");
             ChessBoard.RemovePiece(newPos);
         }
         

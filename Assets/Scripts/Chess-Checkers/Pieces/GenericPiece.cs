@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -180,7 +181,7 @@ public abstract class GenericPiece : MonoBehaviour
     {
         string move = "";
         int getNextCaptureTimer = -1;
-        
+
         for (int i=0; i<MoveTokens.Count; ++i)
         {
             string token = MoveTokens[i];
@@ -280,6 +281,19 @@ public abstract class GenericPiece : MonoBehaviour
     protected static Vector3 RoundVector(Vector3 vector)
     {
         return new Vector3(Mathf.RoundToInt(vector.x), Y, Mathf.RoundToInt(vector.z));
+    }
+
+    protected static bool ForceJumpPresent()
+    {
+        if (BoardMaterials.GameType == BoardMaterials.CHESS_GAME)
+            return false;
+        if (!BoardMaterials.ForceJump)
+            return false;
+        
+        foreach (GenericPiece piece in ChessBoard.Board)
+            if (piece?.ValidMoves.Count > 0)
+                return true;
+        return false;
     }
 
 }

@@ -73,7 +73,10 @@ public class Pawn : GenericPiece
         SetPotentialEnPassant(this);
 
         if (ChessBoard.Board[newPos] != null)
+        {
+            AddMoveTokens($"{this.TeamID}", $"{lastPos}", "x", $"{newPos}");
             ChessBoard.RemovePiece(newPos);
+        }
         else if (Mathf.Abs(newPos-oldPos) == 9 || (Mathf.Abs(newPos-oldPos) == 7)) // enpassant move
         {
             if (IsP1Piece(this))
@@ -93,7 +96,8 @@ public class Pawn : GenericPiece
             UpdatePosition(this, nextPos);
             this.MadeFirstMove = true;
 
-            AddMoveTokens($"{this.TeamID}", $"{lastPos}", $"{newPos}");
+            if (MoveTokens.Count == 0)
+                AddMoveTokens($"{this.TeamID}", $"{lastPos}", $"{newPos}");
 
             ChessBoard_S.UpdateBoard();
             ChessBoard_S.ClearAllPiecesValidMoves();

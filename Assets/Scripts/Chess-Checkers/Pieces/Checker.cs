@@ -9,8 +9,15 @@ public class Checker : GenericPiece
             return false;
         if (ChessBoard_S.TurnCount == ChessBoard.KING_SPAWN)
             return false;
+        if (ForceJumpPresent())
+            return false;
+
+        if (BoardMaterials.IsP1Turn && IsP1Piece(piece) && (PlayerData.PlayerID == 0))
+            return true;
+        if (!BoardMaterials.IsP1Turn && IsP2Piece(piece) && (PlayerData.PlayerID == 1))
+            return true;
         
-        return BoardMaterials.IsP1Turn == IsP1Piece(piece);
+        return false;
     }
 
     void OnMouseOver()
@@ -18,12 +25,12 @@ public class Checker : GenericPiece
         if (!CanElevate(this))
             return;
 
-        if (Input.GetKeyDown(KeyCode.Q)) ElevatePiece(Board_SO.QueenPrefab);
-        else if (Input.GetKeyDown(KeyCode.R)) ElevatePiece(Board_SO.RookPrefab);
-        else if (Input.GetKeyDown(KeyCode.B)) ElevatePiece(Board_SO.BishopPrefab);
-        else if (Input.GetKeyDown(KeyCode.K)) ElevatePiece(Board_SO.KnightPrefab);
-        else if (Input.GetKeyDown(KeyCode.N)) ElevatePiece(Board_SO.KnightPrefab);
-        else if (Input.GetKeyDown(KeyCode.P)) ElevatePiece(Board_SO.PawnPrefab);
+        if (Input.GetKeyDown(KeyCode.Q) && (PlayerData.QueenTokens != 0)) ElevatePiece(Board_SO.QueenPrefab, ref PlayerData.QueenTokens);
+        else if (Input.GetKeyDown(KeyCode.R) && (PlayerData.RookTokens != 0)) ElevatePiece(Board_SO.RookPrefab, ref PlayerData.RookTokens);
+        else if (Input.GetKeyDown(KeyCode.B) && (PlayerData.BishopTokens != 0)) ElevatePiece(Board_SO.BishopPrefab, ref PlayerData.BishopTokens);
+        else if (Input.GetKeyDown(KeyCode.K) && (PlayerData.KnightTokens != 0)) ElevatePiece(Board_SO.KnightPrefab, ref PlayerData.KnightTokens);
+        else if (Input.GetKeyDown(KeyCode.N) && (PlayerData.KnightTokens != 0)) ElevatePiece(Board_SO.KnightPrefab, ref PlayerData.KnightTokens);
+        else if (Input.GetKeyDown(KeyCode.P) && (PlayerData.PawnTokens != 0)) ElevatePiece(Board_SO.PawnPrefab, ref PlayerData.PawnTokens);
     }
 
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps)
@@ -81,7 +88,7 @@ public class Checker : GenericPiece
         {
             int jumpedPiecePos = (newPos+oldPos)/2;
 
-            AddMoveTokens($"{this.TeamID}", $"{oldPos}", "x", $"{newPos}", $"{ChessBoard.Board[jumpedPiecePos].TeamID}");
+            AddMoveTokens($"{this.TeamID}", $"{oldPos}", "x", $"{newPos}");
             ChessBoard.RemovePiece(jumpedPiecePos);
 
             List<int> newValidMoves = GetValidMoves(this, getOnlyJumps: true); // Checks for jumping moves
@@ -113,7 +120,7 @@ public class Checker : GenericPiece
         ChessBoard.CreatePiece(Board_SO.DukePrefab, newPos);
     }
 
-    private void ElevatePiece(GenericPiece prefab)
+    private void ElevatePiece(GenericPiece prefab, ref int chessPieceToken)
     {
         Vector3 pos = this.transform.position;
         int boardPos = ChessBoard.PosToBoardPos(pos);
@@ -123,6 +130,8 @@ public class Checker : GenericPiece
 
         AddMoveTokens($"{this.TeamID}", $"{boardPos}", $"{newPiece.TeamID}");
         UpdateMoveList();
+
+        --chessPieceToken;
 
         ChessBoard_S.ChangeSides(this);
     }
