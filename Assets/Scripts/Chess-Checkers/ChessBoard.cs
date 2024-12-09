@@ -202,6 +202,8 @@ public class ChessBoard : NetworkBehaviour
     {
         if ((BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME) && (TurnCount == KING_SPAWN))
             return;
+        
+        int playerID = BoardMaterials.IsP1Turn ? 0 : 1;
 
         bool p1HasMove = false;
         bool p2HasMove = false;
@@ -212,9 +214,9 @@ public class ChessBoard : NetworkBehaviour
             if (!piece)
                 continue;
 
-            if (!p1HasMove && GenericPiece.IsP1Piece(piece) && piece.ValidMoves.Count > 0)
+            if (!p1HasMove && GenericPiece.IsP1Piece(piece) && PieceHasMove(piece))
                 p1HasMove = true;
-            else if (!p2HasMove && GenericPiece.IsP2Piece(piece) && piece.ValidMoves.Count > 0)
+            else if (!p2HasMove && GenericPiece.IsP2Piece(piece) && PieceHasMove(piece))
                 p2HasMove = true;
             
             if (piece is King)
@@ -230,14 +232,14 @@ public class ChessBoard : NetworkBehaviour
             SetWinnerName(PlayerData.PlayerID, PlayerData.PlayerName);
             RemoveAllPieces();
         }
+        bool PieceHasMove(GenericPiece piece)
+        {
+            return (piece.ValidMoves.Count > 0) || (piece is Checker && piece is not Duke && PlayerData.HasTokens(playerID));
+        }
         bool PlayerCanNotMove()
         {
-            if (BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME)
-            {
-                if (TurnCount > KING_SPAWN)
-                    return kingCount!=2;
-                return false;
-            }
+            if ((BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME) && (TurnCount > KING_SPAWN))
+                return kingCount!=2;
             return !p1HasMove && !p2HasMove;
         }
         void CallCheckMateAchievement(GenericPiece currentPiece)
