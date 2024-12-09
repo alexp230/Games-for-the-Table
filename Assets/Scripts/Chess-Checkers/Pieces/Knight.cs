@@ -38,15 +38,16 @@ public class Knight : GenericPiece
 
     protected override void PostMoveProcess(Vector3 lastPos, Vector3 nextPos)
     {
+        int oldPos = ChessBoard.PosToBoardPos(lastPos);
         int newPos = ChessBoard.PosToBoardPos(nextPos);
         if (ChessBoard.Board[newPos] != null)
         {
-            AddMoveTokens($"{this.TeamID}", $"{lastPos}", "x", $"{newPos}");
+            AddMoveTokens($"{this.TeamID}", $"{oldPos}", "x", $"{newPos}");
             ChessBoard.RemovePiece(newPos);
         }
 
         if (MoveTokens.Count == 0)
-            AddMoveTokens($"{this.TeamID}", $"{lastPos}", $"{newPos}");
+            AddMoveTokens($"{this.TeamID}", $"{oldPos}", $"{newPos}");
         UpdateMoveList();
         
         UpdatePosition(this, nextPos);

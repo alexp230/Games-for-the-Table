@@ -74,7 +74,7 @@ public class Pawn : GenericPiece
 
         if (ChessBoard.Board[newPos] != null)
         {
-            AddMoveTokens($"{this.TeamID}", $"{lastPos}", "x", $"{newPos}");
+            AddMoveTokens($"{this.TeamID}", $"{oldPos}", "x", $"{newPos}");
             ChessBoard.RemovePiece(newPos);
         }
         else if (Mathf.Abs(newPos-oldPos) == 9 || (Mathf.Abs(newPos-oldPos) == 7)) // enpassant move
@@ -84,7 +84,7 @@ public class Pawn : GenericPiece
             else
                 ChessBoard.RemovePiece(newPos-8);
             
-            AddMoveTokens($"{this.TeamID}", $"{lastPos}", "ex", $"{newPos}");
+            AddMoveTokens($"{this.TeamID}", $"{oldPos}", "ex", $"{newPos}");
             
             if (ChessBoard.DidThisPlayerMove())
                 SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_8");
@@ -97,7 +97,7 @@ public class Pawn : GenericPiece
             this.MadeFirstMove = true;
 
             if (MoveTokens.Count == 0)
-                AddMoveTokens($"{this.TeamID}", $"{lastPos}", $"{newPos}");
+                AddMoveTokens($"{this.TeamID}", $"{oldPos}", $"{newPos}");
 
             ChessBoard_S.UpdateBoard();
             ChessBoard_S.ClearAllPiecesValidMoves();
@@ -105,7 +105,7 @@ public class Pawn : GenericPiece
         }
 
         if (MoveTokens.Count == 0)
-            AddMoveTokens($"{this.TeamID}", $"{lastPos}", $"{newPos}");
+            AddMoveTokens($"{this.TeamID}", $"{oldPos}", $"{newPos}");
         UpdateMoveList();
 
         UpdatePosition(this, nextPos);

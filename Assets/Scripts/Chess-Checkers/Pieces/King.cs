@@ -137,7 +137,7 @@ public class King : GenericPiece
         {
             if (ChessBoard.Board[newPos] != null)
             {
-                AddMoveTokens($"{this.TeamID}", $"{lastPos}", "x", $"{newPos}");
+                AddMoveTokens($"{this.TeamID}", $"{oldPos}", "x", $"{newPos}");
                 ChessBoard.RemovePiece(newPos);
             }
         }
@@ -145,7 +145,7 @@ public class King : GenericPiece
             Castle(oldPos, newPos);
         
         if (MoveTokens.Count == 0)
-            AddMoveTokens($"{this.TeamID}", $"{lastPos}", $"{newPos}");
+            AddMoveTokens($"{this.TeamID}", $"{oldPos}", $"{newPos}");
         UpdateMoveList();
 
         UpdatePosition(this, nextPos);
