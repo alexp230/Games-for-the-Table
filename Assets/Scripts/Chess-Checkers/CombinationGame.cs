@@ -69,7 +69,7 @@ public class CombinationGame : MonoBehaviour
             ProcessCheckerToken(ref BishopTokenCount[playerID], B_MAX, ref PlayerData.BishopTokens[playerID]);
             ProcessCheckerToken(ref QueenTokenCount[playerID], Q_MAX, ref PlayerData.QueenTokens[playerID]);
 
-            if (move.Length > 5) // Piece made more than one capture
+            if (move.Length > 6) // Piece made more than one capture
                 ++PlayerData.KnightTokens[playerID];
             
             char newRowPos = move[move.Length-1]; // Checker promotes to Rook
@@ -97,9 +97,7 @@ public class CombinationGame : MonoBehaviour
     // ChessBoard OnChangedTurn UE
     public void SetText(bool p1Turn)
     {
-        int playerID = false ? (p1Turn ? 0 : 1) : PlayerData.PlayerID;
-        print("PlayerID: " + playerID);
-        // int playerID = BoardMaterials.IsLocalGame ? (p1Turn ? 0 : 1) : PlayerData.PlayerID;
+        int playerID = BoardMaterials.RotateBoardOnMove ? (p1Turn ? 0 : 1) : PlayerData.PlayerID;
         Color color = (playerID == 0) ? BoardMaterials_SO.Piece_p1Color.color : BoardMaterials_SO.Piece_p2Color.color;
 
         PawnTokens.text = $"P: {PlayerData.PawnTokens[playerID]} [{PawnTokenCount[playerID]}/{P_MAX}]";
