@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using QFSW.QC;
 using Unity.Netcode;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -279,12 +280,12 @@ public class ChessBoard : NetworkBehaviour
         print(TurnCount);
     }
 
-    public void SendMoveToServer(Vector3 oldPos, Vector3 newPos)
+    public void SendMoveToServer(Vector3[] positions, char prefab = '\0')
     {
         if (BoardMaterials.IsLocalGame) return;
         
         ulong senderID = NetworkManager.Singleton.LocalClientId;
-        SendMove_ServerRPC(senderID, oldPos, newPos);
+        SendMove_ServerRPC(senderID, positions, prefab);
         // SetP1Val_ServerRpc();
     }
 
@@ -387,21 +388,43 @@ public class ChessBoard : NetworkBehaviour
     // }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SendMove_ServerRPC(ulong senderID, Vector3 oldPos, Vector3 newPos)
+    public void SendMove_ServerRPC(ulong senderID, Vector3[] positions, char prefab)
     {
-        UpdatePos_ClientRpc(senderID, oldPos, newPos);
+        UpdatePos_ClientRpc(senderID, positions, prefab);
     }
 
     [ClientRpc]
-    public void UpdatePos_ClientRpc(ulong callerID, Vector3 oldPos, Vector3 newPos)
+    public void UpdatePos_ClientRpc(ulong callerID, Vector3[] positions, char prefab)
     {
         if (callerID == NetworkManager.Singleton.LocalClientId)
             return;
 
-        GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
-        foreach (GameObject piece in allPieces)
-            if (piece.transform.position == oldPos)
-                piece.GetComponent<GenericPiece>().ProcessTurnLocally(oldPos, newPos);
+        if (positions.Length == 2)
+        {
+            GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
+            foreach (GameObject piece in allPieces)
+                if (piece.transform.position == positions[0])
+                    piece.GetComponent<GenericPiece>().ProcessTurnLocally(new Vector3[2] {positions[0], positions[1]});
+        }
+        else if (prefab == 'k')
+        {
+            Tile.DeHighlightKingRow();
+            CreatePiece(Board_SO.KingPrefab, positions[0]);
+            ChangeSides(null);
+        }
+        else
+        {
+            GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
+            foreach (GameObject piece in allPieces)
+            {
+                if (piece.transform.position == positions[0])
+                {
+                    RemovePiece(PosToBoardPos(positions[0]));
+                    CreatePiece(Board_SO.GetPrefab(prefab), positions[0]);
+                    ChangeSides(null);
+                }
+            }
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]

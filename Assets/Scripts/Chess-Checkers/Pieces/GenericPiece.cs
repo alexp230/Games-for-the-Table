@@ -121,8 +121,8 @@ public abstract class GenericPiece : MonoBehaviour
             Vector3 validPos = ChessBoard.BoardPosToPos(validMove);
             if (currentPos == validPos)
             {
-                ChessBoard_S.SendMoveToServer(lastPos, validPos);
-                ProcessTurnLocally(lastPos, validPos);
+                ChessBoard_S.SendMoveToServer(new Vector3[2] {lastPos, validPos});
+                ProcessTurnLocally(new Vector3[2] {lastPos, validPos});
                 break;
             }
         }
@@ -133,11 +133,16 @@ public abstract class GenericPiece : MonoBehaviour
 
     protected abstract void PostMoveProcess(Vector3 lastPos, Vector3 nextPos);
 
-    public void ProcessTurnLocally(Vector3 oldPos, Vector3 newPos)
+    public void ProcessTurnLocally(Vector3[] positions)
     {
-        _AudioSource.PlayOneShot(Board_SO.GetMoveSoundEffect());
-        ChessBoard_S.DisableEnPassantForEachPawn();
-        PostMoveProcess(oldPos, newPos);
+        if (positions.Length == 2)
+        {
+            _AudioSource.PlayOneShot(Board_SO.GetMoveSoundEffect());
+            ChessBoard_S.DisableEnPassantForEachPawn();
+            PostMoveProcess(positions[0], positions[1]);
+        }
+        else
+            ChessBoard.CreatePiece(Board_SO.KingPrefab, new Vector3(positions[0].x, Y, positions[0].z));
     }
     protected void UpdatePosition(GenericPiece currentPiece, Vector3 validPos)
     {

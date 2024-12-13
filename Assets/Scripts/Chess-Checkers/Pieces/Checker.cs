@@ -30,17 +30,17 @@ public class Checker : GenericPiece
         int playerID = BoardMaterials.IsP1Turn ? 0 : 1;
 
         if (Input.GetKeyDown(KeyCode.Q) && (PlayerData.QueenTokens[playerID] != 0)) 
-            ElevatePiece(Board_SO.QueenPrefab, ref PlayerData.QueenTokens[playerID]);
+            ElevatePiece('q', Board_SO.QueenPrefab, ref PlayerData.QueenTokens[playerID]);
         else if (Input.GetKeyDown(KeyCode.R) && (PlayerData.RookTokens[playerID] != 0)) 
-            ElevatePiece(Board_SO.RookPrefab, ref PlayerData.RookTokens[playerID]);
+            ElevatePiece('r', Board_SO.RookPrefab, ref PlayerData.RookTokens[playerID]);
         else if (Input.GetKeyDown(KeyCode.B) && (PlayerData.BishopTokens[playerID] != 0)) 
-            ElevatePiece(Board_SO.BishopPrefab, ref PlayerData.BishopTokens[playerID]);
+            ElevatePiece('b', Board_SO.BishopPrefab, ref PlayerData.BishopTokens[playerID]);
         else if (Input.GetKeyDown(KeyCode.K) && (PlayerData.KnightTokens[playerID] != 0)) 
-            ElevatePiece(Board_SO.KnightPrefab, ref PlayerData.KnightTokens[playerID]);
+            ElevatePiece('h', Board_SO.KnightPrefab, ref PlayerData.KnightTokens[playerID]);
         else if (Input.GetKeyDown(KeyCode.N) && (PlayerData.KnightTokens[playerID] != 0)) 
-            ElevatePiece(Board_SO.KnightPrefab, ref PlayerData.KnightTokens[playerID]);
+            ElevatePiece('h', Board_SO.KnightPrefab, ref PlayerData.KnightTokens[playerID]);
         else if (Input.GetKeyDown(KeyCode.P) && (PlayerData.PawnTokens[playerID] != 0)) 
-            ElevatePiece(Board_SO.PawnPrefab, ref PlayerData.PawnTokens[playerID]);
+            ElevatePiece('p', Board_SO.PawnPrefab, ref PlayerData.PawnTokens[playerID]);
     }
 
     public override List<int> GetValidMoves(GenericPiece currentPiece, bool getOnlyJumps)
@@ -130,10 +130,12 @@ public class Checker : GenericPiece
         ChessBoard.CreatePiece(Board_SO.DukePrefab, newPos);
     }
 
-    private void ElevatePiece(GenericPiece prefab, ref int chessPieceToken)
+    private void ElevatePiece(char c, GenericPiece prefab, ref int chessPieceToken)
     {
         Vector3 pos = this.transform.position;
         int boardPos = ChessBoard.PosToBoardPos(pos);
+
+        ChessBoard_S.SendMoveToServer(new Vector3[1]{pos}, c);
 
         ChessBoard.RemovePiece(boardPos);
         GenericPiece newPiece = ChessBoard.CreatePiece(prefab, pos);

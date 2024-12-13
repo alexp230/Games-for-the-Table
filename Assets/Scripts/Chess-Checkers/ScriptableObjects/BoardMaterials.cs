@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "BoardMaterials", menuName = "Scriptable Objects/BoardMaterials")]
@@ -27,6 +28,22 @@ public class BoardMaterials : ScriptableObject
     public Rook RookPrefab;
     public Queen QueenPrefab;
     public King KingPrefab;
+
+    public GenericPiece GetPrefab(char c)
+    {
+        switch(c)
+        {
+            case 'c': return CheckerPrefab;
+            case 'd': return DukePrefab;
+            case 'p': return PawnPrefab;
+            case 'b': return BishopPrefab;
+            case 'h': return KnightPrefab;
+            case 'r': return RookPrefab;
+            case 'q': return QueenPrefab;
+            case 'k': return KingPrefab;
+            default: return null;
+        }
+    }
 
     public const string ChessSetup = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
     public const string CheckersSetup = "1c1c1c1c/c1c1c1c1/1c1c1c1c/8/8/C1C1C1C1/1C1C1C1C/C1C1C1C1";

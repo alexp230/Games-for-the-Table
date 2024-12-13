@@ -28,7 +28,6 @@ public class FormationSelectionScreen : NetworkBehaviour
 
     public void OnBeginSelection()
     {
-        print("here");
         foreach (Transform child in this.transform)
             child.gameObject.SetActive(true);
         

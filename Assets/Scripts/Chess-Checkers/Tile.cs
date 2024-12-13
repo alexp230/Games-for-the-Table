@@ -30,22 +30,39 @@ public class Tile : MonoBehaviour
         TilePositions.Remove(ChessBoard.PosToBoardPos(this.transform.position));
     }
 
+    private bool CanSpawnKing()
+    {
+        if (BoardMaterials.IsPaused)
+            return false;
+        if (!BoardMaterials.IsLocalGame && (BoardMaterials.IsP1Turn != (PlayerData.PlayerID == 0)))
+            return false;
+            
+        return this._MeshRenderer.material.color==Board_SO.Tile_HighLight.color; 
+    }
+
     void OnMouseDown()
     {
-        if (this._MeshRenderer.material.color == Board_SO.Tile_HighLight.color)
+        if (CanSpawnKing())
         {
-            Vector3 position = this.transform.position;
-            ChessBoard.CreatePiece(Board_SO.KingPrefab, new Vector3(position.x, GenericPiece.Y, position.z));
-
-            int[] kingsRow = BoardMaterials.IsP1Turn ? new int[] {56,57,58,59,60,61,62,63} : new int[] {0,1,2,3,4,5,6,7};
-            foreach (int pos in kingsRow)
-            {
-                Tile tile = TilePositions[pos];
-                tile._MeshRenderer.material = GetTileMaterial(tile.transform.position);
-            }
-
-            ChessBoard_S.ChangeSides(null);
+            DeHighlightKingRow();
+            SpawnKing();
         }
+    }
+    public static void DeHighlightKingRow()
+    {
+        int[] kingsRow = BoardMaterials.IsP1Turn ? new int[] {56,57,58,59,60,61,62,63} : new int[] {0,1,2,3,4,5,6,7};
+        foreach (int pos in kingsRow)
+        {
+            Tile tile = TilePositions[pos];
+            tile._MeshRenderer.material = tile.GetTileMaterial(tile.transform.position);
+        }
+    }
+    private void SpawnKing()
+    {
+        Vector3 position = new Vector3(this.transform.position.x, GenericPiece.Y, this.transform.position.z);
+        ChessBoard.CreatePiece(Board_SO.KingPrefab, position);
+        ChessBoard_S.SendMoveToServer(new Vector3[1] {position}, 'k');
+        ChessBoard_S.ChangeSides(null);
     }
 
     private Material GetTileMaterial(Vector3 position)
