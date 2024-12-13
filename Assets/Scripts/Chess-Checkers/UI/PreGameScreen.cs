@@ -1,11 +1,14 @@
+using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class PreGameScreen : NetworkBehaviour
 {
     [SerializeField] private ChessBoard ChessBoard_S;
+    [SerializeField] private FormationSelectionScreen FormationScreen;
 
     [SerializeField] private Toggle ShowValidMovesToggle;
     [SerializeField] private Toggle EnableBoardRotationToggle;
@@ -15,7 +18,7 @@ public class PreGameScreen : NetworkBehaviour
     [SerializeField] private Button ConfirmButton;
 
     [SerializeField] private GameObject GameScreen;
-    [SerializeField] private GameObject FormationScreen;
+    [SerializeField] private GameObject OptionsMenu;
 
     private bool IsLocalGame = BoardMaterials.IsLocalGame;
 
@@ -25,7 +28,6 @@ public class PreGameScreen : NetworkBehaviour
 
         if (!IsLocalGame && NetworkManager.Singleton.LocalClientId != 0)
             SetSettingsInteractable(false);
-
     }
 
     void OnDisable()
@@ -52,7 +54,7 @@ public class PreGameScreen : NetworkBehaviour
 
         BoardMaterials.IsPaused = true;
 
-        if (BoardMaterials.IsLocalGame)
+        if (IsLocalGame)
             EnableBoardRotationToggle.gameObject.SetActive(true);
         else
             EnableBoardRotationToggle.gameObject.SetActive(false);
@@ -113,7 +115,7 @@ public class PreGameScreen : NetworkBehaviour
         this.gameObject.SetActive(false);
 
         if (BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME)
-            FormationScreen.SetActive(true);
+            FormationScreen.OnBeginSelection();
         else
         {
             GameScreen.SetActive(true);

@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FormationSelectionScreen : MonoBehaviour
+public class FormationSelectionScreen : NetworkBehaviour
 {
     [SerializeField] private ChessBoard ChessBoard_S;
     [SerializeField] private GameObject GameScreen;
@@ -24,6 +25,16 @@ public class FormationSelectionScreen : MonoBehaviour
     [SerializeField] private Button PlayGameButton;
     [SerializeField] private TextMeshProUGUI P1_FormationText;
     [SerializeField] private TextMeshProUGUI P2_FormationText;
+
+    public void OnBeginSelection()
+    {
+        print("here");
+        foreach (Transform child in this.transform)
+            child.gameObject.SetActive(true);
+        
+        SetInteractableUI();
+        OnIsPlayer1ToggleChange();
+    }
 
     void OnEnable()
     {
@@ -55,20 +66,20 @@ public class FormationSelectionScreen : MonoBehaviour
             P2_FormationText.text = $"P2: {formation}";
         }
 
-        IsPlayer1Toggle.isOn ^= true;
-        PlayGameButton.interactable = IsAllPlayersFormationSelected();
+        SetInteractableUI();
 
-        string reverseString(string text)
-        {
-            char[] newText = new char[text.Length];
-            for (int i=0; i<text.Length; ++i)
-                newText[i] = text[text.Length - i - 1];
-            
-            return new string(newText).ToLower();
-        }
+        SendToServer_ServerRPC(PlayerData.PlayerID, formation);
     }
 
     public void OnPlayGameButton()
+    {
+        if (!BoardMaterials.IsLocalGame)
+            StartGame_ClientRPC();
+        else
+            StartGame();
+        
+    }
+    private void StartGame()
     {
         this.gameObject.SetActive(false);
         GameScreen.SetActive(true);
@@ -76,8 +87,67 @@ public class FormationSelectionScreen : MonoBehaviour
     }
 
     public void OnIsPlayer1ToggleChange()
-    {
-        string player = IsPlayer1Toggle.isOn ? "1" : "2";
+    {        
+        string player = BoardMaterials.IsLocalGame ? (IsPlayer1Toggle.isOn ? "1" : "2") : (PlayerData.PlayerID==0 ? "1" : "2");
         PlayerTurnText.text = $"Player {player}'s Selection";
+    }
+
+    public void SetInteractableUI()
+    {
+        if (BoardMaterials.IsLocalGame)
+        {
+            IsPlayer1Toggle.isOn ^= true;
+            PlayGameButton.interactable = IsAllPlayersFormationSelected();
+        }
+        else
+        {
+            IsPlayer1Toggle.isOn = PlayerData.PlayerID==0;
+            IsPlayer1Toggle.interactable = false;
+            PlayGameButton.interactable = PlayerData.PlayerID==0 && IsAllPlayersFormationSelected();
+        }
+    }
+
+    private string reverseString(string text)
+    {
+        char[] newText = new char[text.Length];
+        for (int i=0; i<text.Length; ++i)
+            newText[i] = text[text.Length - i - 1];
+        
+        return new string(newText).ToLower();
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SendToServer_ServerRPC(int callerID, string formation)
+    {
+        print("In Server RPC");
+        if (!BoardMaterials.IsLocalGame)
+            SendSelection_ClientRPC(callerID, formation);
+    }
+    [ClientRpc]
+    private void SendSelection_ClientRPC(int callerID, string formation)
+    {
+        print("In Client RPC");
+        if (callerID == PlayerData.PlayerID)
+            return;
+
+        string strategy = Formations[formation];
+        if (callerID == 0)
+        {
+            BoardMaterials.P1_Formation = strategy;
+            P1_FormationText.text = $"P1: {formation}";
+        }
+        else
+        {
+            BoardMaterials.P2_Formation = reverseString(strategy);
+            P2_FormationText.text = $"P2: {formation}";
+        }
+
+        SetInteractableUI();
+    }
+    [ClientRpc]
+    private void StartGame_ClientRPC()
+    {
+        StartGame();
     }
 }
