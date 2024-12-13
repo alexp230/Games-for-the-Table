@@ -80,6 +80,9 @@ public class FormationSelectionScreen : NetworkBehaviour
     }
     private void StartGame()
     {
+        foreach (Transform child in this.transform)
+            child.gameObject.SetActive(false);
+            
         this.gameObject.SetActive(false);
         GameScreen.SetActive(true);
         ChessBoard_S.StartGame();

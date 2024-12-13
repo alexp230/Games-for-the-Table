@@ -24,6 +24,8 @@ public class PreGameScreen : NetworkBehaviour
 
     void OnEnable()
     {
+        FormationScreen.gameObject.SetActive(BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME);
+        
         SetToggleValues();
 
         if (!IsLocalGame && NetworkManager.Singleton.LocalClientId != 0)
