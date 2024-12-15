@@ -21,35 +21,6 @@ public class CombinationGame : MonoBehaviour
     [SerializeField] private TextMeshProUGUI RookTokens;
     [SerializeField] private TextMeshProUGUI QueenTokens;
 
-    void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.P))
-        {
-            print($"Pawn Tokens p1: {PlayerData.PawnTokens[0]}");
-            print($"Pawn Tokens p2: {PlayerData.PawnTokens[1]}");
-        }
-        if (Input.GetKeyUp(KeyCode.B))
-        {
-            print($"Bishop Tokens p1: {PlayerData.BishopTokens[0]}");
-            print($"Bishop Tokens p2: {PlayerData.BishopTokens[1]}");
-        }
-        if (Input.GetKeyUp(KeyCode.K))
-        {
-            print($"Knight Tokens p1: {PlayerData.KnightTokens[0]}");
-            print($"Knight Tokens p2: {PlayerData.KnightTokens[1]}");
-        }
-        if (Input.GetKeyUp(KeyCode.R))
-        {
-            print($"Rook Tokens p1: {PlayerData.RookTokens[0]}");
-            print($"Rook Tokens p2: {PlayerData.RookTokens[1]}");
-        }
-        if (Input.GetKeyUp(KeyCode.Q))
-        {
-            print($"Queen Tokens p1: {PlayerData.QueenTokens[0]}");
-            print($"Queen Tokens p2: {PlayerData.QueenTokens[1]}");
-        }
-    }
-
     public void AddToMoveList(string move)
     {
         MoveList.Add(move);
@@ -110,5 +81,20 @@ public class CombinationGame : MonoBehaviour
         RookTokens.color = color;
         QueenTokens.text = $"Q: {PlayerData.QueenTokens[playerID]} [{QueenTokenCount[playerID]}/{Q_MAX}]";
         QueenTokens.color = color;
+    }
+
+    // ChessBoard OnGameOver UE
+    public void ResetAllTokens()
+    {
+        for (int id=0; id<2; ++id)
+        {
+            ResetCheckerTokens(id);
+            PlayerData.PawnTokens[id] = 0;
+            PlayerData.BishopTokens[id] = 0;
+            PlayerData.KnightTokens[id] = 0;
+            PlayerData.RookTokens[id] = 0;
+            PlayerData.QueenTokens[id] = 0;
+        }
+        
     }
 }
