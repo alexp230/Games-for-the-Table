@@ -217,6 +217,7 @@ MonoBehaviour:
   PreviousPosition: {x: 0, y: 0, z: 0}
   TeamID: 0
   ValidMoves: 
+  KingSpawn_AC: {fileID: 8300000, guid: 3e08da254a1b5bb44b4c249ec940f196, type: 3}
 --- !u!82 &7694215040761241055
 AudioSource:
   m_ObjectHideFlags: 0
