@@ -6,9 +6,9 @@ public class CombinationGame : MonoBehaviour
 {
     [SerializeField] private BoardMaterials BoardMaterials_SO;
 
-    private const int P_MAX = 2;
-    private const int B_MAX = 3;
-    private const int Q_MAX = 7;
+    public const int P_MAX = 2;
+    public const int B_MAX = 3;
+    public const int Q_MAX = 7;
     private int[] PawnTokenCount = new int[2] { 0,0 };
     private int[] BishopTokenCount = new int[2] { 0,0 };
     private int[] QueenTokenCount = new int[2] { 0,0 };
