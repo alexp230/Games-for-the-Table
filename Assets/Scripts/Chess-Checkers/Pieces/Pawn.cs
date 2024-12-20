@@ -12,12 +12,12 @@ public class Pawn : GenericPiece
     {
         if (OnPromotionRow())
         {
-            if (Input.GetKeyDown(KeyCode.Q)) PromotePiece(Board_SO.QueenPrefab);
-            else if (Input.GetKeyDown(KeyCode.R)) PromotePiece(Board_SO.RookPrefab);
-            else if (Input.GetKeyDown(KeyCode.B)) PromotePiece(Board_SO.BishopPrefab);
-            else if (Input.GetKeyDown(KeyCode.K)) PromotePiece(Board_SO.KnightPrefab);
-            else if (Input.GetKeyDown(KeyCode.N)) PromotePiece(Board_SO.KnightPrefab);
-            else if (Input.GetKeyDown(KeyCode.D)) PromotePiece(Board_SO.DukePrefab);
+            if (Input.GetKeyDown(KeyCode.Q)) PromotePiece(Board_SO.QueenPrefab,'q');
+            else if (Input.GetKeyDown(KeyCode.R)) PromotePiece(Board_SO.RookPrefab,'r');
+            else if (Input.GetKeyDown(KeyCode.B)) PromotePiece(Board_SO.BishopPrefab,'b');
+            else if (Input.GetKeyDown(KeyCode.K)) PromotePiece(Board_SO.KnightPrefab,'k');
+            else if (Input.GetKeyDown(KeyCode.H)) PromotePiece(Board_SO.KnightPrefab,'k');
+            else if (Input.GetKeyDown(KeyCode.D)) PromotePiece(Board_SO.DukePrefab,'d');
         }    
     }
 
@@ -127,7 +127,7 @@ public class Pawn : GenericPiece
         }
     }
 
-    private void PromotePiece(GenericPiece prefab)
+    private void PromotePiece(GenericPiece prefab, char c)
     {
         Vector3 currentPos = this.transform.position;
         ChessBoard.RemovePiece(ChessBoard.PosToBoardPos(currentPos));
@@ -135,6 +135,9 @@ public class Pawn : GenericPiece
 
         AddMoveTokens($"{newPiece.TeamID}");
         UpdateMoveList();
+
+        ChessBoard_S.SendMoveToServer(new Vector3[1]{currentPos}, c);
+
 
         ChessBoard_S.ChangeSides(this);
     }

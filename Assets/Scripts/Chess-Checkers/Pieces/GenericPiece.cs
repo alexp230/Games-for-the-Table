@@ -314,11 +314,12 @@ public abstract class GenericPiece : MonoBehaviour
     {
         this._MeshRenderer.material = Board_SO.SpecialPieceColor;
     }
-    public void DehighlightPieces(bool p1Turn)
+    public static void DehighlightPieces(Material p1Color, Material p2Color)
     {
+        bool p1Turn = BoardMaterials.IsP1Turn;
         foreach (GenericPiece piece in ChessBoard.Board)
             if (piece && IsP1Piece(piece) && p1Turn)
-                piece._MeshRenderer.material = p1Turn ? Board_SO.Piece_p1Color : Board_SO.Piece_p2Color;
+                piece._MeshRenderer.material = p1Turn ? p1Color : p2Color;
     }
 
 }

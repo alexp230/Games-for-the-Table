@@ -125,7 +125,7 @@ public class ChessBoard : NetworkBehaviour
 
     public void ChangeSides(GenericPiece currentPiece)
     {
-        currentPiece.DehighlightPieces(BoardMaterials.IsP1Turn);
+        GenericPiece.DehighlightPieces(Board_SO.Piece_p1Color, Board_SO.Piece_p2Color);
         BoardMaterials.IsP1Turn ^= true;
         SetTurnCount();
         UpdateBoard();
@@ -269,6 +269,7 @@ public class ChessBoard : NetworkBehaviour
                 case Rook: SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_3"); break;
                 case Knight: SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_4"); break;
                 case Queen: SteamAchievements.UnlockAchievement("NEW_ACHIEVEMENT_1_5"); break;
+                default: return;
             }
         }
     }
@@ -374,8 +375,13 @@ public class ChessBoard : NetworkBehaviour
         {
             GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
             foreach (GameObject piece in allPieces)
+            {
                 if (piece.transform.position == positions[0])
+                {
                     piece.GetComponent<GenericPiece>().ProcessTurnLocally(new Vector3[2] {positions[0], positions[1]});
+                    return;
+                }
+            }
         }
         else if (prefab == 'k') // king summon
         {
@@ -393,6 +399,7 @@ public class ChessBoard : NetworkBehaviour
                     RemovePiece(PosToBoardPos(positions[0]));
                     CreatePiece(Board_SO.GetPrefab(prefab), positions[0]);
                     ChangeSides(null);
+                    return;
                 }
             }
         }
