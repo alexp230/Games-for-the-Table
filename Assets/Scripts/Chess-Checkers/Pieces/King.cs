@@ -14,7 +14,7 @@ public class King : GenericPiece
             int boardPos = ChessBoard.PosToBoardPos(this.transform.position);
             AddMoveTokens($"{this.TeamID}", $"{boardPos}");
             UpdateMoveList();
-            _AudioSource.PlayOneShot(KingSpawn_AC, 0.25f);
+            _AudioSource.PlayOneShot(KingSpawn_AC);
         }
     }
 
