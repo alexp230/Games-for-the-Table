@@ -59,6 +59,7 @@
     "dotnet.defaultSolution": "Games-for-the-Table.sln",
     "cSpell.words": [
         "Behaviour",
+        "Dehighlight",
         "Dont",
         "dtls",
         "enpassant",

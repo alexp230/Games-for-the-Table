@@ -125,6 +125,7 @@ public class ChessBoard : NetworkBehaviour
 
     public void ChangeSides(GenericPiece currentPiece)
     {
+        currentPiece.DehighlightPieces(BoardMaterials.IsP1Turn);
         BoardMaterials.IsP1Turn ^= true;
         SetTurnCount();
         UpdateBoard();
@@ -200,8 +201,13 @@ public class ChessBoard : NetworkBehaviour
         bool HaveJumpingMove(Checker currentPiece)
         {
             foreach (Checker piece in allPiecesJump)
+            {
                 if (currentPiece == piece)
+                {
+                    piece.HighlightPiece();
                     return true;
+                }
+            }
             return false;
         }
         
@@ -352,40 +358,6 @@ public class ChessBoard : NetworkBehaviour
 
 
 
-    // private FixedString64Bytes GetGameState()
-    // {
-    //     char[] AlexNotation = new char[32];
-    //     Array.Fill(AlexNotation, '0');
-
-    //     GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
-    //     foreach (GameObject piece in allPieces)
-    //     {
-    //         Checker checker = piece.GetComponent<Checker>();
-    //         if (checker.transform.position == DEAD_PIECE)
-    //             continue;
-
-    //         int index = PosToBoardPos(checker.transform.position)/2;
-    //         AlexNotation[index] = checker.TeamID;
-    //     }
-    //     return new FixedString64Bytes(new string(AlexNotation));
-    // }
-
-
-
-
-
-    // [ServerRpc(RequireOwnership = false)]
-    // private void SetP1Val_ServerRpc()
-    // {
-    //     IsP1Turn_Net.Value ^= true;
-    // }
-
-    // [ServerRpc(RequireOwnership = false)]
-    // private void SetP1Val_ServerRpc(bool p1Turn)
-    // {
-    //     IsP1Turn_Net.Value = p1Turn;
-    // }
-
     [ServerRpc(RequireOwnership = false)]
     public void SendMove_ServerRPC(ulong senderID, Vector3[] positions, char prefab)
     {
@@ -398,20 +370,20 @@ public class ChessBoard : NetworkBehaviour
         if (callerID == NetworkManager.Singleton.LocalClientId)
             return;
 
-        if (positions.Length == 2)
+        if (positions.Length == 2) // move
         {
             GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
             foreach (GameObject piece in allPieces)
                 if (piece.transform.position == positions[0])
                     piece.GetComponent<GenericPiece>().ProcessTurnLocally(new Vector3[2] {positions[0], positions[1]});
         }
-        else if (prefab == 'k')
+        else if (prefab == 'k') // king summon
         {
             Tile.DeHighlightKingRow();
             CreatePiece(Board_SO.KingPrefab, positions[0]);
             ChangeSides(null);
         }
-        else
+        else // checker elevation
         {
             GameObject[] allPieces = GameObject.FindGameObjectsWithTag("Piece");
             foreach (GameObject piece in allPieces)

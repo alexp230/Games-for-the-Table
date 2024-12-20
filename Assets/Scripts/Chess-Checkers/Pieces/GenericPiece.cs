@@ -49,7 +49,6 @@ public abstract class GenericPiece : MonoBehaviour
     }
 
 
-
     private void Start()
     {
         MainCamera = Camera.main;
@@ -309,6 +308,17 @@ public abstract class GenericPiece : MonoBehaviour
             
             return Math.Abs(ChessBoard.PosToBoardPos(piece.transform.position) - piece.ValidMoves[0]) > 9;
         }
+    }
+
+    public void HighlightPiece()
+    {
+        this._MeshRenderer.material = Board_SO.SpecialPieceColor;
+    }
+    public void DehighlightPieces(bool p1Turn)
+    {
+        foreach (GenericPiece piece in ChessBoard.Board)
+            if (piece && IsP1Piece(piece) && p1Turn)
+                piece._MeshRenderer.material = p1Turn ? Board_SO.Piece_p1Color : Board_SO.Piece_p2Color;
     }
 
 }
