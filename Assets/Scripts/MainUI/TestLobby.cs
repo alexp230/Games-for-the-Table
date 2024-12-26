@@ -56,8 +56,7 @@ public class TestLobby : MonoBehaviour
         // string extension = UnityEngine.Random.Range(1, 99999).ToString().PadLeft(5, '0');
         // playerName = $"Player{extension}";
         
-        try
-        {
+        try{
             playerName = SteamIntegration.GetSteamName();
         }
         catch (Exception e){
