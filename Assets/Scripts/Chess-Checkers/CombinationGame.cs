@@ -20,6 +20,7 @@ public class CombinationGame : MonoBehaviour
     [SerializeField] private TextMeshProUGUI KnightTokens;
     [SerializeField] private TextMeshProUGUI RookTokens;
     [SerializeField] private TextMeshProUGUI QueenTokens;
+    [SerializeField] private TextMeshProUGUI ToolTipText;
 
     public void AddToMoveList(string move)
     {
@@ -95,6 +96,19 @@ public class CombinationGame : MonoBehaviour
             PlayerData.RookTokens[id] = 0;
             PlayerData.QueenTokens[id] = 0;
         }
-        
+        MoveList.Clear();  
+    }
+
+    public void SetToolTipText(string piece)
+    {
+        int playerID = BoardMaterials.RotateBoardOnMove ? (BoardMaterials.IsP1Turn ? 0 : 1) : PlayerData.PlayerID;
+        switch (piece)
+        {
+            case "pawn": ToolTipText.text =  $"Recieve a pawn token for every {P_MAX} consecutive checker moves.\nYou are at {PawnTokenCount[playerID]} out of {P_MAX}."; break;
+            case "bishop": ToolTipText.text =  $"Recieve a bishop token for every {B_MAX} consecutive checker moves.\nYou are at {BishopTokenCount[playerID]} out of {B_MAX}."; break;
+            case "knight": ToolTipText.text =  $"Recieve a knight token after capturing two or more pieces in one turn"; break;
+            case "rook": ToolTipText.text =  $"Recieve a rook token after promoting a checker to a duke"; break;
+            case "queen": ToolTipText.text =  $"Recieve a queen token for every {Q_MAX} consecutive checker moves.\nYou are at {QueenTokenCount[playerID]} out of {Q_MAX}."; break;
+        }
     }
 }

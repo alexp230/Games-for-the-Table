@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class PreGameScreen : NetworkBehaviour
@@ -115,6 +113,7 @@ public class PreGameScreen : NetworkBehaviour
         PlayerData.PlayerID = GetPlayerID(Player1MovesFirstToggle.isOn);
 
         this.gameObject.SetActive(false);
+        TurnOnGameScreen();
 
         if (BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME)
             FormationScreen.OnBeginSelection();
@@ -133,4 +132,10 @@ public class PreGameScreen : NetworkBehaviour
             return (isPlayer1 == (NetworkManager.Singleton.LocalClientId == 0)) ? 0 : 1;  
     }
 
+    private void TurnOnGameScreen()
+    {
+        foreach (Transform child in GameScreen.transform)
+            if (child.name.Contains("ToolTip"))
+                child.gameObject.SetActive(BoardMaterials.GameType == BoardMaterials.CHECKERS_CHESS_GAME);
+    }
 }
