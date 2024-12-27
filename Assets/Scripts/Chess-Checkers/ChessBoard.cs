@@ -18,7 +18,6 @@ public class ChessBoard : NetworkBehaviour
     
     public static GenericPiece[] Board = new GenericPiece[64];
     public int TurnCount = 1;
-    public int HalfMove = 0;
     public List<string> MoveList = new List<string>();
 
     public UnityEvent<bool> OnChangedTurn;
@@ -40,7 +39,6 @@ public class ChessBoard : NetworkBehaviour
     public void StartGame()
     {
         TurnCount = 1;
-        HalfMove = 0;
         MoveList.Clear();
 
         BoardMaterials.IsP1Turn = true;
