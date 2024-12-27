@@ -78,7 +78,7 @@ public class BoardMaterials : ScriptableObject
     public const int CHECKERS_GAME = 0;
     public const int CHESS_GAME = 1;
     public const int CHECKERS_CHESS_GAME = 2;
-    public static int GameType = 2;
+    public static int GameType = 1;
 
     public static bool IsPaused = true;
     public static bool IsLocalGame = true;

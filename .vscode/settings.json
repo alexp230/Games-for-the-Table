@@ -59,6 +59,7 @@
     "dotnet.defaultSolution": "Games-for-the-Table.sln",
     "cSpell.words": [
         "Behaviour",
+        "bestmove",
         "Dehighlight",
         "Dont",
         "dtls",
@@ -68,13 +69,16 @@
         "interactable",
         "Investore",
         "Mathf",
+        "movetime",
         "Netcode",
         "NVRP",
         "NVWP",
         "QFSW",
         "RNBQKBNR",
         "Scriptable",
+        "setoption",
         "Steamworks",
+        "stockfish",
         "UGUI"
     ]
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class King : GenericPiece
 {
     [SerializeField] private AudioClip KingSpawn_AC;
-    bool HasMoved = false;
+    public bool HasMoved = false;
 
     void Start()
     {
@@ -153,6 +153,7 @@ public class King : GenericPiece
         UpdatePosition(this, nextPos);
         
         this.HasMoved = true;
+        // SetAICastleRights(this);
         ChessBoard_S.ChangeSides(this);
     }
 
@@ -170,4 +171,15 @@ public class King : GenericPiece
         
         UpdatePosition(rook, ChessBoard.BoardPosToPos(oldPos+offset));
     }
+
+    // private void SetAICastleRights(King king)
+    // {
+    //     if (BoardMaterials.GameType != BoardMaterials.CHESS_GAME)
+    //         return;
+            
+    //     if (IsP1Piece(king))
+    //         StockfishAI_S.CanCastle1[0] = false;
+    //     else
+    //         StockfishAI_S.CanCastle2[0] = false;
+    // }
 }

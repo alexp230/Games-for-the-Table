@@ -10,6 +10,7 @@ public abstract class GenericPiece : MonoBehaviour
     [SerializeField] protected MeshRenderer _MeshRenderer;
     protected static ChessBoard ChessBoard_S;
     protected static CombinationGame CombinationGame_S;
+    // protected static stockfishAI StockfishAI_S;
 
     public const float Y = 0.15f;
 
@@ -55,6 +56,7 @@ public abstract class GenericPiece : MonoBehaviour
         CameraDistanceZ = MainCamera.WorldToScreenPoint(this.transform.position).z;
         ChessBoard_S = GameObject.Find("ChessBoard").GetComponent<ChessBoard>();
         CombinationGame_S = GameObject.Find("ChessBoard").GetComponent<CombinationGame>();
+        // StockfishAI_S = GameObject.Find("ChessBoard").GetComponent<stockfishAI>();
     }
 
 
@@ -134,6 +136,13 @@ public abstract class GenericPiece : MonoBehaviour
 
     public void ProcessTurnLocally(Vector3[] positions)
     {
+        if (BoardMaterials.GameType == BoardMaterials.CHESS_GAME)
+        {
+            string oldPos = BoardPosToAlgebraNotation(ChessBoard.PosToBoardPos(positions[0]).ToString());
+            string newPos = BoardPosToAlgebraNotation(ChessBoard.PosToBoardPos(positions[1]).ToString());
+            ChessBoard_S.AddToMoveList(oldPos + newPos);
+        }
+
         if (positions.Length == 2)
         {
             _AudioSource.PlayOneShot(Board_SO.GetMoveSoundEffect());
@@ -200,16 +209,11 @@ public abstract class GenericPiece : MonoBehaviour
             else if (char.IsLetter(token[0]))
                 move += $"{token}";
             else if (char.IsDigit(token[0]))
-            {
-                int tile = int.Parse(token);
-                char col = (char)((tile%8)+97);
-                int row = 8 - (tile/8);
+                move += BoardPosToAlgebraNotation(token);
 
-                move += $"{col}{row}";
-            }
             --getNextCaptureTimer;
         }
-
+        
         CombinationGame_S.AddToMoveList(move);
         MoveTokens.Clear();
     }
@@ -244,7 +248,6 @@ public abstract class GenericPiece : MonoBehaviour
         this.ValidMoves.Clear();
     }
 
-
     protected bool OutOfBounds(int currentPos){return currentPos < 0 || currentPos > 63;}      
 
     // 00 01 02 03 04 05 06 07
@@ -260,6 +263,20 @@ public abstract class GenericPiece : MonoBehaviour
     // not a valid tile for a checker on 7 to go to, though being within bounds of board
     public abstract bool Overflown(int currentPos, int offset);
 
+    public static string BoardPosToAlgebraNotation(string token)
+    {
+        int tile = int.Parse(token);
+        char col = (char)((tile%8)+97);
+        int row = 8 - (tile/8);
+
+        return $"{col}{row}";
+    }
+    public static int AlgebraNotationToBoardPos(string token)
+    {
+        int col = token[0]-'a';
+        int row = (8 -(token[1]-'0'))*8;
+        return col+row;
+    }
 
     public static bool IsP1Piece(GenericPiece piece)
     {

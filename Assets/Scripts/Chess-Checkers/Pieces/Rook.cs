@@ -59,7 +59,16 @@ public class Rook : GenericPiece
         UpdateMoveList();
         
         UpdatePosition(this, nextPos);
+        // SetAICastleRights(oldPos);
         this.HasMoved = true;
         ChessBoard_S.ChangeSides(this);
     }
+
+    // private void SetAICastleRights(int pos)
+    // {
+    //     if (IsP1Piece(this))
+    //         StockfishAI_S.CanCastle1[(pos==56) ? 2 : 1] = false;
+    //     else
+    //         StockfishAI_S.CanCastle2[(pos==0) ? 2 : 1] = false;
+    // }
 }

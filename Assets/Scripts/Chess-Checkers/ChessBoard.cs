@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using QFSW.QC;
 using Unity.Netcode;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,25 +10,39 @@ public class ChessBoard : NetworkBehaviour
     [SerializeField] private BoardMaterials Board_SO;
     [SerializeField] private Camera MainCamera;
     [SerializeField] private Transform GameInfoNoteBook;
+    // [SerializeField] private CombinationGame CombinationGame_S; 
+    // [SerializeField] private stockfishAI stockfishAI_S;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
     public const int KING_SPAWN = 1;
     
     public static GenericPiece[] Board = new GenericPiece[64];
     public int TurnCount = 1;
+    public int HalfMove = 0;
+    public List<string> MoveList = new List<string>();
 
     public UnityEvent<bool> OnChangedTurn;
     public UnityEvent OnGameOver;
     public UnityEvent<string> OnWinnerAnnounced;
+
+    // private IEnumerator coroutine;
 
     void Start()
     {
         GenerateBoardTiles();
     }
 
+    public void AddToMoveList(string move)
+    {
+        MoveList.Add(move);
+    }
+
     public void StartGame()
     {
         TurnCount = 1;
+        HalfMove = 0;
+        MoveList.Clear();
+
         BoardMaterials.IsP1Turn = true;
         OnChangedTurn?.Invoke(BoardMaterials.IsP1Turn);
 
@@ -134,7 +147,20 @@ public class ChessBoard : NetworkBehaviour
         SetCameraAndPiecesRotation();
 
         OnChangedTurn?.Invoke(BoardMaterials.IsP1Turn);
+
+        // coroutine = WaitAndPrint(0.5f);
+        // StartCoroutine(coroutine);
     }
+
+    // private IEnumerator WaitAndPrint(float waitTime)
+    // {
+    //     yield return new WaitForSeconds(waitTime);
+    //     if (!BoardMaterials.IsP1Turn)
+    //     {
+    //         print("here");
+    //         stockfishAI_S.MakeMove();
+    //     }        
+    // }
 
     private void SetValidMovesForPieces()
     {
@@ -355,6 +381,36 @@ public class ChessBoard : NetworkBehaviour
     public static bool DidThisPlayerMove()
     {
         return BoardMaterials.IsP1Turn == (PlayerData.PlayerID == 0);
+    }
+
+    public static string BoardToFenNotation()
+    {
+        string fenNotation = "";
+
+        int x = 0;
+        int rowLimit = 0;
+        foreach (GenericPiece piece in Board)
+        {
+            if (piece)
+            {
+                if (x != 0)
+                    fenNotation += (char)(x + '0');
+                fenNotation += piece.TeamID;
+                x = 0;
+            }
+            else
+                ++x;
+            
+            if (++rowLimit == 8)
+            {
+                if (x != 0)
+                    fenNotation += (char)(x + '0');
+                fenNotation += '/';
+                x = 0;
+                rowLimit = 0;
+            }
+        }
+        return fenNotation.Substring(0, fenNotation.Length-1);
     }
 
 

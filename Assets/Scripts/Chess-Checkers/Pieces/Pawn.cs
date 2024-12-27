@@ -70,6 +70,9 @@ public class Pawn : GenericPiece
         int oldPos = ChessBoard.PosToBoardPos(lastPos);
         int newPos = ChessBoard.PosToBoardPos(nextPos);
 
+        // if ((Math.Abs(oldPos - newPos) == 16) && (BoardMaterials.GameType == BoardMaterials.CHESS_GAME)) // Pawn moves two spaces forward
+        //     StockfishAI_S.EnPassantPiece = this;
+
         SetPotentialEnPassant(this);
 
         if (ChessBoard.Board[newPos] != null)
