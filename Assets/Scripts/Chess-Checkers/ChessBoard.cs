@@ -14,7 +14,7 @@ public class ChessBoard : NetworkBehaviour
     // [SerializeField] private stockfishAI stockfishAI_S;
 
     private static Vector3 DEAD_PIECE = new Vector3(-100f, -100f, -100f);
-    public const int KING_SPAWN = 1;
+    public const int KING_SPAWN = 8;
     
     public static GenericPiece[] Board = new GenericPiece[64];
     public int TurnCount = 1;

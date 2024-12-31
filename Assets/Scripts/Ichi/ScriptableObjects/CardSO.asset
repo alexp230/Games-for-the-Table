@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fc47eb76df8ad54d89e2319d2ac61af, type: 3}
+  m_Name: CardSO
+  m_EditorClassIdentifier: 
+  ColorRed: {fileID: 2100000, guid: 0aeea57a6c89f7a43983bf214d49c40a, type: 2}
+  ColorYellow: {fileID: 2100000, guid: 92ec8d5cc32757a4a84b37b79592c29a, type: 2}
+  ColorCyan: {fileID: 2100000, guid: fdf0c47e8a757bc4183353f7e542b172, type: 2}
+  ColorGreen: {fileID: 2100000, guid: 9e5dbf4d533662d49a6106d58881cdcd, type: 2}
