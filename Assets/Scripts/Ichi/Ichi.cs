@@ -3,17 +3,18 @@ using UnityEngine;
 public class Ichi : MonoBehaviour
 {
     [SerializeField] private Card Card_Prefab;
-    private int numberOfCards = 3; // Cards per player deck
+    private int numberOfCards = 7; // Cards per player deck
 
     private int numberOfObjects = 3; // Number of objects to spawn
-    private float radius = 45f; // Radius of the circle
+    private float radius = 90f; // Radius of the circle
 
     void Start()
     {
         SpawnObjects();
+        SetCamera();
     }
 
-    void SpawnObjects()
+    private void SpawnObjects()
     {
         for (int i=0; i<numberOfObjects; ++i)
         {
@@ -38,18 +39,14 @@ public class Ichi : MonoBehaviour
             playerDeck.transform.SetPositionAndRotation(position, rotation);
 
             SpawnCards(playerDeck.transform);
-
-            // Spawn cards in an arc for this player deck
-            // Card[] cards = SpawnCardsInArc(playerDeck.transform);
-            // ArrangeCardsInHand(playerDeck.transform, cards, cardArcAngle, cardArcRadius);
         }
     }
 
     private void SpawnCards(Transform deckTransform)
     {
-        // Total range and spacing calculation
-        int topRange = 10;
-        int bottomRange = -10;
+        // Total range and spacing calculations
+        float topRange = 3.5f * numberOfCards;
+        float bottomRange = -topRange;
 
         float totalRange = topRange - bottomRange;
         float spacing = totalRange / (numberOfCards - 1);
@@ -65,12 +62,28 @@ public class Ichi : MonoBehaviour
             Vector3 worldPosition = deckTransform.TransformPoint(localPosition);
 
             // Instantiate card at the correct world position and rotation
-            Card card = Instantiate(Card_Prefab, worldPosition, deckTransform.rotation);
-            card.SetColor();
+            Instantiate(Card_Prefab, worldPosition, deckTransform.rotation);
 
             // Increment for slight horizontal offset
             z -= 0.1f;
         }
+    }
+
+    private void SetCamera()
+    {
+        string player = "PlayerDeck0";
+        GameObject playerDeck = GameObject.Find(player);
+
+        print(player);
+        
+        // Set the camera's position relative to the deck
+        Vector3 offset = playerDeck.transform.forward * -100f + playerDeck.transform.up * 70f; // Move back and up
+        Camera.main.transform.position = playerDeck.transform.position + offset;
+
+        // Rotate the camera to look at the deck
+        Camera.main.transform.LookAt(playerDeck.transform);
+
+        // Camera.main.transform.Rotate(10f, 0f, 0f, Space.Self);
     }
 
 }
