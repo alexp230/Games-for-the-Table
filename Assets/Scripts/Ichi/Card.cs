@@ -11,48 +11,67 @@ public class Card : MonoBehaviour
     [SerializeField] private BoxCollider BoxCollider;
 
     private char Value;
-    private int CardLift = 20;
+    private const int CARD_LIFT = 20;
 
     void Start()
     {
-        this.SetColor();
-        this.SetValue();
+        // this.SetColor();
+        // this.SetValue();
     }
 
     void OnMouseEnter()
     {
         Vector3 pos = this.transform.position;
-        this.transform.position = new Vector3(pos.x, pos.y+CardLift, pos.z);
+        this.transform.position = new Vector3(pos.x, pos.y+CARD_LIFT, pos.z);
 
         Vector3 boxPos = this.BoxCollider.size;
-        print(this.BoxCollider.size);
         this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y*2, boxPos.z);
     }
 
     void OnMouseExit()
     {
         Vector3 pos = this.transform.position;
-        this.transform.position = new Vector3(pos.x, pos.y-CardLift, pos.z);
+        this.transform.position = new Vector3(pos.x, pos.y-CARD_LIFT, pos.z);
 
         Vector3 boxPos = this.BoxCollider.size;
-        print(this.BoxCollider.size);
         this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y/2, boxPos.z);
     }
 
     
-    private void SetColor()
+    public void SetColor(string color = "")
     {
-        Material[] mats = new Material[4] {Card_SO.ColorRed, Card_SO.ColorYellow, Card_SO.ColorGreen, Card_SO.ColorCyan};
-        
-        this.GetComponent<MeshRenderer>().material = mats[Random.Range(0, mats.Length)];
+        if (color == "")
+        {
+            Material[] mats = new Material[4] {Card_SO.ColorRed, Card_SO.ColorYellow, Card_SO.ColorGreen, Card_SO.ColorCyan};
+            this.GetComponent<MeshRenderer>().material = mats[Random.Range(0, mats.Length)];
+            return;
+        }
+        switch (color)
+        {
+            case "red": this.GetComponent<MeshRenderer>().material = Card_SO.ColorRed; break;
+            case "green": this.GetComponent<MeshRenderer>().material = Card_SO.ColorGreen; break;
+            case "yellow": this.GetComponent<MeshRenderer>().material = Card_SO.ColorYellow; break;
+            case "cyan": this.GetComponent<MeshRenderer>().material = Card_SO.ColorCyan; break;
+        }        
     }
-    private void SetValue()
+    public void SetValue(string val = "z")
     {
-        string value = Random.Range(1, 10).ToString();
+        if (val != "z")
+        {
+            this.Value = val[0];
+            MiddleText.text = val;
+            TopLeftText.text = val;
+            BottomRightText.text = val;
+        }
+        else
+        {
+            string value = Random.Range(1, 10).ToString();
+            this.Value = value[0];
+            MiddleText.text = value;
+            TopLeftText.text = value;
+            BottomRightText.text = value;
+        }
         
-        this.Value = value[0];
-        MiddleText.text = value;
-        TopLeftText.text = value;
-        BottomRightText.text = value;
+        
     }
 }

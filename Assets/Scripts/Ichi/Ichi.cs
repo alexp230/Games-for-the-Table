@@ -1,29 +1,67 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Ichi : MonoBehaviour
 {
     [SerializeField] private Card Card_Prefab;
+
+    public List<string> Deck = new List<string>();
+
+    private int NumberOfDecks = 3; // Number of objects to spawn
     private int numberOfCards = 7; // Cards per player deck
 
-    private int numberOfObjects = 3; // Number of objects to spawn
-    private float radius = 90f; // Radius of the circle
+    private int DeckCount = 0;
 
     void Start()
     {
-        SpawnObjects();
+        CreateDeck();
+        SpawnDecks();
         SetCamera();
     }
 
-    private void SpawnObjects()
+    void Update()
     {
-        for (int i=0; i<numberOfObjects; ++i)
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            if (++DeckCount == NumberOfDecks)
+                DeckCount = 0;
+            SetCamera();            
+        }
+
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            if (--DeckCount == 0)
+                DeckCount = NumberOfDecks-1;
+            SetCamera();
+        }
+    }
+
+    private void CreateDeck()
+    {
+        string[] colors = new string[] { "red", "green", "yellow", "cyan"};
+        string[] numbers = new string[] { "0","1","2","3","4","5","6","7","8","9" };
+        foreach (string color in colors)
+        {
+            foreach (string number in numbers)
+            {
+                Deck.Add(color+number);
+            }
+        }
+    }
+    
+
+    private void SpawnDecks()
+    {
+        float Radius = 90f; // Radius of the circle
+
+        for (int i=0; i<NumberOfDecks; ++i)
         {
             // Calculate angle in radians
-            float angle = i*Mathf.PI*2f / numberOfObjects;
+            float angle = i*Mathf.PI*2f / NumberOfDecks;
 
             // Calculate position on the circle
-            float x = Mathf.Cos(angle) * radius;
-            float z = Mathf.Sin(angle) * radius;
+            float x = Mathf.Cos(angle) * Radius;
+            float z = Mathf.Sin(angle) * Radius;
 
             // Create position relative to the central object
             Vector3 position = new Vector3(x, 0, z) + transform.position;
@@ -33,8 +71,7 @@ public class Ichi : MonoBehaviour
             // Calculate rotation to face away from the central object
             Quaternion rotation = Quaternion.LookRotation(-direction);
 
-            // Instantiate the object
-            // Instantiate(Card_Prefab, position, rotation);
+            // Instantiate the deck
             GameObject playerDeck = new GameObject($"PlayerDeck{i}");
             playerDeck.transform.SetPositionAndRotation(position, rotation);
 
@@ -62,7 +99,12 @@ public class Ichi : MonoBehaviour
             Vector3 worldPosition = deckTransform.TransformPoint(localPosition);
 
             // Instantiate card at the correct world position and rotation
-            Instantiate(Card_Prefab, worldPosition, deckTransform.rotation);
+            int index = Random.Range(0, Deck.Count);
+            Card card = Instantiate(Card_Prefab, worldPosition, deckTransform.rotation);
+            string attribute = Deck[index];
+            card.SetColor(attribute.Substring(0,attribute.Length-1));
+            card.SetValue(attribute[attribute.Length-1].ToString());
+            Deck.Remove(attribute);
 
             // Increment for slight horizontal offset
             z -= 0.1f;
@@ -71,7 +113,7 @@ public class Ichi : MonoBehaviour
 
     private void SetCamera()
     {
-        string player = "PlayerDeck0";
+        string player = $"PlayerDeck{DeckCount}";
         GameObject playerDeck = GameObject.Find(player);
 
         print(player);
@@ -82,8 +124,7 @@ public class Ichi : MonoBehaviour
 
         // Rotate the camera to look at the deck
         Camera.main.transform.LookAt(playerDeck.transform);
-
-        // Camera.main.transform.Rotate(10f, 0f, 0f, Space.Self);
+        Camera.main.transform.Rotate(-12f, 0f, 0f, Space.Self); // rotate camera a little up
     }
 
 }
