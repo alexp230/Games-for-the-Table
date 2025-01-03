@@ -1,20 +1,16 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Ichi : MonoBehaviour
 {
-    [SerializeField] private Card Card_Prefab;
+    [SerializeField] private DrawDeck DrawDeck_S;
 
-    public List<string> Deck = new List<string>();
+    private int NumberOfDecks = 4;
+    private int NumberOfCards = 7;
 
-    private int NumberOfDecks = 3; // Number of objects to spawn
-    private int numberOfCards = 7; // Cards per player deck
-
-    private int DeckCount = 0;
+    public int DeckCount = 0;
 
     void Start()
     {
-        CreateDeck();
         SpawnDecks();
         SetCamera();
     }
@@ -35,21 +31,7 @@ public class Ichi : MonoBehaviour
             SetCamera();
         }
     }
-
-    private void CreateDeck()
-    {
-        string[] colors = new string[] { "red", "green", "yellow", "cyan"};
-        string[] numbers = new string[] { "0","1","2","3","4","5","6","7","8","9" };
-        foreach (string color in colors)
-        {
-            foreach (string number in numbers)
-            {
-                Deck.Add(color+number);
-            }
-        }
-    }
     
-
     private void SpawnDecks()
     {
         float Radius = 90f; // Radius of the circle
@@ -68,6 +50,7 @@ public class Ichi : MonoBehaviour
 
             // Calculate the direction vector from the central object to the position
             Vector3 direction = (position - transform.position).normalized;
+
             // Calculate rotation to face away from the central object
             Quaternion rotation = Quaternion.LookRotation(-direction);
 
@@ -75,39 +58,8 @@ public class Ichi : MonoBehaviour
             GameObject playerDeck = new GameObject($"PlayerDeck{i}");
             playerDeck.transform.SetPositionAndRotation(position, rotation);
 
-            SpawnCards(playerDeck.transform);
-        }
-    }
-
-    private void SpawnCards(Transform deckTransform)
-    {
-        // Total range and spacing calculations
-        float topRange = 3.5f * numberOfCards;
-        float bottomRange = -topRange;
-
-        float totalRange = topRange - bottomRange;
-        float spacing = totalRange / (numberOfCards - 1);
-        float z = 0;
-
-        for (int i = 0; i < numberOfCards; ++i)
-        {
-            // Calculate position for the current object within the local space of the deck
-            float local_x = bottomRange + i * spacing;
-            Vector3 localPosition = new Vector3(local_x, 0, z);
-
-            // Convert local position to world position relative to the deck
-            Vector3 worldPosition = deckTransform.TransformPoint(localPosition);
-
-            // Instantiate card at the correct world position and rotation
-            int index = Random.Range(0, Deck.Count);
-            Card card = Instantiate(Card_Prefab, worldPosition, deckTransform.rotation);
-            string attribute = Deck[index];
-            card.SetColor(attribute.Substring(0,attribute.Length-1));
-            card.SetValue(attribute[attribute.Length-1].ToString());
-            Deck.Remove(attribute);
-
-            // Increment for slight horizontal offset
-            z -= 0.1f;
+            for (int j=0; j<NumberOfCards; ++j)
+                DrawDeck_S.DrawCard(playerDeck.transform);
         }
     }
 
