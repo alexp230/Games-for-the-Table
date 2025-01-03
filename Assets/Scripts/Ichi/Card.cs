@@ -13,6 +13,13 @@ public class Card : MonoBehaviour
     [SerializeField] private BoxCollider BoxCollider;
 
     private char Value;
+    private Transform PlayPile;
+
+
+    void Start()
+    {
+        PlayPile = GameObject.Find("PlayPile").transform;
+    }
 
     void OnMouseEnter()
     {
@@ -30,6 +37,14 @@ public class Card : MonoBehaviour
 
         Vector3 boxPos = this.BoxCollider.size;
         this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y/2, boxPos.z);
+    }
+
+    void OnMouseDown()
+    {
+        this.transform.SetParent(PlayPile);
+
+        this.transform.localPosition = new Vector3(0, (PlayPile.childCount*0.12f) + CARD_LIFT, 0);
+        this.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
     }
 
     

@@ -26,7 +26,7 @@ public class Ichi : MonoBehaviour
 
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            if (--DeckCount == 0)
+            if (--DeckCount == -1)
                 DeckCount = NumberOfDecks-1;
             SetCamera();
         }
