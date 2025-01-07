@@ -47,7 +47,7 @@ public class Ichi : MonoBehaviour
             float z = Mathf.Sin(angle) * Radius;
 
             // Create position relative to the central object
-            Vector3 position = new Vector3(x, 0, z) + transform.position;
+            Vector3 position = new Vector3(x, 10, z) + transform.position;
 
             // Calculate the direction vector from the central object to the position
             Vector3 direction = (position - transform.position).normalized;

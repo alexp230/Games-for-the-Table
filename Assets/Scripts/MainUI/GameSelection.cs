@@ -25,5 +25,11 @@ public class GameSelection : MonoBehaviour
         BoardMaterials.GameType = BoardMaterials.CHECKERS_CHESS_GAME;
         BoardMaterials.IsLocalGame = true;
         SceneManager.LoadScene(sceneName:"Chess-Checkers");
-    }   
+    }
+
+    // CheckerChessButton UE
+    public void OnIchiButton()
+    {
+        SceneManager.LoadScene(sceneName:"Ichi");
+    } 
 }

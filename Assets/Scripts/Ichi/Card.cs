@@ -23,8 +23,8 @@ public class Card : MonoBehaviour
 
     void OnMouseEnter()
     {
-        Vector3 pos = this.transform.position;
-        this.transform.position = new Vector3(pos.x, pos.y+CARD_LIFT, pos.z);
+        Vector3 pos = this.transform.localPosition;
+        this.transform.localPosition = new Vector3(pos.x, pos.y+CARD_LIFT, pos.z);
 
         Vector3 boxPos = this.BoxCollider.size;
         this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y*2, boxPos.z);
@@ -32,8 +32,8 @@ public class Card : MonoBehaviour
 
     void OnMouseExit()
     {
-        Vector3 pos = this.transform.position;
-        this.transform.position = new Vector3(pos.x, pos.y-CARD_LIFT, pos.z);
+        Vector3 pos = this.transform.localPosition;
+        this.transform.localPosition = new Vector3(pos.x, pos.y-CARD_LIFT, pos.z);
 
         Vector3 boxPos = this.BoxCollider.size;
         this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y/2, boxPos.z);
@@ -45,7 +45,7 @@ public class Card : MonoBehaviour
 
         this.transform.SetParent(PlayPile);
 
-        this.transform.localPosition = new Vector3(0, (PlayPile.childCount*0.2f) + CARD_LIFT, 0);
+        this.transform.localPosition = new Vector3(0, (PlayPile.childCount*0.2f)+CARD_LIFT, 0);
         this.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
 
         playerDeck.ArrangeDeck();
