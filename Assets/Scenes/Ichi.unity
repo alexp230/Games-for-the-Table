@@ -180,6 +180,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawDeck_S: {fileID: 1688727684}
+  PlayerDeck_P: {fileID: 2032614673437018706, guid: ecc64b016d2a2cb48950bc521364b530, type: 3}
   DeckCount: 0
 --- !u!4 &247706537
 Transform:

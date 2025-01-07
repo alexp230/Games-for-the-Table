@@ -41,10 +41,14 @@ public class Card : MonoBehaviour
 
     void OnMouseDown()
     {
+        PlayerDeck playerDeck = this.transform.parent.GetComponent<PlayerDeck>();
+
         this.transform.SetParent(PlayPile);
 
-        this.transform.localPosition = new Vector3(0, (PlayPile.childCount*0.12f) + CARD_LIFT, 0);
+        this.transform.localPosition = new Vector3(0, (PlayPile.childCount*0.2f) + CARD_LIFT, 0);
         this.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
+
+        playerDeck.ArrangeDeck();
     }
 
     

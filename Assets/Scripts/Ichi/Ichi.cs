@@ -3,6 +3,7 @@ using UnityEngine;
 public class Ichi : MonoBehaviour
 {
     [SerializeField] private DrawDeck DrawDeck_S;
+    [SerializeField] private PlayerDeck PlayerDeck_P;
 
     private int NumberOfDecks = 4;
     private int NumberOfCards = 7;
@@ -55,8 +56,9 @@ public class Ichi : MonoBehaviour
             Quaternion rotation = Quaternion.LookRotation(-direction);
 
             // Instantiate the deck
-            GameObject playerDeck = new GameObject($"PlayerDeck{i}");
+            PlayerDeck playerDeck = Instantiate(PlayerDeck_P);
             playerDeck.transform.SetPositionAndRotation(position, rotation);
+            playerDeck.name = $"PlayerDeck{i}";
 
             for (int j=0; j<NumberOfCards; ++j)
                 DrawDeck_S.DrawCard(playerDeck.transform);
