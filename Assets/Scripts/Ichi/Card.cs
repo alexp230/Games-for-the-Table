@@ -41,6 +41,11 @@ public class Card : MonoBehaviour
 
     void OnMouseDown()
     {
+        Card topCard = PlayPile.transform.GetChild(PlayPile.transform.childCount-1).GetComponent<Card>();
+
+        if ((topCard.GetComponent<MeshRenderer>().material.name != this.GetComponent<MeshRenderer>().material.name) && (topCard.Value != this.Value))
+            return;
+            
         PlayerDeck playerDeck = this.transform.parent.GetComponent<PlayerDeck>();
 
         this.transform.SetParent(PlayPile);
