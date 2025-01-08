@@ -10,6 +10,7 @@ public class DrawDeck : MonoBehaviour
     void Awake()
     {
         CreateDeck();
+        DrawToPlayPile();
     }
 
     void OnMouseDown()
@@ -26,6 +27,26 @@ public class DrawDeck : MonoBehaviour
         foreach (string color in colors)
             foreach (string number in numbers)
                 TheDeck.Add(color+number);
+    }
+
+    private void DrawToPlayPile()
+    {
+        Transform playPile = GameObject.Find("PlayPile").transform;
+
+        Card card = Instantiate(Card_Prefab, playPile);
+
+        int index = Random.Range(0, TheDeck.Count);
+        string attribute = TheDeck[index];
+
+        card.SetColor(attribute.Substring(0,attribute.Length-1));
+        card.SetValue(attribute[attribute.Length-1].ToString());
+
+        card.transform.SetParent(playPile);
+
+        card.transform.localPosition = Vector3.zero;
+        card.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
+
+        TheDeck.Remove(attribute);
     }
 
     public void DrawCard(Transform deckTransform)
