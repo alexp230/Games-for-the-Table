@@ -16,6 +16,8 @@ public class GameCards
 
     Time-bomb: must make a move in three seconds, or else you draw cards
 
+    Pile-up: flip a card from the draw-pile; players must play a card with the same color, first person who cant gets the stack
+
 
     Abilities:
     Jump-in: player can play out of turn in the played card is the same color and kind
@@ -23,7 +25,6 @@ public class GameCards
     Reveal: player reveals everyone's cards temporarily
 
     Fortune-Teller: can see the next five draw cards
-
         
     */
     
