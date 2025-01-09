@@ -5,7 +5,8 @@ public class DrawDeck : MonoBehaviour
 {
     [SerializeField] private Ichi Ichi_S;
     [SerializeField] private Card Card_Prefab;
-    [SerializeField] private List<string> TheDeck = new List<string>();
+
+    public List<Card> ELDeck = new List<Card>();
     
     void Awake()
     {
@@ -25,41 +26,38 @@ public class DrawDeck : MonoBehaviour
         string[] numbers = new string[] { "0","1","2","3","4","5","6","7","8","9" };
 
         foreach (string color in colors)
+        {
             foreach (string number in numbers)
-                TheDeck.Add(color+number);
+            {
+                Card card = Instantiate(Card_Prefab);
+
+                card.SetColor(color);
+                card.SetValue(number);
+
+                ELDeck.Add(card);
+            }
+        }
     }
 
     private void DrawToPlayPile()
     {
+        Card topCard = ELDeck[Random.Range(0, ELDeck.Count)];
+
         Transform playPile = GameObject.Find("PlayPile").transform;
+        topCard.transform.SetParent(playPile);
 
-        Card card = Instantiate(Card_Prefab, playPile);
+        topCard.transform.localPosition = Vector3.zero;
+        topCard.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
 
-        int index = Random.Range(0, TheDeck.Count);
-        string attribute = TheDeck[index];
-
-        card.SetColor(attribute.Substring(0,attribute.Length-1));
-        card.SetValue(attribute[attribute.Length-1].ToString());
-
-        card.transform.SetParent(playPile);
-
-        card.transform.localPosition = Vector3.zero;
-        card.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
-
-        TheDeck.Remove(attribute);
+        ELDeck.Remove(topCard);
     }
 
     public void DrawCard(Transform deckTransform)
     {
-        Card card = Instantiate(Card_Prefab, deckTransform);
+        Card card = ELDeck[Random.Range(0, ELDeck.Count)];
+        card.transform.SetParent(deckTransform);
 
-        int index = Random.Range(0, TheDeck.Count);
-        string attribute = TheDeck[index];
-
-        card.SetColor(attribute.Substring(0,attribute.Length-1));
-        card.SetValue(attribute[attribute.Length-1].ToString());
-
-        TheDeck.Remove(attribute);
+        ELDeck.Remove(card);
 
         deckTransform.GetComponent<PlayerDeck>().ArrangeDeck();
     }

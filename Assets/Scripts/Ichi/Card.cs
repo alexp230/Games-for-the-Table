@@ -12,7 +12,8 @@ public class Card : MonoBehaviour
     [SerializeField] private TextMeshProUGUI BottomRightText;
     [SerializeField] private BoxCollider BoxCollider;
 
-    private char Value;
+    public char CardValue;
+    public Material CardMaterial;
     private Transform PlayPile;
 
 
@@ -23,59 +24,76 @@ public class Card : MonoBehaviour
 
     void OnMouseEnter()
     {
-        Vector3 pos = this.transform.localPosition;
-        this.transform.localPosition = new Vector3(pos.x, pos.y+CARD_LIFT, pos.z);
-
-        Vector3 boxPos = this.BoxCollider.size;
-        this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y*2, boxPos.z);
+        ManueverCard(true);
     }
 
     void OnMouseExit()
     {
+        ManueverCard(false);
+    }
+
+    private void ManueverCard(bool upDirection)
+    {
         Vector3 pos = this.transform.localPosition;
-        this.transform.localPosition = new Vector3(pos.x, pos.y-CARD_LIFT, pos.z);
+        this.transform.localPosition = new Vector3(pos.x, pos.y + (upDirection ? CARD_LIFT : -CARD_LIFT), pos.z);
 
         Vector3 boxPos = this.BoxCollider.size;
-        this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y/2, boxPos.z);
+        this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y * (upDirection ? 2f : 0.5f), boxPos.z);
     }
 
     void OnMouseDown()
     {
-        Card topCard = PlayPile.transform.GetChild(PlayPile.transform.childCount-1).GetComponent<Card>();
+        if (!CanPlayCard())
+            return;        
 
-        if ((topCard.GetComponent<MeshRenderer>().material.name != this.GetComponent<MeshRenderer>().material.name) && (topCard.Value != this.Value))
-            return;
-            
         PlayerDeck playerDeck = this.transform.parent.GetComponent<PlayerDeck>();
 
+        SetCardOnPlayPile();
+
+        playerDeck.ArrangeDeck();
+    }
+
+    private bool CanPlayCard()
+    {
+        Card topCard = PlayPile.transform.GetChild(PlayPile.transform.childCount-1).GetComponent<Card>();
+        return !((topCard.CardMaterial.name != this.CardMaterial.name) && (topCard.CardValue != this.CardValue));
+    }
+    private void SetCardOnPlayPile()
+    {        
         this.transform.SetParent(PlayPile);
 
         this.transform.localPosition = new Vector3(0, (PlayPile.childCount*0.2f)+CARD_LIFT, 0);
         this.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
 
-        playerDeck.ArrangeDeck();
+        this.BoxCollider.enabled = false;
     }
 
-    
+
     public void SetColor(string color = "")
     {
         Material[] mats = new Material[4] {Card_SO.ColorRed, Card_SO.ColorYellow, Card_SO.ColorGreen, Card_SO.ColorCyan};
+        Material mat;
 
         switch (color)
         {
-            case "red": this.GetComponent<MeshRenderer>().material = mats[0]; break;
-            case "yellow": this.GetComponent<MeshRenderer>().material = mats[1]; break;
-            case "green": this.GetComponent<MeshRenderer>().material = mats[2]; break;
-            case "cyan": this.GetComponent<MeshRenderer>().material = mats[3]; break;
-            default:  this.GetComponent<MeshRenderer>().material = mats[Random.Range(0, mats.Length)]; break;
-        }        
+            case "red": mat = mats[0]; break;
+            case "yellow": mat = mats[1]; break;
+            case "green": mat = mats[2]; break;
+            case "cyan": mat = mats[3]; break;
+            default:  mat = mats[Random.Range(0, mats.Length)]; break;
+        }
+
+        this.GetComponent<MeshRenderer>().material = mat;
+        CardMaterial = mat;
     }
-    public void SetValue(string val = "z")
+
+    public void SetValue(string val = "")
     {
-        if (val == "z")
+        if (val == "")
             val = Random.Range(1, 10).ToString();
 
-        this.Value = val[0];
+        this.CardValue = val[0];
+
         MiddleText.text = val;
         TopLeftText.text = val;
         BottomRightText.text = val;
