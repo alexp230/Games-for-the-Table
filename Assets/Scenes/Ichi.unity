@@ -1506,6 +1506,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Ichi_S: {fileID: 247706536}
   Card_Prefab: {fileID: 3222667513411856933, guid: bf7f38ca8bbaffc4a82e8c2fef378dce, type: 3}
+  SkipCard_Prefab: {fileID: 3222667513411856933, guid: 7f5e2731f82b0a94ab3ea20c4f152844, type: 3}
+  ReverseCard_Prefab: {fileID: 3222667513411856933, guid: 91882dfed1ebca2448eb974fd3931c20, type: 3}
   TheDeck: []
 --- !u!1001 &1845788353
 PrefabInstance:

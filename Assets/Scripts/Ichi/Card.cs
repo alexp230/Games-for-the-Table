@@ -70,7 +70,7 @@ public class Card : MonoBehaviour
     }
 
 
-    public void SetColor(string color = "")
+    public void SetColor(string color)
     {
         Material[] mats = new Material[4] {Card_SO.ColorRed, Card_SO.ColorYellow, Card_SO.ColorGreen, Card_SO.ColorCyan};
         Material mat;
@@ -87,12 +87,12 @@ public class Card : MonoBehaviour
         this.GetComponent<MeshRenderer>().material = mat;
         CardMaterial = mat;
     }
-    public void SetValue(string val = "")
+    public void SetValue(string val)
     {
-        if (val == "")
-            val = Random.Range(1, 10).ToString();
-
         this.CardValue = val[0];
+
+        if (val == "s" || val == "r")
+            return;
 
         MiddleText.text = val;
         TopLeftText.text = val;

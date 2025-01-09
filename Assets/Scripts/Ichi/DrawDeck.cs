@@ -5,6 +5,8 @@ public class DrawDeck : MonoBehaviour
 {
     [SerializeField] private Ichi Ichi_S;
     [SerializeField] private Card Card_Prefab;
+    [SerializeField] private Card SkipCard_Prefab;
+    [SerializeField] private Card ReverseCard_Prefab;
 
     public List<Card> TheDeck = new List<Card>();
     
@@ -24,15 +26,24 @@ public class DrawDeck : MonoBehaviour
     {
         foreach (string color in new string[] { "red", "green", "yellow", "cyan"})
         {
-            foreach (string number in new string[] { "0","1","2","3","4","5","6","7","8","9" })
+            foreach (string type in new string[] { "0","1","2","3","4","5","6","7","8","9" })
+                CreateCard(Card_Prefab, color, type);
+                
+            for (int i=0; i<2; ++i)
             {
-                Card card = Instantiate(Card_Prefab, this.transform);
-
-                card.SetColor(color);
-                card.SetValue(number);
-
-                TheDeck.Add(card);
+                CreateCard(SkipCard_Prefab, color, "s");
+                CreateCard(ReverseCard_Prefab, color, "r");
             }
+                
+        }
+
+        void CreateCard(Card cardPrefab, string color, string type)
+        {
+            Card card = Instantiate(cardPrefab, this.transform);
+            card.SetColor(color);
+            card.SetValue(type);
+
+            TheDeck.Add(card);
         }
     }
 
