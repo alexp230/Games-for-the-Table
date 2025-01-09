@@ -25,19 +25,10 @@ public class DrawDeck : MonoBehaviour
     private void CreateDeck()
     {
         foreach (string color in new string[] { "red", "green", "yellow", "cyan"})
-        {
-            foreach (string type in new string[] { "0","1","2","3","4","5","6","7","8","9" })
+            foreach (char type in new char[] { '0','1','2','3','4','5','6','7','8','9','c','r' })
                 CreateCard(Card_Prefab, color, type);
-                
-            for (int i=0; i<2; ++i)
-            {
-                CreateCard(SkipCard_Prefab, color, "s");
-                CreateCard(ReverseCard_Prefab, color, "r");
-            }
-                
-        }
 
-        void CreateCard(Card cardPrefab, string color, string type)
+        void CreateCard(Card cardPrefab, string color, char type)
         {
             Card card = Instantiate(cardPrefab, this.transform);
             card.SetColor(color);

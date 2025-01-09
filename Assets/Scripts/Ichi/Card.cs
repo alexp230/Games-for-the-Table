@@ -1,27 +1,28 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.Events;
 
 public class Card : MonoBehaviour
 {
     private const int CARD_LIFT = 20;
 
     [SerializeField] private CardSO Card_SO;
-    private Ichi Ichi_S;
 
-    [SerializeField] private TextMeshProUGUI MiddleText;
-    [SerializeField] private TextMeshProUGUI TopLeftText;
-    [SerializeField] private TextMeshProUGUI BottomRightText;
+    [SerializeField] private SpriteRenderer CardSpriteTL;
+    [SerializeField] private SpriteRenderer CardSpriteM;
+    [SerializeField] private SpriteRenderer CardSpriteBR;
     [SerializeField] private BoxCollider BoxCollider;
 
     public char CardValue;
     public Material CardMaterial;
     private Transform PlayPile;
 
+    public UnityEvent OnPlayCard;
+
 
     void Start()
     {
         PlayPile = GameObject.Find("PlayPile").transform;
-        Ichi_S = GameObject.Find("Ichi").GetComponent<Ichi>();
     }
 
     void OnMouseEnter()
@@ -52,7 +53,7 @@ public class Card : MonoBehaviour
 
         SetCardOnPlayPile();
 
-        GameObject.Find($"PlayerDeck{Ichi_S.DeckCount}").GetComponent<PlayerDeck>().ArrangeDeck();
+        OnPlayCard?.Invoke();
     }
 
     private bool CanPlayCard()
@@ -88,16 +89,14 @@ public class Card : MonoBehaviour
         this.GetComponent<MeshRenderer>().material = mat;
         CardMaterial = mat;
     }
-    public void SetValue(string val)
+    public void SetValue(char val)
     {
-        this.CardValue = val[0];
+        this.CardValue = val;
 
-        if (val == "s" || val == "r")
-            return;
-
-        MiddleText.text = val;
-        TopLeftText.text = val;
-        BottomRightText.text = val;
+        Sprite sprite = Card_SO.GetSprite(val);
+        this.CardSpriteTL.sprite = sprite;
+        this.CardSpriteM.sprite = sprite;
+        this.CardSpriteBR.sprite = sprite;
     }
     public void SetCollider(bool enable)
     {

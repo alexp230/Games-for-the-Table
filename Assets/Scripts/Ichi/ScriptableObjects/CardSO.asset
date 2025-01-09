@@ -16,3 +16,15 @@ MonoBehaviour:
   ColorYellow: {fileID: 2100000, guid: 92ec8d5cc32757a4a84b37b79592c29a, type: 2}
   ColorCyan: {fileID: 2100000, guid: fdf0c47e8a757bc4183353f7e542b172, type: 2}
   ColorGreen: {fileID: 2100000, guid: 9e5dbf4d533662d49a6106d58881cdcd, type: 2}
+  Number0: {fileID: 21300000, guid: 0475ee44e1f5589419f2da91272aa777, type: 3}
+  Number1: {fileID: 21300000, guid: c4bea00a2ff66c9458fa1019c3cecd03, type: 3}
+  Number2: {fileID: 21300000, guid: 0a7e548ee8b9a964bb6ecdbbf833ad28, type: 3}
+  Number3: {fileID: 21300000, guid: eef5f853001cd9e41a079b4fc14ed6c0, type: 3}
+  Number4: {fileID: 21300000, guid: e82b1f9fbe667424fa3f1eabe64a5e2c, type: 3}
+  Number5: {fileID: 21300000, guid: 7a7ab904247659941b74b5a94bda8ff8, type: 3}
+  Number6: {fileID: 21300000, guid: 307851588e978af4ea954215f8b6a4ad, type: 3}
+  Number7: {fileID: 21300000, guid: c856073d4a07b80428e2b73dfa1acda1, type: 3}
+  Number8: {fileID: 21300000, guid: 1f0f32ad12d24c945a9acb9d0fdbe97d, type: 3}
+  Number9: {fileID: 21300000, guid: 0b8b98f8ac7122f48abcbf933ddad321, type: 3}
+  Cancel: {fileID: 21300000, guid: e96b3cbd775fc024399e0188e3d2ee81, type: 3}
+  Reverse: {fileID: 21300000, guid: 1697d413f572e2c4dae8b42b315da1c5, type: 3}

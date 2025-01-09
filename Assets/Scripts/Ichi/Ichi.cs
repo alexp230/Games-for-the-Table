@@ -9,6 +9,7 @@ public class Ichi : MonoBehaviour
     private int NumberOfCards = 7;
 
     public int DeckCount = 0;
+    public int PlayerTurn = 0;
 
     void Start()
     {
@@ -79,6 +80,11 @@ public class Ichi : MonoBehaviour
         // Rotate the camera to look at the deck
         Camera.main.transform.LookAt(playerDeck.transform);
         Camera.main.transform.Rotate(-12f, 0f, 0f, Space.Self); // rotate camera a little up
+    }
+
+    public void ReArrangeDeck()
+    {
+        GameObject.Find($"PlayerDeck{DeckCount}").GetComponent<PlayerDeck>().ArrangeDeck();
     }
 
 }

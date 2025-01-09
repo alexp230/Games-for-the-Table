@@ -16,7 +16,6 @@ public class PlayPile : MonoBehaviour
             card.transform.rotation = Quaternion.identity;
 
             DrawDeck_S.AddToDeck(card);
-
         }
 
         ShuffleDeck();
