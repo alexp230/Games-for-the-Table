@@ -5,12 +5,9 @@ public class PlayPile : MonoBehaviour
     [SerializeField] private DrawDeck DrawDeck_S;
 
 
-
     public void RearrangePlayPile()
     {
-        int cardCount = this.transform.childCount;
-
-        if (cardCount >= 6)
+        if (this.transform.childCount >= 6)
         {
             Card card = this.transform.GetChild(0).GetComponent<Card>();
 
@@ -19,14 +16,15 @@ public class PlayPile : MonoBehaviour
             card.transform.rotation = Quaternion.identity;
 
             DrawDeck_S.AddToDeck(card);
+
         }
 
-        RearrangePile();
+        ShuffleDeck();
     }
 
-    private void RearrangePile()
+    private void ShuffleDeck()
     {
-        int i=-1;
+        int i=0;
         foreach (Transform card in this.transform)
         {
             card.position = Vector3.zero;

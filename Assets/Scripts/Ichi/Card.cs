@@ -6,6 +6,7 @@ public class Card : MonoBehaviour
     private const int CARD_LIFT = 20;
 
     [SerializeField] private CardSO Card_SO;
+    private Ichi Ichi_S;
 
     [SerializeField] private TextMeshProUGUI MiddleText;
     [SerializeField] private TextMeshProUGUI TopLeftText;
@@ -20,6 +21,7 @@ public class Card : MonoBehaviour
     void Start()
     {
         PlayPile = GameObject.Find("PlayPile").transform;
+        Ichi_S = GameObject.Find("Ichi").GetComponent<Ichi>();
     }
 
     void OnMouseEnter()
@@ -42,16 +44,15 @@ public class Card : MonoBehaviour
         this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y * (upDirection ? 2f : 0.5f), boxPos.z);
     }
 
+
     void OnMouseDown()
     {
         if (!CanPlayCard())
             return;
 
-        PlayerDeck playerDeck = this.transform.parent.GetComponent<PlayerDeck>();
-
         SetCardOnPlayPile();
 
-        playerDeck.ArrangeDeck();
+        GameObject.Find($"PlayerDeck{Ichi_S.DeckCount}").GetComponent<PlayerDeck>().ArrangeDeck();
     }
 
     private bool CanPlayCard()
@@ -60,7 +61,7 @@ public class Card : MonoBehaviour
         return !((topCard.CardMaterial.name != this.CardMaterial.name) && (topCard.CardValue != this.CardValue));
     }
     private void SetCardOnPlayPile()
-    {        
+    {
         this.transform.SetParent(PlayPile);
         this.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
 
