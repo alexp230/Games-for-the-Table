@@ -24,12 +24,13 @@ public class Card : MonoBehaviour
 
     void OnMouseEnter()
     {
-        ManueverCard(true);
+        ManueverCard(upDirection: true);
     }
 
     void OnMouseExit()
     {
-        ManueverCard(false);
+        if (this.BoxCollider.enabled)
+            ManueverCard(upDirection: false);
     }
 
     private void ManueverCard(bool upDirection)
@@ -44,7 +45,7 @@ public class Card : MonoBehaviour
     void OnMouseDown()
     {
         if (!CanPlayCard())
-            return;        
+            return;
 
         PlayerDeck playerDeck = this.transform.parent.GetComponent<PlayerDeck>();
 
@@ -61,11 +62,11 @@ public class Card : MonoBehaviour
     private void SetCardOnPlayPile()
     {        
         this.transform.SetParent(PlayPile);
-
-        this.transform.localPosition = new Vector3(0, (PlayPile.childCount*0.2f)+CARD_LIFT, 0);
         this.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
 
-        this.BoxCollider.enabled = false;
+        SetCollider(false);
+
+        PlayPile.GetComponent<PlayPile>().RearrangePlayPile();
     }
 
 
@@ -86,7 +87,6 @@ public class Card : MonoBehaviour
         this.GetComponent<MeshRenderer>().material = mat;
         CardMaterial = mat;
     }
-
     public void SetValue(string val = "")
     {
         if (val == "")
@@ -97,5 +97,9 @@ public class Card : MonoBehaviour
         MiddleText.text = val;
         TopLeftText.text = val;
         BottomRightText.text = val;
+    }
+    public void SetCollider(bool enable)
+    {
+        this.BoxCollider.enabled = enable;
     }
 }

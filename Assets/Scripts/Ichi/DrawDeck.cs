@@ -6,7 +6,7 @@ public class DrawDeck : MonoBehaviour
     [SerializeField] private Ichi Ichi_S;
     [SerializeField] private Card Card_Prefab;
 
-    public List<Card> ELDeck = new List<Card>();
+    public List<Card> TheDeck = new List<Card>();
     
     void Awake()
     {
@@ -22,26 +22,23 @@ public class DrawDeck : MonoBehaviour
 
     private void CreateDeck()
     {
-        string[] colors = new string[] { "red", "green", "yellow", "cyan"};
-        string[] numbers = new string[] { "0","1","2","3","4","5","6","7","8","9" };
-
-        foreach (string color in colors)
+        foreach (string color in new string[] { "red", "green", "yellow", "cyan"})
         {
-            foreach (string number in numbers)
+            foreach (string number in new string[] { "0","1","2","3","4","5","6","7","8","9" })
             {
-                Card card = Instantiate(Card_Prefab);
+                Card card = Instantiate(Card_Prefab, this.transform);
 
                 card.SetColor(color);
                 card.SetValue(number);
 
-                ELDeck.Add(card);
+                TheDeck.Add(card);
             }
         }
     }
 
     private void DrawToPlayPile()
     {
-        Card topCard = ELDeck[Random.Range(0, ELDeck.Count)];
+        Card topCard = TheDeck[Random.Range(0, TheDeck.Count)];
 
         Transform playPile = GameObject.Find("PlayPile").transform;
         topCard.transform.SetParent(playPile);
@@ -49,17 +46,23 @@ public class DrawDeck : MonoBehaviour
         topCard.transform.localPosition = Vector3.zero;
         topCard.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
 
-        ELDeck.Remove(topCard);
+        TheDeck.Remove(topCard);
     }
 
     public void DrawCard(Transform deckTransform)
     {
-        Card card = ELDeck[Random.Range(0, ELDeck.Count)];
+        Card card = TheDeck[Random.Range(0, TheDeck.Count)];
         card.transform.SetParent(deckTransform);
+        card.SetCollider(true);
 
-        ELDeck.Remove(card);
+        TheDeck.Remove(card);
 
         deckTransform.GetComponent<PlayerDeck>().ArrangeDeck();
+    }
+
+    public void AddToDeck(Card card)
+    {
+        TheDeck.Add(card);
     }
 
 }
