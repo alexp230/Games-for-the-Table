@@ -9,13 +9,13 @@ public class Ichi : MonoBehaviour
     private int NumberOfCards = 7;
 
     public int DeckCount = 0;
-    public int PlayerTurn = 0;
+    private bool ReverseMode = false;
 
     void Start()
     {
-        SubScribeToCardEvents();
         SpawnDecks();
         SetCamera();
+        SubScribeToEvents();
     }
     private void SpawnDecks()
     {
@@ -63,20 +63,22 @@ public class Ichi : MonoBehaviour
         Camera.main.transform.LookAt(playerDeck.transform);
         Camera.main.transform.Rotate(-12f, 0f, 0f, Space.Self); // rotate camera a little up
     }
-    private void SubScribeToCardEvents()
+    private void SubScribeToEvents()
     {
-        foreach (Card card in DrawDeck_S.TheDeck)
-            card.OnPlayedCard += OnCardPlayed;
+        DrawDeck_S.OnDrawCard += OnDrawCard;
+        foreach (GameObject card in GameObject.FindGameObjectsWithTag("Card"))
+            card.GetComponent<Card>().OnPlayedCard += OnCardPlayed;
     }
 
     void OnDisable()
     {
-        UnSubScribeToCardEvents();
+        UnSubScribeToEvents();
     }
-    private void UnSubScribeToCardEvents()
+    private void UnSubScribeToEvents()
     {
-        foreach (Card card in DrawDeck_S.TheDeck)
-            card.OnPlayedCard -= OnCardPlayed;
+        DrawDeck_S.OnDrawCard -= OnDrawCard;
+        foreach (GameObject card in GameObject.FindGameObjectsWithTag("Card"))
+            card.GetComponent<Card>().OnPlayedCard -= OnCardPlayed;
     }
 
     void Update()
@@ -96,15 +98,50 @@ public class Ichi : MonoBehaviour
         }
     }
     
-
-    public void ReArrangeDeck()
-    {
-        GameObject.Find($"PlayerDeck{DeckCount}").GetComponent<PlayerDeck>().ArrangeDeck();
-    }
-
     private void OnCardPlayed(Card playedCard)
     {
         ReArrangeDeck();
+        ChangePlayerTurn(playedCard);
     }
+    private void OnDrawCard()
+    {
+        ModifyDeckCount(1);
+    }
+
+    private void ReArrangeDeck()
+    {
+        GameObject.Find($"PlayerDeck{DeckCount}").GetComponent<PlayerDeck>().ArrangeDeck();
+    }
+    private void ReArrangeDecks()
+    {
+        for (int i=0; i<NumberOfDecks; ++i)
+            GameObject.Find($"PlayerDeck{i}").GetComponent<PlayerDeck>().ArrangeDeck();
+    }
+    private void ChangePlayerTurn(Card card)
+    {
+        switch (card.Value)
+        {
+            case 'r': ReverseMode ^= true; ModifyDeckCount(1); break;
+            case 'c': ModifyDeckCount(2); break;
+            default: ModifyDeckCount(1); break;
+        }
+    }
+    private void ModifyDeckCount(int amount)
+    {
+        while (amount != 0)
+        {
+            DeckCount += ReverseMode ? -1 : 1;
+
+            if (DeckCount <= -1)
+                DeckCount = NumberOfDecks-1;
+            else if (DeckCount >= NumberOfDecks)
+                DeckCount = 0;
+            
+            --amount;
+        }
+        SetCamera();
+    }
+
+    
 
 }

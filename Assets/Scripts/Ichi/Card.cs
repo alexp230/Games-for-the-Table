@@ -9,8 +9,8 @@ public class Card : MonoBehaviour
     [SerializeField] private SpriteRenderer[] CardSprites;
     [SerializeField] private BoxCollider BoxCollider;
 
-    public char CardValue;
-    public Material CardMaterial;
+    public char Value;
+    public Material Material;
     private Transform PlayPile;
 
     public event System.Action<Card> OnPlayedCard;
@@ -54,7 +54,7 @@ public class Card : MonoBehaviour
     private bool CanPlayCard()
     {
         Card topCard = PlayPile.transform.GetChild(PlayPile.transform.childCount-1).GetComponent<Card>();
-        return !((topCard.CardMaterial.name != this.CardMaterial.name) && (topCard.CardValue != this.CardValue));
+        return !((topCard.Material.name != this.Material.name) && (topCard.Value != this.Value));
     }
     private void SetCardOnPlayPile()
     {
@@ -80,11 +80,11 @@ public class Card : MonoBehaviour
         }
 
         this.GetComponent<MeshRenderer>().material = mat;
-        CardMaterial = mat;
+        Material = mat;
     }
     public void SetValue(char val)
     {
-        this.CardValue = val;
+        this.Value = val;
 
         Sprite sprite = Card_SO.GetSprite(val);
         foreach (SpriteRenderer spriteRenderer in CardSprites)

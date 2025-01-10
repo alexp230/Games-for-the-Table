@@ -1031,7 +1031,7 @@ GameObject:
   - component: {fileID: 3222667513411856933}
   m_Layer: 0
   m_Name: Card
-  m_TagString: Untagged
+  m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1155,23 +1155,8 @@ MonoBehaviour:
   - {fileID: 4996606215606997497}
   - {fileID: 1791641721849117120}
   BoxCollider: {fileID: 9061729589028949542}
-  CardValue: 0
-  CardMaterial: {fileID: 0}
-  OnPlayedCard:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+  Value: 0
+  Material: {fileID: 0}
 --- !u!1 &4880289150288033786
 GameObject:
   m_ObjectHideFlags: 0

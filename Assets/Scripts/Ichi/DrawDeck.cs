@@ -7,6 +7,8 @@ public class DrawDeck : MonoBehaviour
     [SerializeField] private Card Card_Prefab;
 
     public List<Card> TheDeck = new List<Card>();
+
+    public event System.Action OnDrawCard;
     
     void Awake()
     {
@@ -56,8 +58,9 @@ public class DrawDeck : MonoBehaviour
         card.SetCollider(true);
 
         TheDeck.Remove(card);
-
         deckTransform.GetComponent<PlayerDeck>().ArrangeDeck();
+
+        OnDrawCard?.Invoke();
     }
 
     public void AddToDeck(Card card)
