@@ -5,8 +5,6 @@ public class DrawDeck : MonoBehaviour
 {
     [SerializeField] private Ichi Ichi_S;
     [SerializeField] private Card Card_Prefab;
-    [SerializeField] private Card SkipCard_Prefab;
-    [SerializeField] private Card ReverseCard_Prefab;
 
     public List<Card> TheDeck = new List<Card>();
     

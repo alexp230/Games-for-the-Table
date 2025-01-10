@@ -1,5 +1,4 @@
 using UnityEngine;
-using TMPro;
 using UnityEngine.Events;
 
 public class Card : MonoBehaviour
@@ -7,18 +6,14 @@ public class Card : MonoBehaviour
     private const int CARD_LIFT = 20;
 
     [SerializeField] private CardSO Card_SO;
-
-    [SerializeField] private SpriteRenderer CardSpriteTL;
-    [SerializeField] private SpriteRenderer CardSpriteM;
-    [SerializeField] private SpriteRenderer CardSpriteBR;
+    [SerializeField] private SpriteRenderer[] CardSprites;
     [SerializeField] private BoxCollider BoxCollider;
 
     public char CardValue;
     public Material CardMaterial;
     private Transform PlayPile;
 
-    public UnityEvent OnPlayCard;
-
+    public event System.Action<Card> OnPlayedCard;
 
     void Start()
     {
@@ -51,11 +46,11 @@ public class Card : MonoBehaviour
         if (!CanPlayCard())
             return;
 
+        SetCollider(false);
         SetCardOnPlayPile();
 
-        OnPlayCard?.Invoke();
+        OnPlayedCard?.Invoke(this);     
     }
-
     private bool CanPlayCard()
     {
         Card topCard = PlayPile.transform.GetChild(PlayPile.transform.childCount-1).GetComponent<Card>();
@@ -65,8 +60,6 @@ public class Card : MonoBehaviour
     {
         this.transform.SetParent(PlayPile);
         this.transform.rotation = Quaternion.Euler(90f, 0, Random.Range(0, 361));
-
-        SetCollider(false);
 
         PlayPile.GetComponent<PlayPile>().RearrangePlayPile();
     }
@@ -94,9 +87,8 @@ public class Card : MonoBehaviour
         this.CardValue = val;
 
         Sprite sprite = Card_SO.GetSprite(val);
-        this.CardSpriteTL.sprite = sprite;
-        this.CardSpriteM.sprite = sprite;
-        this.CardSpriteBR.sprite = sprite;
+        foreach (SpriteRenderer spriteRenderer in CardSprites)
+            spriteRenderer.sprite = sprite;
     }
     public void SetCollider(bool enable)
     {

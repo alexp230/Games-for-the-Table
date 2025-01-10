@@ -1133,7 +1133,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1.0485944, y: 1.0535704, z: 131.22191}
   m_Center: {x: 0.002176132, y: 0.0011105537, z: -11.900083}
@@ -1150,22 +1150,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Card_SO: {fileID: 11400000, guid: b902d4569bf5ef54c80a8deb686aaa25, type: 2}
-  CardSpriteTL: {fileID: 559821651217795293}
-  CardSpriteM: {fileID: 4996606215606997497}
-  CardSpriteBR: {fileID: 1791641721849117120}
+  CardSprites:
+  - {fileID: 559821651217795293}
+  - {fileID: 4996606215606997497}
+  - {fileID: 1791641721849117120}
   BoxCollider: {fileID: 9061729589028949542}
   CardValue: 0
   CardMaterial: {fileID: 0}
-  OnPlayCard:
+  OnPlayedCard:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2032614673437018706, guid: ecc64b016d2a2cb48950bc521364b530, type: 3}
-        m_TargetAssemblyTypeName: PlayerDeck, Assembly-CSharp
-        m_MethodName: ArrangeDeck
-        m_Mode: 1
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgumentAssemblyTypeName: 
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

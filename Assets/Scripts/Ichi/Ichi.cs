@@ -13,27 +13,10 @@ public class Ichi : MonoBehaviour
 
     void Start()
     {
+        SubScribeToCardEvents();
         SpawnDecks();
         SetCamera();
     }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            if (++DeckCount == NumberOfDecks)
-                DeckCount = 0;
-            SetCamera();            
-        }
-
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            if (--DeckCount == -1)
-                DeckCount = NumberOfDecks-1;
-            SetCamera();
-        }
-    }
-    
     private void SpawnDecks()
     {
         float Radius = 90f; // Radius of the circle
@@ -65,7 +48,6 @@ public class Ichi : MonoBehaviour
                 DrawDeck_S.DrawCard(playerDeck.transform);
         }
     }
-
     private void SetCamera()
     {
         string player = $"PlayerDeck{DeckCount}";
@@ -81,10 +63,48 @@ public class Ichi : MonoBehaviour
         Camera.main.transform.LookAt(playerDeck.transform);
         Camera.main.transform.Rotate(-12f, 0f, 0f, Space.Self); // rotate camera a little up
     }
+    private void SubScribeToCardEvents()
+    {
+        foreach (Card card in DrawDeck_S.TheDeck)
+            card.OnPlayedCard += OnCardPlayed;
+    }
+
+    void OnDisable()
+    {
+        UnSubScribeToCardEvents();
+    }
+    private void UnSubScribeToCardEvents()
+    {
+        foreach (Card card in DrawDeck_S.TheDeck)
+            card.OnPlayedCard -= OnCardPlayed;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            if (++DeckCount == NumberOfDecks)
+                DeckCount = 0;
+            SetCamera();            
+        }
+
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            if (--DeckCount == -1)
+                DeckCount = NumberOfDecks-1;
+            SetCamera();
+        }
+    }
+    
 
     public void ReArrangeDeck()
     {
         GameObject.Find($"PlayerDeck{DeckCount}").GetComponent<PlayerDeck>().ArrangeDeck();
+    }
+
+    private void OnCardPlayed(Card playedCard)
+    {
+        ReArrangeDeck();
     }
 
 }
