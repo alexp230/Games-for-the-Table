@@ -29,12 +29,13 @@ public class DrawDeck : MonoBehaviour
         foreach (string color in CardSO.COLORS)
             foreach (string type in CardSO.TYPES)
                 CreateCard(Card_Prefab, color, type);
+        foreach (string specialType in CardSO.SPECIAL_TYPES)
+            CreateCard(Card_Prefab, "Black", specialType);
 
         void CreateCard(Card cardPrefab, string color, string type)
         {
             Card card = Instantiate(cardPrefab, this.transform);
-            card.SetColor(color);
-            card.SetValue(type);
+            card.InitializeCard(type, color);
 
             TheDeck.Add(card);
         }

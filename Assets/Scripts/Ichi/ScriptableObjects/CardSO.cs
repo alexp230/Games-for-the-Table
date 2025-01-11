@@ -7,6 +7,8 @@ public class CardSO : ScriptableObject
     public Material ColorYellow;
     public Material ColorCyan;
     public Material ColorGreen;
+    public Material ColorWhite;
+    public Material ColorBlack;
     public static string[] COLORS = new string[] {"Red", "Yellow", "Cyan", "Green"};
 
     public Material GetMaterial(string color)
@@ -17,6 +19,8 @@ public class CardSO : ScriptableObject
             case "Yellow": return ColorYellow;
             case "Cyan": return ColorCyan;
             case "Green": return ColorGreen;
+            case "White": return ColorWhite;
+            case "Black": return ColorBlack;
 
             default: return null;
         }
@@ -37,8 +41,11 @@ public class CardSO : ScriptableObject
     public Sprite Plus2;
     public Sprite Plus4;
     public Sprite Plus6;
-    public static string[] TYPES = new string[] { "0","1","2","3","4","5","6","7","8","9","cancel","reverse","plus2","plus4",
+    public Sprite Wild;
+    public Sprite Wild4;
+    public static string[] TYPES = new string[] {"0","1","2","3","4","5","6","7","8","9","cancel","reverse","plus2","plus4",
         "plus6" };
+    public static string[] SPECIAL_TYPES = new string[] { "wild", "wild4" };
 
     public Sprite GetSprite(string type)
     {
@@ -59,8 +66,15 @@ public class CardSO : ScriptableObject
             case "plus2": return Plus2;
             case "plus4": return Plus4;
             case "plus6": return Plus6;
+            case "wild": return Wild;
+            case "wild4": return Wild4;
             
             default: return null;
         }
+    }
+
+    public bool IsSpecialCard(Sprite sprite)
+    {
+        return sprite.name == Wild.name || sprite.name == Wild4.name;
     }
 }

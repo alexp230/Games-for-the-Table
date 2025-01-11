@@ -11,6 +11,7 @@ public class Card : MonoBehaviour
 
     public string Value;
     public Material Material;
+    public bool IsSpecialCard;
     private Transform PlayPile;
 
     public event System.Action<Card> OnPlayedCard;
@@ -18,6 +19,12 @@ public class Card : MonoBehaviour
     void Start()
     {
         PlayPile = GameObject.Find("PlayPile").transform;
+    }
+    public void InitializeCard(string type, string color)
+    {
+        SetSpecialCard(type);
+        SetValue(type);
+        SetColor(color);
     }
 
     void OnMouseEnter()
@@ -55,7 +62,16 @@ public class Card : MonoBehaviour
     private bool CanPlayCard()
     {
         Card topCard = PlayPile.transform.GetChild(PlayPile.transform.childCount-1).GetComponent<Card>();
-        return !((topCard.Material.name != this.Material.name) && (topCard.Value != this.Value));
+        print(topCard.Material.name);
+        if (topCard.Material.name == this.Material.name)
+            return true;
+        if (topCard.Value == this.Value)
+            return true;
+        if (this.IsSpecialCard)
+            return true;
+        if (topCard.IsSpecialCard)
+            return true;
+        return false;
     }
     private void SetCardOnPlayPile()
     {
@@ -65,21 +81,27 @@ public class Card : MonoBehaviour
         PlayPile.GetComponent<PlayPile>().RearrangePlayPile();
     }
 
-
-    public void SetColor(string color)
+    private void SetSpecialCard(string val)
+    {
+        this.IsSpecialCard = Card_SO.IsSpecialCard(Card_SO.GetSprite(val));
+    }
+    private void SetColor(string color)
     {
         Material mat = Card_SO.GetMaterial(color);
 
         this.GetComponent<MeshRenderer>().material = mat;
         this.Material = mat;
     }
-    public void SetValue(string val)
+    private void SetValue(string val)
     {
         this.Value = val;
 
         Sprite sprite = Card_SO.GetSprite(val);
         foreach (SpriteRenderer spriteRenderer in CardSprites)
+        {
             spriteRenderer.sprite = sprite;
+            spriteRenderer.color = this.IsSpecialCard ? Color.white : Color.black;
+        }
     }
     public void SetCollider(bool enable)
     {

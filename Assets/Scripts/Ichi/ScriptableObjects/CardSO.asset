@@ -16,6 +16,8 @@ MonoBehaviour:
   ColorYellow: {fileID: 2100000, guid: 92ec8d5cc32757a4a84b37b79592c29a, type: 2}
   ColorCyan: {fileID: 2100000, guid: fdf0c47e8a757bc4183353f7e542b172, type: 2}
   ColorGreen: {fileID: 2100000, guid: 9e5dbf4d533662d49a6106d58881cdcd, type: 2}
+  ColorWhite: {fileID: 2100000, guid: d96ce2538e10bd64990c205efca410e1, type: 2}
+  ColorBlack: {fileID: 2100000, guid: 6813187a8b73ddc4382973d007a28e8e, type: 2}
   Number0: {fileID: 21300000, guid: 0475ee44e1f5589419f2da91272aa777, type: 3}
   Number1: {fileID: 21300000, guid: c4bea00a2ff66c9458fa1019c3cecd03, type: 3}
   Number2: {fileID: 21300000, guid: 0a7e548ee8b9a964bb6ecdbbf833ad28, type: 3}
@@ -31,3 +33,5 @@ MonoBehaviour:
   Plus2: {fileID: 21300000, guid: 48fdafc530aad6b4a89256b7d57e51b3, type: 3}
   Plus4: {fileID: 21300000, guid: a8c1afd0229a8d94a908ab56e1c38b36, type: 3}
   Plus6: {fileID: 21300000, guid: fa69611415d7ea44f8d481eac53e7587, type: 3}
+  Wild: {fileID: 21300000, guid: 0d5f7d23f91c2914e8b821519071d0d5, type: 3}
+  Wild4: {fileID: 21300000, guid: 75ac8ca587ae6474aa436ad9aee937a4, type: 3}
