@@ -28,3 +28,6 @@ MonoBehaviour:
   Number9: {fileID: 21300000, guid: 0b8b98f8ac7122f48abcbf933ddad321, type: 3}
   Cancel: {fileID: 21300000, guid: e96b3cbd775fc024399e0188e3d2ee81, type: 3}
   Reverse: {fileID: 21300000, guid: 1697d413f572e2c4dae8b42b315da1c5, type: 3}
+  Plus2: {fileID: 21300000, guid: 48fdafc530aad6b4a89256b7d57e51b3, type: 3}
+  Plus4: {fileID: 21300000, guid: a8c1afd0229a8d94a908ab56e1c38b36, type: 3}
+  Plus6: {fileID: 21300000, guid: fa69611415d7ea44f8d481eac53e7587, type: 3}

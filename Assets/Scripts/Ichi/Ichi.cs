@@ -113,11 +113,6 @@ public class Ichi : MonoBehaviour
     {
         GameObject.Find($"PlayerDeck{DeckCount}").GetComponent<PlayerDeck>().ArrangeDeck();
     }
-    private void ReArrangeDecks()
-    {
-        for (int i=0; i<NumberOfDecks; ++i)
-            GameObject.Find($"PlayerDeck{i}").GetComponent<PlayerDeck>().ArrangeDeck();
-    }
     private void ChangePlayerTurn(Card card)
     {
         switch (card.Value)
@@ -151,7 +146,6 @@ public class Ichi : MonoBehaviour
         PlayerDeck playerDeck = GameObject.Find($"PlayerDeck{DeckCount}").GetComponent<PlayerDeck>();
 
         StartCoroutine(DrawCardsWithDelay(amount, playerDeck));
-        ChangeTurns(1);
     }
 
     private IEnumerator DrawCardsWithDelay(int amount, PlayerDeck playerDeck)
@@ -161,6 +155,7 @@ public class Ichi : MonoBehaviour
             yield return new WaitForSeconds(1f); // Delay here
             DrawDeck_S.DrawCard(playerDeck.transform);
         }
+        ChangeTurns(1);
     }
 
 }

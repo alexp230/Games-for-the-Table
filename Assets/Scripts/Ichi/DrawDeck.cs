@@ -5,7 +5,6 @@ public class DrawDeck : MonoBehaviour
 {
     [SerializeField] private Ichi Ichi_S;
     [SerializeField] private Card Card_Prefab;
-    [SerializeField] private CardSO Card_SO;
 
     public List<Card> TheDeck = new List<Card>();
 
@@ -21,6 +20,8 @@ public class DrawDeck : MonoBehaviour
     {
         Transform deck = GameObject.Find($"PlayerDeck{Ichi_S.DeckCount}").transform;
         DrawCard(deck);
+
+        OnDrawCard?.Invoke();
     }
 
     private void CreateDeck()
@@ -60,8 +61,6 @@ public class DrawDeck : MonoBehaviour
 
         TheDeck.Remove(card);
         deckTransform.GetComponent<PlayerDeck>().ArrangeDeck();
-
-        // OnDrawCard?.Invoke();
     }
 
     public void AddToDeck(Card card)

@@ -46,6 +46,7 @@ public class Card : MonoBehaviour
         if (!CanPlayCard())
             return;
 
+        ManueverCard(upDirection: false);
         SetCollider(false);
         SetCardOnPlayPile();
 
