@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Ichi : MonoBehaviour
@@ -105,7 +106,7 @@ public class Ichi : MonoBehaviour
     }
     private void OnDrawCard()
     {
-        ModifyDeckCount(1);
+        ChangeTurns(1);
     }
 
     private void ReArrangeDeck()
@@ -121,12 +122,15 @@ public class Ichi : MonoBehaviour
     {
         switch (card.Value)
         {
-            case 'r': ReverseMode ^= true; ModifyDeckCount(1); break;
-            case 'c': ModifyDeckCount(2); break;
-            default: ModifyDeckCount(1); break;
+            case "reverse": ReverseMode ^= true; ChangeTurns(1); break;
+            case "cancel": ChangeTurns(2); break;
+            case "plus2": DrawCards(2); break;
+            case "plus4": DrawCards(4); break;
+            case "plus6": DrawCards(6); break;
+            default: ChangeTurns(1); break;
         }
     }
-    private void ModifyDeckCount(int amount)
+    private void ChangeTurns(int amount)
     {
         while (amount != 0)
         {
@@ -141,7 +145,22 @@ public class Ichi : MonoBehaviour
         }
         SetCamera();
     }
+    private void DrawCards(int amount)
+    {
+        ChangeTurns(1);
+        PlayerDeck playerDeck = GameObject.Find($"PlayerDeck{DeckCount}").GetComponent<PlayerDeck>();
 
-    
+        StartCoroutine(DrawCardsWithDelay(amount, playerDeck));
+        ChangeTurns(1);
+    }
+
+    private IEnumerator DrawCardsWithDelay(int amount, PlayerDeck playerDeck)
+    {
+        for (int i = 0; i < amount; ++i)
+        {
+            yield return new WaitForSeconds(1f); // Delay here
+            DrawDeck_S.DrawCard(playerDeck.transform);
+        }
+    }
 
 }
