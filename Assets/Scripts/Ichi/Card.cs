@@ -9,7 +9,7 @@ public class Card : MonoBehaviour
     [SerializeField] private SpriteRenderer[] CardSprites;
     [SerializeField] private BoxCollider BoxCollider;
 
-    public char Value;
+    public string Value;
     public Material Material;
     private Transform PlayPile;
 
@@ -67,22 +67,12 @@ public class Card : MonoBehaviour
 
     public void SetColor(string color)
     {
-        Material[] mats = new Material[4] {Card_SO.ColorRed, Card_SO.ColorYellow, Card_SO.ColorGreen, Card_SO.ColorCyan};
-        Material mat;
-
-        switch (color)
-        {
-            case "red": mat = mats[0]; break;
-            case "yellow": mat = mats[1]; break;
-            case "green": mat = mats[2]; break;
-            case "cyan": mat = mats[3]; break;
-            default:  mat = mats[Random.Range(0, mats.Length)]; break;
-        }
+        Material mat = Card_SO.GetMaterial(color);
 
         this.GetComponent<MeshRenderer>().material = mat;
-        Material = mat;
+        this.Material = mat;
     }
-    public void SetValue(char val)
+    public void SetValue(string val)
     {
         this.Value = val;
 

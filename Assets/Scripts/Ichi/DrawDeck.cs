@@ -5,6 +5,7 @@ public class DrawDeck : MonoBehaviour
 {
     [SerializeField] private Ichi Ichi_S;
     [SerializeField] private Card Card_Prefab;
+    [SerializeField] private CardSO Card_SO;
 
     public List<Card> TheDeck = new List<Card>();
 
@@ -24,11 +25,11 @@ public class DrawDeck : MonoBehaviour
 
     private void CreateDeck()
     {
-        foreach (string color in new string[] { "red", "green", "yellow", "cyan"})
-            foreach (char type in new char[] { '0','1','2','3','4','5','6','7','8','9','c','r' })
+        foreach (string color in CardSO.COLORS)
+            foreach (string type in CardSO.TYPES)
                 CreateCard(Card_Prefab, color, type);
 
-        void CreateCard(Card cardPrefab, string color, char type)
+        void CreateCard(Card cardPrefab, string color, string type)
         {
             Card card = Instantiate(cardPrefab, this.transform);
             card.SetColor(color);
@@ -60,7 +61,7 @@ public class DrawDeck : MonoBehaviour
         TheDeck.Remove(card);
         deckTransform.GetComponent<PlayerDeck>().ArrangeDeck();
 
-        OnDrawCard?.Invoke();
+        // OnDrawCard?.Invoke();
     }
 
     public void AddToDeck(Card card)
