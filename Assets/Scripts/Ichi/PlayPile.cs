@@ -11,6 +11,8 @@ public class PlayPile : MonoBehaviour
         {
             Card card = this.transform.GetChild(0).GetComponent<Card>();
 
+            if (card.IsSpecialCard)
+                card.SetColor("Black");
             card.transform.SetParent(DrawDeck_S.transform);
             card.transform.position = Vector3.zero;
             card.transform.rotation = Quaternion.identity;

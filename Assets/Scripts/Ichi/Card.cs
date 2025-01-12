@@ -33,7 +33,7 @@ public class Card : MonoBehaviour
     {
         this.IsSpecialCard = Card_SO.IsSpecialCard(Card_SO.GetSprite(val));
     }
-    private void SetColor(string color)
+    public void SetColor(string color)
     {
         Material mat = Card_SO.GetMaterial(color);
 
@@ -60,7 +60,7 @@ public class Card : MonoBehaviour
 
     void OnMouseExit()
     {
-        if (this.BoxCollider.enabled && CanPlayCard())
+        if (CanPlayCard())
             ManueverCard(upDirection: false);
     }
 
@@ -86,6 +86,8 @@ public class Card : MonoBehaviour
     }
     private bool CanPlayCard()
     {
+        if (!this.BoxCollider.enabled)
+            return false;
         if (GameObject.Find($"PlayerDeck{Ichi_S.DeckCount}").transform != this.transform.parent)
             return false;
 
@@ -96,8 +98,6 @@ public class Card : MonoBehaviour
         if (topCard.Value == this.Value)
             return true;
         if (this.IsSpecialCard)
-            return true;
-        if (topCard.IsSpecialCard)
             return true;
         return false;
     }

@@ -63,6 +63,9 @@ public class Ichi : MonoBehaviour
         // Rotate the camera to look at the deck
         Camera.main.transform.LookAt(playerDeck.transform);
         Camera.main.transform.Rotate(-12f, 0f, 0f, Space.Self); // rotate camera a little up
+
+        this.transform.LookAt(GameObject.Find($"PlayerDeck{DeckCount}").transform);
+        this.transform.Rotate(0f, 180f, 0f);
     }
     private void SubScribeToEvents()
     {
@@ -122,6 +125,8 @@ public class Ichi : MonoBehaviour
             case "plus2": DrawCards(2); break;
             case "plus4": DrawCards(4); break;
             case "plus6": DrawCards(6); break;
+            case "wild": OnWildPlay(); break;
+            case "wild4": OnWildPlay(); break;
             default: ChangeTurns(1); break;
         }
     }
@@ -147,7 +152,6 @@ public class Ichi : MonoBehaviour
 
         StartCoroutine(DrawCardsWithDelay(amount, playerDeck));
     }
-
     private IEnumerator DrawCardsWithDelay(int amount, PlayerDeck playerDeck)
     {
         for (int i = 0; i < amount; ++i)
@@ -156,6 +160,23 @@ public class Ichi : MonoBehaviour
             DrawDeck_S.DrawCard(playerDeck.transform);
         }
         ChangeTurns(1);
+    }
+
+    private void OnWildPlay()
+    {
+        GameObject wildSelector = this.transform.GetChild(0).gameObject;
+
+        wildSelector.SetActive(true);
+    }
+    public void OnWildSelect(Card card)
+    {
+        this.transform.GetChild(0).gameObject.SetActive(false);
+        if (card.Value == "wild")
+            ChangeTurns(1);
+
+        else if (card.Value == "wild4")
+            DrawCards(4);
+        
     }
 
 }
