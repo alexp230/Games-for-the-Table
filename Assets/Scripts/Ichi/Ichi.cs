@@ -114,7 +114,7 @@ public class Ichi : MonoBehaviour
 
     private void ReArrangeDeck()
     {
-        GameObject.Find($"PlayerDeck{DeckCount}").GetComponent<PlayerDeck>().ArrangeDeck();
+        GameObject.Find($"PlayerDeck{DeckCount}").GetComponent<PlayerDeck>().SortDeck();
     }
     private void ChangePlayerTurn(Card card)
     {

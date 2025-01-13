@@ -61,7 +61,7 @@ public class DrawDeck : MonoBehaviour
         card.SetCollider(true);
 
         TheDeck.Remove(card);
-        deckTransform.GetComponent<PlayerDeck>().ArrangeDeck();
+        deckTransform.GetComponent<PlayerDeck>().SortDeck();
     }
 
     public void AddToDeck(Card card)
