@@ -100,6 +100,9 @@ public class Ichi : MonoBehaviour
                 DeckCount = NumberOfDecks-1;
             SetCamera();
         }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+            SwitchDeck();
     }
     
     private void OnCardPlayed(Card playedCard)
@@ -154,7 +157,7 @@ public class Ichi : MonoBehaviour
     }
     private IEnumerator DrawCardsWithDelay(int amount, PlayerDeck playerDeck)
     {
-        for (int i = 0; i < amount; ++i)
+        for (int i=0; i<amount; ++i)
         {
             yield return new WaitForSeconds(1f); // Delay here
             DrawDeck_S.DrawCard(playerDeck.transform);
@@ -176,7 +179,44 @@ public class Ichi : MonoBehaviour
 
         else if (card.Value == "wild4")
             DrawCards(4);
-        
+    }
+
+    private void OnShiftPlay(Card topCard)
+    {        
+        int loopCount;
+        bool isSpecialCard = int.TryParse(topCard.Value, out loopCount);
+
+        loopCount = isSpecialCard ? 10 : loopCount;
+
+        for (int i=0; i<loopCount; ++i)
+            SwitchDeck();
+    }
+
+
+    private void SwitchDeck()
+    {
+        GameObject currentDeck = GameObject.Find("PlayerDeck0");
+        int currentDeckCardCount = currentDeck.transform.childCount;
+
+        Transform originalDeck = currentDeck.transform;
+
+        for (int i=1; i<NumberOfDecks; ++i)
+        {
+            GameObject nextDeck = GameObject.Find($"PlayerDeck{i}");
+            int nextDeckCardCount = nextDeck.transform.childCount;
+
+            for (int j=0; j<currentDeckCardCount; ++j)
+                currentDeck.transform.GetChild(0).SetParent(nextDeck.transform);
+
+            currentDeck = nextDeck;
+            currentDeckCardCount = nextDeckCardCount;     
+        }
+
+        for (int i=0; i<currentDeckCardCount; ++i)
+            currentDeck.transform.GetChild(0).SetParent(originalDeck);
+
+        for (int i=0; i<NumberOfDecks; ++i)
+            GameObject.Find($"PlayerDeck{i}").GetComponent<PlayerDeck>().SortDeck();
     }
 
 }
