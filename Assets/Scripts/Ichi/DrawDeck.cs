@@ -29,6 +29,7 @@ public class DrawDeck : MonoBehaviour
         foreach (string color in CardSO.COLORS)
             foreach (string type in CardSO.TYPES)
                 CreateCard(Card_Prefab, color, type);
+                
         foreach (string specialType in CardSO.SPECIAL_TYPES)
             CreateCard(Card_Prefab, "Black", specialType);
 

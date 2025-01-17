@@ -5,9 +5,10 @@ public class Ichi : MonoBehaviour
 {
     [SerializeField] private DrawDeck DrawDeck_S;
     [SerializeField] private PlayerDeck PlayerDeck_P;
+    [SerializeField] private PlayPile PlayPile_S;
 
     private int NumberOfDecks = 4;
-    private int NumberOfCards = 7;
+    private int NumberOfCards = 15;
 
     public int DeckCount = 0;
     private bool ReverseMode = false;
@@ -130,6 +131,7 @@ public class Ichi : MonoBehaviour
             case "plus6": DrawCards(6); break;
             case "wild": OnWildPlay(); break;
             case "wild4": OnWildPlay(); break;
+            case "shift": StartCoroutine(OnShiftPlay()); break;
             default: ChangeTurns(1); break;
         }
     }
@@ -181,15 +183,21 @@ public class Ichi : MonoBehaviour
             DrawCards(4);
     }
 
-    private void OnShiftPlay(Card topCard)
-    {        
+    private IEnumerator OnShiftPlay()
+    {
+        print("ShiftPlay");
+        Card secondCard = PlayPile_S.transform.GetChild(PlayPile_S.transform.childCount-2).GetComponent<Card>();
+        
         int loopCount;
-        bool isSpecialCard = int.TryParse(topCard.Value, out loopCount);
 
-        loopCount = isSpecialCard ? 10 : loopCount;
+        bool isNotSpecialCard = int.TryParse(secondCard.Value, out loopCount);
+        loopCount = isNotSpecialCard ? loopCount : 10;
 
         for (int i=0; i<loopCount; ++i)
+        {
+            yield return new WaitForSeconds(1f); // Delay here
             SwitchDeck();
+        }
     }
 
 
@@ -200,16 +208,34 @@ public class Ichi : MonoBehaviour
 
         Transform originalDeck = currentDeck.transform;
 
-        for (int i=1; i<NumberOfDecks; ++i)
+        if (ReverseMode)
         {
-            GameObject nextDeck = GameObject.Find($"PlayerDeck{i}");
-            int nextDeckCardCount = nextDeck.transform.childCount;
+            for (int i=NumberOfDecks-1; i>0; --i)
+            {
+                GameObject nextDeck = GameObject.Find($"PlayerDeck{i}");
+                int nextDeckCardCount = nextDeck.transform.childCount;
 
-            for (int j=0; j<currentDeckCardCount; ++j)
-                currentDeck.transform.GetChild(0).SetParent(nextDeck.transform);
+                for (int j=0; j<currentDeckCardCount; ++j)
+                    currentDeck.transform.GetChild(0).SetParent(nextDeck.transform);
 
-            currentDeck = nextDeck;
-            currentDeckCardCount = nextDeckCardCount;     
+                currentDeck = nextDeck;
+                currentDeckCardCount = nextDeckCardCount;     
+            }
+        }
+
+        else
+        {
+            for (int i=1; i<NumberOfDecks; ++i)
+            {
+                GameObject nextDeck = GameObject.Find($"PlayerDeck{i}");
+                int nextDeckCardCount = nextDeck.transform.childCount;
+
+                for (int j=0; j<currentDeckCardCount; ++j)
+                    currentDeck.transform.GetChild(0).SetParent(nextDeck.transform);
+
+                currentDeck = nextDeck;
+                currentDeckCardCount = nextDeckCardCount;     
+            }
         }
 
         for (int i=0; i<currentDeckCardCount; ++i)

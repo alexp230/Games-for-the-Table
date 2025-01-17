@@ -43,9 +43,10 @@ public class CardSO : ScriptableObject
     public Sprite Plus6;
     public Sprite Wild;
     public Sprite Wild4;
+    public Sprite Shift;
     public static string[] TYPES = new string[] {"0","1","2","3","4","5","6","7","8","9","cancel","reverse","plus2","plus4",
         "plus6" };
-    public static string[] SPECIAL_TYPES = new string[] { "wild", "wild4" };
+    public static string[] SPECIAL_TYPES = new string[] { "wild", "wild4", "shift" };
 
     public Sprite GetSprite(string type)
     {
@@ -68,6 +69,7 @@ public class CardSO : ScriptableObject
             case "plus6": return Plus6;
             case "wild": return Wild;
             case "wild4": return Wild4;
+            case "shift": return Shift;
             
             default: return null;
         }
@@ -75,6 +77,9 @@ public class CardSO : ScriptableObject
 
     public bool IsSpecialCard(Sprite sprite)
     {
-        return sprite.name == Wild.name || sprite.name == Wild4.name;
+        foreach (string cardName in SPECIAL_TYPES)
+            if (cardName == sprite.name)
+                return true;
+        return false;
     }
 }

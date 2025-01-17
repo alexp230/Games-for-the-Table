@@ -29,7 +29,7 @@ public class PlayPile : MonoBehaviour
         foreach (Transform card in this.transform)
         {
             card.position = Vector3.zero;
-            card.localPosition = new Vector3(0, ++i*0.25f, 0);
+            card.localPosition = new Vector3(0, ++i*0.4f, 0);
         }
     }
 
