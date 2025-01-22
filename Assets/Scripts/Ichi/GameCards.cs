@@ -6,9 +6,8 @@ public class GameCards
     Skip: skips the turn of the next player
     Choice: change the color of the stack (+2, +4, +6)
     Shift: shifts each deck 'x' times of the turn order
-
-
     Choice-Erase: everyone discard all the cards of the chosen color from their deck's
+
 
     Time-bomb: must make a move in three seconds, or else you draw cards
 
