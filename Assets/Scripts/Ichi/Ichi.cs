@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Ichi : MonoBehaviour
@@ -132,6 +133,7 @@ public class Ichi : MonoBehaviour
             case "wild": OnWildPlay(); break;
             case "wild4": OnWildPlay(); break;
             case "shift": StartCoroutine(OnShiftPlay()); break;
+            case "wildErase": OnWildErasePlay(); break;
             default: ChangeTurns(1); break;
         }
     }
@@ -185,17 +187,15 @@ public class Ichi : MonoBehaviour
 
     private IEnumerator OnShiftPlay()
     {
-        print("ShiftPlay");
         Card secondCard = PlayPile_S.transform.GetChild(PlayPile_S.transform.childCount-2).GetComponent<Card>();
         
         int loopCount;
-
         bool isNotSpecialCard = int.TryParse(secondCard.Value, out loopCount);
         loopCount = isNotSpecialCard ? loopCount : 10;
 
         for (int i=0; i<loopCount; ++i)
         {
-            yield return new WaitForSeconds(1f); // Delay here
+            yield return new WaitForSeconds(1f);
             SwitchDeck();
         }
     }
@@ -243,6 +243,40 @@ public class Ichi : MonoBehaviour
 
         for (int i=0; i<NumberOfDecks; ++i)
             GameObject.Find($"PlayerDeck{i}").GetComponent<PlayerDeck>().SortDeck();
+        
+        Card switchDeckCard = PlayPile_S.transform.GetChild(PlayPile_S.transform.childCount-1).GetComponent<Card>();
+        Card secondCard = PlayPile_S.transform.GetChild(PlayPile_S.transform.childCount-2).GetComponent<Card>();
+        switchDeckCard.SetColor(secondCard.Material);
+    }
+
+    private void OnWildErasePlay()
+    {
+        Card secondCard = PlayPile_S.transform.GetChild(PlayPile_S.transform.childCount-2).GetComponent<Card>();
+        Card wildEraseCard = PlayPile_S.transform.GetChild(PlayPile_S.transform.childCount-1).GetComponent<Card>();
+
+        wildEraseCard.SetColor(secondCard.Material);
+        string materialName = wildEraseCard.Material.name;
+
+        for (int i=0; i<NumberOfDecks; ++i)
+        {
+            PlayerDeck playerDeck = GameObject.Find($"PlayerDeck{i}").GetComponent<PlayerDeck>();
+            List<Transform> cardsToBeDiscarded = new List<Transform>();
+
+            foreach (Transform child in playerDeck.transform)
+                if (child.GetComponent<Card>().Material.name == materialName)
+                    cardsToBeDiscarded.Add(child);
+            
+            foreach (Transform card in cardsToBeDiscarded)
+            {
+                card.transform.SetParent(DrawDeck_S.transform);
+                card.transform.position = Vector3.zero;
+                card.transform.rotation = Quaternion.identity;
+                DrawDeck_S.AddToDeck(card.GetComponent<Card>());
+            }
+
+            playerDeck.SortDeck();
+        }
+        ChangeTurns(1);
     }
 
 }

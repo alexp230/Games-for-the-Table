@@ -36,3 +36,4 @@ MonoBehaviour:
   Wild: {fileID: 21300000, guid: 0d5f7d23f91c2914e8b821519071d0d5, type: 3}
   Wild4: {fileID: 21300000, guid: 75ac8ca587ae6474aa436ad9aee937a4, type: 3}
   Shift: {fileID: 21300000, guid: 5f4d3d5de7d66bd4bacf490636471d01, type: 3}
+  WildErase: {fileID: 21300000, guid: 273ec701d0d2e5c41a88a67298a9cbe5, type: 3}

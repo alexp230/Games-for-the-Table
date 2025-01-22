@@ -44,9 +44,10 @@ public class CardSO : ScriptableObject
     public Sprite Wild;
     public Sprite Wild4;
     public Sprite Shift;
+    public Sprite WildErase;
     public static string[] TYPES = new string[] {"0","1","2","3","4","5","6","7","8","9","cancel","reverse","plus2","plus4",
         "plus6" };
-    public static string[] SPECIAL_TYPES = new string[] { "wild", "wild4", "shift" };
+    public static string[] SPECIAL_TYPES = new string[] { "wild", "wild4", "shift", "wildErase" };
 
     public Sprite GetSprite(string type)
     {
@@ -70,6 +71,7 @@ public class CardSO : ScriptableObject
             case "wild": return Wild;
             case "wild4": return Wild4;
             case "shift": return Shift;
+            case "wildErase": return WildErase;
             
             default: return null;
         }

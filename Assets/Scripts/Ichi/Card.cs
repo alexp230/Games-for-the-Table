@@ -40,6 +40,11 @@ public class Card : MonoBehaviour
         this.GetComponent<MeshRenderer>().material = mat;
         this.Material = mat;
     }
+    public void SetColor(Material mat)
+    {
+        this.GetComponent<MeshRenderer>().material = mat;
+        this.Material = mat;
+    }
     private void SetValue(string val)
     {
         this.Value = val;
@@ -92,12 +97,13 @@ public class Card : MonoBehaviour
             return false;
 
         Card topCard = PlayPile.transform.GetChild(PlayPile.transform.childCount-1).GetComponent<Card>();
-
         if (topCard.Material.name == this.Material.name)
             return true;
         if (topCard.Value == this.Value)
             return true;
         if (this.IsSpecialCard)
+            return true;
+        if (topCard.IsSpecialCard && (topCard.Material.name == "Black"))
             return true;
         return false;
     }
