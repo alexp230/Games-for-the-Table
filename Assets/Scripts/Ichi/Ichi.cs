@@ -150,7 +150,6 @@ public class Ichi : MonoBehaviour
             
             --amount;
         }
-        SetCamera();
     }
     private void DrawCards(int amount)
     {
@@ -205,7 +204,6 @@ public class Ichi : MonoBehaviour
     {
         GameObject currentDeck = GameObject.Find("PlayerDeck0");
         int currentDeckCardCount = currentDeck.transform.childCount;
-
         Transform originalDeck = currentDeck.transform;
 
         if (ReverseMode)

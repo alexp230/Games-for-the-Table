@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class Card : MonoBehaviour
 {
@@ -8,13 +7,12 @@ public class Card : MonoBehaviour
     [SerializeField] private CardSO Card_SO;
     [SerializeField] private SpriteRenderer[] CardSprites;
     [SerializeField] private BoxCollider BoxCollider;
+    private Transform PlayPile;
+    private Ichi Ichi_S;
 
     public string Value;
     public Material Material;
     public bool IsSpecialCard;
-
-    private Transform PlayPile;
-    private Ichi Ichi_S;
 
     public event System.Action<Card> OnPlayedCard;
 
@@ -26,8 +24,8 @@ public class Card : MonoBehaviour
     public void InitializeCard(string type, string color)
     {
         SetSpecialCard(type);
-        SetValue(type);
         SetColor(color);
+        SetValue(type);
     }
     private void SetSpecialCard(string val)
     {
@@ -69,15 +67,6 @@ public class Card : MonoBehaviour
             ManueverCard(upDirection: false);
     }
 
-    private void ManueverCard(bool upDirection)
-    {
-        Vector3 pos = this.transform.localPosition;
-        this.transform.localPosition = new Vector3(pos.x, pos.y + (upDirection ? CARD_LIFT : -CARD_LIFT), pos.z);
-
-        Vector3 boxPos = this.BoxCollider.size;
-        this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y * (upDirection ? 2f : 0.5f), boxPos.z);
-    }
-
     void OnMouseDown()
     {
         if (!CanPlayCard())
@@ -103,9 +92,15 @@ public class Card : MonoBehaviour
             return true;
         if (this.IsSpecialCard)
             return true;
-        if (topCard.IsSpecialCard && (topCard.Material.name == "Black"))
-            return true;
         return false;
+    }
+    private void ManueverCard(bool upDirection)
+    {
+        Vector3 pos = this.transform.localPosition;
+        this.transform.localPosition = new Vector3(pos.x, pos.y + (upDirection ? CARD_LIFT : -CARD_LIFT), pos.z);
+
+        Vector3 boxPos = this.BoxCollider.size;
+        this.BoxCollider.size = new Vector3(boxPos.x, boxPos.y * (upDirection ? 2f : 0.5f), boxPos.z);
     }
     private void SetCardOnPlayPile()
     {
