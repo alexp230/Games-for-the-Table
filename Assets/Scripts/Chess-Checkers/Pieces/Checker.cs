@@ -107,6 +107,9 @@ public class Checker : GenericPiece
                 ChessBoard_S.UpdateBoard();
                 ChessBoard_S.ClearAllPiecesValidMoves();
                 this.ValidMoves = newValidMoves;
+
+                DehighlightPieces(Board_SO.Piece_p1Color, Board_SO.Piece_p2Color);
+                HighlightPiece();
             }
             else
             {
