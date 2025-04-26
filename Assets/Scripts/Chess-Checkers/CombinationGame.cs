@@ -69,9 +69,10 @@ public class CombinationGame : MonoBehaviour
     // ChessBoard OnChangedTurn UE
     public void SetText(bool p1Turn)
     {
-        int playerID = BoardMaterials.RotateBoardOnMove ? (p1Turn ? 0 : 1) : PlayerData.PlayerID;
+        int playerID = p1Turn ? 0 : 1;
+        // int playerID = BoardMaterials.RotateBoardOnMove ? (p1Turn ? 0 : 1) : PlayerData.PlayerID;
         Color color = (playerID == 0) ? BoardMaterials_SO.Piece_p1Color.color : BoardMaterials_SO.Piece_p2Color.color;
-
+        
         PawnTokens.text = $"P: {PlayerData.PawnTokens[playerID]} [{PawnTokenCount[playerID]}/{P_MAX}]";
         PawnTokens.color = color;
         BishopTokens.text = $"B: {PlayerData.BishopTokens[playerID]} [{BishopTokenCount[playerID]}/{B_MAX}]";
