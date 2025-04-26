@@ -8,11 +8,13 @@ public class Ichi : MonoBehaviour
     [SerializeField] private PlayerDeck PlayerDeck_P;
     [SerializeField] private PlayPile PlayPile_S;
 
-    private int NumberOfDecks = 4;
-    private int NumberOfCards = 15;
+    private const int NUMBER_OF_DECKS = 4;
+    private const int NUMBER_OF_CARDS = 7;
 
     public int DeckCount = 0;
     private bool ReverseMode = false;
+
+    public bool isLocalGame = true;
 
     void Start()
     {
@@ -24,10 +26,10 @@ public class Ichi : MonoBehaviour
     {
         float Radius = 90f; // Radius of the circle
 
-        for (int i=0; i<NumberOfDecks; ++i)
+        for (int i=0; i<NUMBER_OF_DECKS; ++i)
         {
             // Calculate angle in radians
-            float angle = i*Mathf.PI*2f / NumberOfDecks;
+            float angle = i*Mathf.PI*2f / NUMBER_OF_DECKS;
 
             // Calculate position on the circle
             float x = Mathf.Cos(angle) * Radius;
@@ -47,7 +49,7 @@ public class Ichi : MonoBehaviour
             playerDeck.transform.SetPositionAndRotation(position, rotation);
             playerDeck.name = $"PlayerDeck{i}";
 
-            for (int j=0; j<NumberOfCards; ++j)
+            for (int j=0; j<NUMBER_OF_CARDS; ++j)
                 DrawDeck_S.DrawCard(playerDeck.transform);
         }
     }
@@ -91,7 +93,7 @@ public class Ichi : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            if (++DeckCount == NumberOfDecks)
+            if (++DeckCount == NUMBER_OF_DECKS)
                 DeckCount = 0;
             SetCamera();            
         }
@@ -99,7 +101,7 @@ public class Ichi : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             if (--DeckCount == -1)
-                DeckCount = NumberOfDecks-1;
+                DeckCount = NUMBER_OF_DECKS-1;
             SetCamera();
         }
 
@@ -144,8 +146,8 @@ public class Ichi : MonoBehaviour
             DeckCount += ReverseMode ? -1 : 1;
 
             if (DeckCount <= -1)
-                DeckCount = NumberOfDecks-1;
-            else if (DeckCount >= NumberOfDecks)
+                DeckCount = NUMBER_OF_DECKS-1;
+            else if (DeckCount >= NUMBER_OF_DECKS)
                 DeckCount = 0;
             
             --amount;
@@ -208,7 +210,7 @@ public class Ichi : MonoBehaviour
 
         if (ReverseMode)
         {
-            for (int i=NumberOfDecks-1; i>0; --i)
+            for (int i=NUMBER_OF_DECKS-1; i>0; --i)
             {
                 GameObject nextDeck = GameObject.Find($"PlayerDeck{i}");
                 int nextDeckCardCount = nextDeck.transform.childCount;
@@ -223,7 +225,7 @@ public class Ichi : MonoBehaviour
 
         else
         {
-            for (int i=1; i<NumberOfDecks; ++i)
+            for (int i=1; i<NUMBER_OF_DECKS; ++i)
             {
                 GameObject nextDeck = GameObject.Find($"PlayerDeck{i}");
                 int nextDeckCardCount = nextDeck.transform.childCount;
@@ -239,7 +241,7 @@ public class Ichi : MonoBehaviour
         for (int i=0; i<currentDeckCardCount; ++i)
             currentDeck.transform.GetChild(0).SetParent(originalDeck);
 
-        for (int i=0; i<NumberOfDecks; ++i)
+        for (int i=0; i<NUMBER_OF_DECKS; ++i)
             GameObject.Find($"PlayerDeck{i}").GetComponent<PlayerDeck>().SortDeck();
         
         Card switchDeckCard = PlayPile_S.transform.GetChild(PlayPile_S.transform.childCount-1).GetComponent<Card>();
@@ -255,7 +257,7 @@ public class Ichi : MonoBehaviour
         wildEraseCard.SetColor(secondCard.Material);
         string materialName = wildEraseCard.Material.name;
 
-        for (int i=0; i<NumberOfDecks; ++i)
+        for (int i=0; i<NUMBER_OF_DECKS; ++i)
         {
             PlayerDeck playerDeck = GameObject.Find($"PlayerDeck{i}").GetComponent<PlayerDeck>();
             List<Transform> cardsToBeDiscarded = new List<Transform>();
