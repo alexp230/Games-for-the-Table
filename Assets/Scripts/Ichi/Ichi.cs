@@ -8,8 +8,8 @@ public class Ichi : MonoBehaviour
     [SerializeField] private PlayerDeck PlayerDeck_P;
     [SerializeField] private PlayPile PlayPile_S;
 
-    private const int NUMBER_OF_DECKS = 4;
-    private const int NUMBER_OF_CARDS = 7;
+    private const int NUMBER_OF_DECKS = 8;
+    private const int NUMBER_OF_CARDS = 5;
 
     public int DeckCount = 0;
     private bool ReverseMode = false;
