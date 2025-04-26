@@ -49,6 +49,25 @@ To earn a queen token, you must make {CombinationGame.Q_MAX} consecutive checker
 After {ChessBoard.KING_SPAWN} moves has passed, each player will summon their king on an unoccupied square their back row./
 The first player to capture the opponent's king wins./";
 
+    private static readonly string ICHI = @"
+Players take turns playing cards in a clockwise sequential order./
+Once a card is played, you are only able to play certain cards, based on the top card of the play pile./
+You may only play a card if the top card on the play pile has the same color as the card you want to play or if the card has the same number/symbol on it./
+There are three types of cards: a number card, action card, and special card./
+Special cards (cards colored in black) are able to be played no matter the what color or symbol on the top card.
+<align=center>Action Cards</align=center>
+Reverse Card: reverses the current turn order.
+Cancel Card: skips the turn of the next player.
+Plus Cards: the next player must draw the amount of cards displayed on the card and has their turn skipped./
+<align=center>Special Cards</align=center>
+Choice Card: you are able to make this card any color.
+Choice Plus4 Card: same as the normal choice card, except the next player must draw 4 cards and have their turn skipped.
+Choice Erase: after choosing a color, all the cards in every player's deck of the color selected will be sent to the draw pile.
+Shift Card: all player's will pass their deck to the next player based on the turn order 'x' times. 'X' being the number on the card played before (if the card is an action or special card, x=10.)/
+The first player to have no more cards in their deck wins!/
+The winner's score is calculated by adding together the number value of each card they have (special and action cards are worth 10)./";
+
+
     void OnEnable()
     {
         if (InstructionsList.Count > 0)
