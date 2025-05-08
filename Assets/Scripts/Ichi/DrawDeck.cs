@@ -40,6 +40,7 @@ public class DrawDeck : MonoBehaviour
 
             TheDeck.Add(card);
         }
+        print(TheDeck.Count);
     }
 
     private void DrawToPlayPile()

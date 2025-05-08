@@ -8,8 +8,8 @@ public class Ichi : MonoBehaviour
     [SerializeField] private PlayerDeck PlayerDeck_P;
     [SerializeField] private PlayPile PlayPile_S;
 
-    private const int NUMBER_OF_DECKS = 8;
-    private const int NUMBER_OF_CARDS = 5;
+    private const int NUMBER_OF_DECKS = 3; // 64 cards total
+    private const int NUMBER_OF_CARDS = 7;
 
     public int DeckCount = 0;
     private bool ReverseMode = false;
@@ -24,7 +24,8 @@ public class Ichi : MonoBehaviour
     }
     private void SpawnDecks()
     {
-        float Radius = 90f; // Radius of the circle
+        float distance = 90f + (25 * NUMBER_OF_DECKS); // distance from center of the circle
+        int height = 15 + (5 * NUMBER_OF_DECKS);
 
         for (int i=0; i<NUMBER_OF_DECKS; ++i)
         {
@@ -32,14 +33,14 @@ public class Ichi : MonoBehaviour
             float angle = i*Mathf.PI*2f / NUMBER_OF_DECKS;
 
             // Calculate position on the circle
-            float x = Mathf.Cos(angle) * Radius;
-            float z = Mathf.Sin(angle) * Radius;
+            float x = Mathf.Cos(angle) * distance;
+            float z = Mathf.Sin(angle) * distance;
 
             // Create position relative to the central object
-            Vector3 position = new Vector3(x, 10, z) + transform.position;
+            Vector3 position = new Vector3(x, height, z) + this.transform.position;
 
             // Calculate the direction vector from the central object to the position
-            Vector3 direction = (position - transform.position).normalized;
+            Vector3 direction = (position - this.transform.position).normalized;
 
             // Calculate rotation to face away from the central object
             Quaternion rotation = Quaternion.LookRotation(-direction);
@@ -208,34 +209,18 @@ public class Ichi : MonoBehaviour
         int currentDeckCardCount = currentDeck.transform.childCount;
         Transform originalDeck = currentDeck.transform;
 
-        if (ReverseMode)
+        (int index, int end, int increment) = ReverseMode ? (NUMBER_OF_DECKS-1, 0, -1) : (1, NUMBER_OF_DECKS, 1);
+        
+        for (int i=index; i>end; i+=increment)
         {
-            for (int i=NUMBER_OF_DECKS-1; i>0; --i)
-            {
-                GameObject nextDeck = GameObject.Find($"PlayerDeck{i}");
-                int nextDeckCardCount = nextDeck.transform.childCount;
+            GameObject nextDeck = GameObject.Find($"PlayerDeck{i}");
+            int nextDeckCardCount = nextDeck.transform.childCount;
 
-                for (int j=0; j<currentDeckCardCount; ++j)
-                    currentDeck.transform.GetChild(0).SetParent(nextDeck.transform);
+            for (int j=0; j<currentDeckCardCount; ++j)
+                currentDeck.transform.GetChild(0).SetParent(nextDeck.transform);
 
-                currentDeck = nextDeck;
-                currentDeckCardCount = nextDeckCardCount;     
-            }
-        }
-
-        else
-        {
-            for (int i=1; i<NUMBER_OF_DECKS; ++i)
-            {
-                GameObject nextDeck = GameObject.Find($"PlayerDeck{i}");
-                int nextDeckCardCount = nextDeck.transform.childCount;
-
-                for (int j=0; j<currentDeckCardCount; ++j)
-                    currentDeck.transform.GetChild(0).SetParent(nextDeck.transform);
-
-                currentDeck = nextDeck;
-                currentDeckCardCount = nextDeckCardCount;     
-            }
+            currentDeck = nextDeck;
+            currentDeckCardCount = nextDeckCardCount;     
         }
 
         for (int i=0; i<currentDeckCardCount; ++i)

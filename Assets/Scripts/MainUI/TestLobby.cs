@@ -53,18 +53,18 @@ public class TestLobby : MonoBehaviour
     {
         string playerName;
 
-        // string extension = UnityEngine.Random.Range(1, 99999).ToString().PadLeft(5, '0');
-        // playerName = $"Player{extension}";
+        string extension = UnityEngine.Random.Range(1, 99999).ToString().PadLeft(5, '0');
+        playerName = $"Player{extension}";
         
-        try{
-            playerName = SteamIntegration.GetSteamName();
-        }
-        catch (Exception e){
-            string extension = UnityEngine.Random.Range(1, 99999).ToString().PadLeft(5, '0');
-            playerName = $"Player{extension}";
+        // try{
+        //     playerName = SteamIntegration.GetSteamName();
+        // }
+        // catch (Exception e){
+        //     string extension = UnityEngine.Random.Range(1, 99999).ToString().PadLeft(5, '0');
+        //     playerName = $"Player{extension}";
 
-            print(e);
-        }
+        //     print(e);
+        // }
         
         PlayerData.PlayerName = playerName;
 
