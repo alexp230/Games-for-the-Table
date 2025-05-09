@@ -265,13 +265,10 @@ public class TestLobby : MonoBehaviour
     }
     private void CheckIfHostStartedGame()
     {
-        if (JoinedLobby != null && JoinedLobby.Data[START_GAME].Value != "0")
+        if (JoinedLobby != null && JoinedLobby.Data[START_GAME].Value != "0" && HostLobby == null)
         {
-            if (HostLobby == null)
-            {
-                JoinRelay(JoinedLobby.Data[START_GAME].Value);
-                LeaveLobby();
-            }
+            JoinRelay(JoinedLobby.Data[START_GAME].Value);
+            LeaveLobby();
         }
     }
     private void HandleDelayingJoinByCodeButton()
@@ -292,9 +289,8 @@ public class TestLobby : MonoBehaviour
         {
             LeaveLobby();
 
-            BoardMaterials.GameType = GameModeSelectionDropDown.value;
-            BoardMaterials.IsLocalGame = false;
-            NetworkManager.Singleton.SceneManager.LoadScene("Chess-Checkers", LoadSceneMode.Single);
+            string sceneName = SetLocalPlayerGameMode();
+            NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         }
     }
 
@@ -329,8 +325,7 @@ public class TestLobby : MonoBehaviour
     private async void JoinRelay(string joinCode)
     {
         try{
-            BoardMaterials.GameType = GetGameModeIdFromLobby();
-            BoardMaterials.IsLocalGame = false;
+            SetLocalPlayerGameMode();
 
             print("Joining Relay with " + joinCode);
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
@@ -718,17 +713,15 @@ public class TestLobby : MonoBehaviour
         UpdateLobbySetting(newHostLobby);
     }
 
-
-    private int GetGameModeIdFromLobby()
+    private string SetLocalPlayerGameMode()
     {
         string gameMode = JoinedLobby.Data[GAME_MODE].Value;
-        for (int i=0; i<GameModeSelectionDropDown.options.Count; ++i)
-            if (GameModeSelectionDropDown.options[i].text == gameMode)
-                return i;
-        return -1;
+        switch (gameMode)
+        {
+            case "Checkers": case "Chess": case "Combination": BoardMaterials.SetGameType(gameMode); return "Chess-Checkers";
+            default: return gameMode;
+        }
     }
-
-
 
 
 

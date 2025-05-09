@@ -99,4 +99,17 @@ public class BoardMaterials : ScriptableObject
             default: return ChessSFX_1; 
         }
     }
+
+    public static void SetGameType(string gameName)
+    {
+        switch (gameName)
+        {
+            case "Checkers": GameType = 0; break;
+            case "Chess": GameType = 1; break;
+            case "Combination": GameType = 2; break;
+            default: GameType = 0; break;
+        }
+
+        IsLocalGame = false;
+    }
 }
