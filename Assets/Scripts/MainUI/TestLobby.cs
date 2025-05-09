@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using QFSW.QC;
@@ -27,6 +28,7 @@ public class TestLobby : MonoBehaviour
     [SerializeField] private TMP_Dropdown GameModeSelectionDropDown;
     [SerializeField] private TextMeshProUGUI GameModeText;
     [SerializeField] private TextMeshProUGUI LobbyCodeText;
+    [SerializeField] private Button CopyCodeButton;
     [SerializeField] private Toggle IsPrivateLobbyToggle;
     [SerializeField] private Button StartGameButton;
     [SerializeField] private Button CreateLobbyButton;
@@ -188,6 +190,7 @@ public class TestLobby : MonoBehaviour
             GameModeSelectionDropDown.gameObject.SetActive(false);
             GameModeText.gameObject.SetActive(false);
             LobbyCodeText.gameObject.SetActive(false);
+            CopyCodeButton.gameObject.SetActive(false);
             IsPrivateLobbyToggle.gameObject.SetActive(false);
             StartGameButton.gameObject.SetActive(false);
 
@@ -203,6 +206,7 @@ public class TestLobby : MonoBehaviour
             GameModeSelectionDropDown.gameObject.SetActive(true);
             GameModeText.gameObject.SetActive(false);
             LobbyCodeText.gameObject.SetActive(false);
+            CopyCodeButton.gameObject.SetActive(false);
             IsPrivateLobbyToggle.gameObject.SetActive(true);
             StartGameButton.gameObject.SetActive(false);
 
@@ -217,6 +221,7 @@ public class TestLobby : MonoBehaviour
             GameModeSelectionDropDown.gameObject.SetActive(true);
             GameModeText.gameObject.SetActive(false);
             LobbyCodeText.gameObject.SetActive(true);
+            CopyCodeButton.gameObject.SetActive(true);
             IsPrivateLobbyToggle.gameObject.SetActive(true);
             StartGameButton.gameObject.SetActive((HostLobby.Players.Count >= 2) ? true : false);
 
@@ -231,6 +236,7 @@ public class TestLobby : MonoBehaviour
             GameModeSelectionDropDown.gameObject.SetActive(false);
             GameModeText.gameObject.SetActive(true);
             LobbyCodeText.gameObject.SetActive(true);
+            CopyCodeButton.gameObject.SetActive(true);
             IsPrivateLobbyToggle.gameObject.SetActive(false);
             StartGameButton.gameObject.SetActive(false);
 
@@ -721,6 +727,19 @@ public class TestLobby : MonoBehaviour
             case "Checkers": case "Chess": case "Combination": BoardMaterials.SetGameType(gameMode); return "Chess-Checkers";
             default: return gameMode;
         }
+    }
+
+    public void CopyLobbyCode()
+    {
+        GUIUtility.systemCopyBuffer = LobbyCodeText.text;
+        CopyCodeButton.gameObject.SetActive(false);
+        StartCoroutine(ReenableCopyButton());
+    }
+
+    private IEnumerator ReenableCopyButton()
+    {
+        yield return new WaitForSeconds(0.5f);
+        CopyCodeButton.gameObject.SetActive(true);
     }
 
 
